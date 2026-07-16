@@ -1,0 +1,25 @@
+{
+  "name": "Klangwort — 德语音乐词典",
+  "short_name": "Klangwort",
+  "description": "用中文和英语学习作曲与 Tonmeister 德语音乐词汇。",
+  "lang": "zh-CN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f6f5ef",
+  "theme_color": "#1d2a2d",
+  "icons": [
+    {
+      "src": "./icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
