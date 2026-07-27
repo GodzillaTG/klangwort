@@ -752,6 +752,14 @@ $('#globalSearch').addEventListener('click',() => {
 $('#closeSearch').addEventListener('click',() => { $('#searchModal').hidden = true; });
 $('#searchModal').addEventListener('click',event => { if (event.target === $('#searchModal')) $('#searchModal').hidden = true; });
 $('#searchInput').addEventListener('input',event => searchWords(event.target.value));
+const isAppleMobile = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+if (isAppleMobile && !isStandalone) $('#iosInstallButton').hidden = false;
+if (isStandalone) document.body.classList.add('standalone-mode');
+$('#iosInstallButton').addEventListener('click',() => { $('#installModal').hidden = false; });
+$('#closeInstall').addEventListener('click',() => { $('#installModal').hidden = true; });
+$('#installDone').addEventListener('click',() => { $('#installModal').hidden = true; });
+$('#installModal').addEventListener('click',event => { if (event.target === $('#installModal')) $('#installModal').hidden = true; });
 $$('.nav-item').forEach(item => item.addEventListener('click',() => activateNav(item.getAttribute('href'))));
 let scrollFrame = 0;
 window.addEventListener('scroll',() => {
@@ -772,6 +780,7 @@ document.addEventListener('keydown',event => {
   if (event.key === 'Escape') {
     if (!$('#searchModal').hidden) $('#searchModal').hidden = true;
     else if (!$('#wordModal').hidden) $('#wordModal').hidden = true;
+    else if (!$('#installModal').hidden) $('#installModal').hidden = true;
   }
 });
 

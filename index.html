@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Mein Deutsch" />
+    <meta name="format-detection" content="telephone=no" />
     <meta name="description" content="为 Sichenguo 定制的德语刷题 App：2,080 个 Klangwort、AI、游戏与电影词汇，配套词性和四格题库。" />
     <meta property="og:title" content="Mein Deutsch — 我的德语训练场" />
     <meta property="og:description" content="2,080 个专业与兴趣词汇，加上词性和四格题库，一起刷进长期记忆。" />
@@ -17,7 +18,7 @@
     <meta name="twitter:image" content="https://mein-deutsch-sichenguo.godzillatg.chatgpt.site/og.png" />
     <title>Mein Deutsch — 我的德语训练场</title>
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="icon-180.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png" />
     <link rel="manifest" href="manifest.json" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -53,7 +54,10 @@
             <p class="eyebrow">DEIN PERSÖNLICHER LERNRAUM</p>
             <h1>不是学所有德语，<br /><em>只练你真正需要的。</em></h1>
             <p>专业音乐词汇、最容易混淆的词性和四格，<br />再加上 AI、游戏、电影——每天刷到形成直觉。</p>
-            <button class="primary-button" data-start="daily">开始今日 15 题 <span>→</span></button>
+            <div class="hero-actions">
+              <button class="primary-button" data-start="daily">开始今日 15 题 <span>→</span></button>
+              <button class="ios-install-button" id="iosInstallButton" hidden>▣ 添加到 iPhone 主屏幕</button>
+            </div>
           </div>
           <div class="hero-score">
             <p>HEUTE</p>
@@ -151,6 +155,21 @@
 
     <div class="word-modal" id="wordModal" hidden><div class="word-panel"><button id="closeWord" aria-label="关闭">×</button><div id="wordDetail"></div></div></div>
     <div class="search-modal" id="searchModal" hidden><div class="search-panel"><button id="closeSearch" aria-label="关闭">×</button><label for="searchInput">搜索你的德语词库</label><input id="searchInput" type="search" placeholder="德语、English 或中文" autocomplete="off" /><div id="searchResults"></div></div></div>
+    <div class="install-modal" id="installModal" hidden>
+      <div class="install-panel">
+        <button id="closeInstall" aria-label="关闭">×</button>
+        <span class="install-icon">m</span>
+        <p class="eyebrow">IPHONE · ZUM HOME-BILDSCHIRM</p>
+        <h2>把 Mein Deutsch<br />放到 iPhone 桌面</h2>
+        <ol>
+          <li><b>1</b><span>请使用 <strong>Safari</strong> 打开这个页面。</span></li>
+          <li><b>2</b><span>点击 Safari 底部的<strong>分享按钮</strong>。</span></li>
+          <li><b>3</b><span>向下滑，选择<strong>“添加到主屏幕”</strong>，再点“添加”。</span></li>
+        </ol>
+        <p class="install-note">第一次从桌面打开时，可能需要重新登录一次。之后会像独立 App 一样全屏运行。</p>
+        <button class="install-done" id="installDone">知道了</button>
+      </div>
+    </div>
 
     <script src="app.js"></script>
   </body>
