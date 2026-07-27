@@ -3,7 +3,7 @@
   "short_name": "Mein Deutsch",
   "description": "为 Sichenguo 定制的德语学习与刷题 App：Klangwort、词性、四格、AI、游戏与电影。",
   "lang": "zh-CN",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
