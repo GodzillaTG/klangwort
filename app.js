@@ -334,6 +334,32 @@ const allWords = [
   ...makeWords(expandedFilmWords,'film')
 ];
 
+const caseSeedEnglish = {
+  'case-01':'The composer is writing a new opera.',
+  'case-02':'I hear the sound.',
+  'case-03':'We thank the recording engineer.',
+  'case-04':'The ending of the film is surprising.',
+  'case-05':'I play with the controller.',
+  'case-06':'The gift is for the player.',
+  'case-07':'We are talking about the film.',
+  'case-08':'The music comes from the game.',
+  'case-09':'She works at the production.',
+  'case-10':'It does not work without the microphone.',
+  'case-11':'He is going to the studio.',
+  'case-12':'The recording stops because of the error.',
+  'case-13':'The cable is lying on the table.',
+  'case-14':'I put the cable onto the table.',
+  'case-15':'The director shows the actress the scene.',
+  'case-16':'The director shows the actress the scene.',
+  'case-17':'I see a film.',
+  'case-18':'We are filming with a camera.',
+  'case-19':'The idea of a game is original.',
+  'case-20':'I help the player.',
+  'case-21':'The algorithm learns quickly.',
+  'case-22':'We are testing the model.',
+  'case-23':'The graphics of the game are beautiful.',
+  'case-24':'We play with the players.'
+};
 const caseQuestionSeeds = [
   ['case-01','冠词变化 · 主格','___ Komponist schreibt eine neue Oper.','谁在做动作？Komponist 是主语。',['Der','Den','Dem','Des'],'Der','主语使用 Nominativ。阳性定冠词是 der。'],
   ['case-02','冠词变化 · 宾格','Ich höre ___ Klang.','“声音”是 hören 直接作用的对象。',['der','den','dem','des'],'den','阳性名词作直接宾语，用 Akkusativ：der → den。'],
@@ -362,7 +388,7 @@ const caseQuestionSeeds = [
 ].map(row => ({
   id:row[0], category:row[1], prompt:row[2], context:row[3],
   options:row[4].map(value => ({value,label:value})), answer:row[5], explanation:row[6],
-  type:'case'
+  translationEn:caseSeedEnglish[row[0]], type:'case'
 }));
 
 const caseNames = ['Nominativ','Akkusativ','Dativ','Genitiv'];
@@ -391,11 +417,19 @@ function makeCaseQuestion(word,index,caseName) {
       : caseName === 'Dativ'
         ? `Wir arbeiten mit ${phrase}.`
         : `Die Bedeutung ${phrase} ist klar.`;
+  const translationEn = caseName === 'Nominativ'
+    ? `The ${word.en} is important today.`
+    : caseName === 'Akkusativ'
+      ? `We examine the ${word.en}.`
+      : caseName === 'Dativ'
+        ? `We work with the ${word.en}.`
+        : `The meaning of the ${word.en} is clear.`;
   return {
     id:`case-generated-${index}`,
     category:`格判断 · ${caseName}`,
     prompt,
     context:`判断句子中“${phrase}”使用的是哪一个格。`,
+    translationEn,
     options:caseNames.map(value => ({value,label:value,sub:caseLabels[value].split(' · ')[0]})),
     answer:caseName,
     explanation:caseName === 'Nominativ'
@@ -419,6 +453,130 @@ const caseQuestions = [
   ...caseQuestionSeeds,
   ...buildCaseBank(TARGET_TOPIC_SIZE - caseQuestionSeeds.length)
 ];
+
+const articleFamilies = [
+  {key:'definite',label:'der / die / das',base:'der',en:'the',kind:'definite',plural:true},
+  {key:'ein',label:'ein',base:'ein',en:'a/an',kind:'ein',plural:false},
+  {key:'kein',label:'kein',base:'kein',en:'no',kind:'ein',plural:true},
+  {key:'mein',label:'mein',base:'mein',en:'my',kind:'ein',plural:true},
+  {key:'dein',label:'dein',base:'dein',en:'your',kind:'ein',plural:true},
+  {key:'sein',label:'sein',base:'sein',en:'his/its',kind:'ein',plural:true},
+  {key:'ihr',label:'ihr',base:'ihr',en:'her/their',kind:'ein',plural:true},
+  {key:'unser',label:'unser',base:'unser',en:'our',kind:'ein',plural:true},
+  {key:'euer',label:'euer',base:'euer',en:'your (plural)',kind:'ein',plural:true},
+  {key:'formal',label:'Ihr',base:'Ihr',en:'your (formal)',kind:'ein',plural:true}
+];
+const articleGenders = [
+  {key:'m',de:'Maskulin',zh:'阳性',en:'masculine',noun:'Algorithmus',genitive:'Algorithmus',nounEn:'algorithm'},
+  {key:'f',de:'Feminin',zh:'阴性',en:'feminine',noun:'Kamera',genitive:'Kamera',nounEn:'camera'},
+  {key:'n',de:'Neutrum',zh:'中性',en:'neuter',noun:'Modell',genitive:'Modells',nounEn:'model'},
+  {key:'pl',de:'Plural',zh:'复数',en:'plural',noun:'Daten',genitive:'Daten',nounEn:'data'}
+];
+const articleCaseEnglish = {
+  Nominativ:'nominative',
+  Akkusativ:'accusative',
+  Dativ:'dative',
+  Genitiv:'genitive'
+};
+const definiteDeclension = {
+  Nominativ:{m:'der',f:'die',n:'das',pl:'die'},
+  Akkusativ:{m:'den',f:'die',n:'das',pl:'die'},
+  Dativ:{m:'dem',f:'der',n:'dem',pl:'den'},
+  Genitiv:{m:'des',f:'der',n:'des',pl:'der'}
+};
+const einEndings = {
+  Nominativ:{m:'',f:'e',n:'',pl:'e'},
+  Akkusativ:{m:'en',f:'e',n:'',pl:'e'},
+  Dativ:{m:'em',f:'er',n:'em',pl:'en'},
+  Genitiv:{m:'es',f:'er',n:'es',pl:'er'}
+};
+function attachArticleEnding(base,ending) {
+  if (!ending) return base;
+  return base === 'euer' ? `eur${ending}` : `${base}${ending}`;
+}
+function declinedArticle(family,caseName,genderKey) {
+  return family.kind === 'definite'
+    ? definiteDeclension[caseName][genderKey]
+    : attachArticleEnding(family.base,einEndings[caseName][genderKey]);
+}
+function articleMemoryTip(family,caseName,gender,answer) {
+  const definiteRows = {
+    Nominativ:'der · die · das · die',
+    Akkusativ:'den · die · das · die',
+    Dativ:'dem · der · dem · den',
+    Genitiv:'des · der · des · der'
+  };
+  if (family.kind === 'definite') {
+    return `${caseName} 横排背法：${definiteRows[caseName]}。${gender.zh}位置对应 ${answer}。`;
+  }
+  const ending = einEndings[caseName][gender.key] || '零词尾';
+  return `ein 类冠词共用同一套词尾。${caseName} 的 ${gender.zh}位置记作 ${ending === '零词尾' ? ending : `-${ending}`}：${family.base} → ${answer}。`;
+}
+function articleChoiceOptions(family,answer,index) {
+  const candidates = family.kind === 'definite'
+    ? ['der','die','das','den','dem','des']
+    : ['', 'e','en','em','er','es'].map(ending => attachArticleEnding(family.base,ending));
+  const values = [answer,...candidates.filter(value => value !== answer)].slice(0,4);
+  const shift = index % values.length;
+  return [...values.slice(shift),...values.slice(0,shift)].map(value => ({value,label:value}));
+}
+function articleSentence(family,caseName,gender,answer) {
+  const noun = caseName === 'Genitiv' ? gender.genitive : gender.noun;
+  const phrase = `${answer} ${noun}`;
+  const englishDeterminer = family.key === 'ein'
+    ? (/^[aeiou]/i.test(gender.nounEn) ? 'an' : 'a')
+    : family.en;
+  if (caseName === 'Nominativ') return {
+    de:`___ ${gender.noun} ist wichtig.`,
+    en:`${titleCase(englishDeterminer)} ${gender.nounEn} is important.`
+  };
+  if (caseName === 'Akkusativ') return {
+    de:`Wir benutzen ___ ${gender.noun}.`,
+    en:`We use ${englishDeterminer} ${gender.nounEn}.`
+  };
+  if (caseName === 'Dativ') return {
+    de:`Wir arbeiten mit ___ ${gender.noun}.`,
+    en:`We work with ${englishDeterminer} ${gender.nounEn}.`
+  };
+  return {
+    de:`Die Qualität ___ ${noun} ist gut.`,
+    en:`The quality of ${englishDeterminer} ${gender.nounEn} is good.`,
+    phrase
+  };
+}
+const articleCombinations = articleFamilies.flatMap(family =>
+  caseNames.flatMap(caseName =>
+    articleGenders
+      .filter(gender => family.plural || gender.key !== 'pl')
+      .map(gender => ({family,caseName,gender}))
+  )
+);
+function makeArticleQuestion(combo,index) {
+  const {family,caseName,gender} = combo;
+  const answer = declinedArticle(family,caseName,gender.key);
+  const variant = Math.floor(index / articleCombinations.length) % 3;
+  const sentence = articleSentence(family,caseName,gender,answer);
+  const directPrompt = `${family.label} · ${gender.de} · ${caseName}`;
+  return {
+    id:`article-${family.key}-${caseName}-${gender.key}-${index}`,
+    type:'article',
+    category:'冠词变格 · ARTIKEL',
+    prompt:variant === 1 ? sentence.de : directPrompt,
+    context:variant === 1
+      ? `填写正确冠词。基础形式：${family.label}；${gender.zh}；${caseName}。`
+      : `写出 ${family.label} 在${gender.zh} ${caseName} 中的正确形式。`,
+    translationEn:variant === 1
+      ? sentence.en
+      : `What is the ${gender.en} ${articleCaseEnglish[caseName]} form of “${family.label}”?`,
+    options:articleChoiceOptions(family,answer,index),
+    answer,
+    explanation:`${family.label} + ${gender.de} + ${caseName} = ${answer}。`,
+    memoryTip:articleMemoryTip(family,caseName,gender,answer)
+  };
+}
+const articleBank = Array.from({length:TARGET_TOPIC_SIZE},(_,index) =>
+  makeArticleQuestion(articleCombinations[index % articleCombinations.length],index)
+);
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -513,13 +671,16 @@ function genderHint(word) {
 }
 
 function makeGenderQuestion(word) {
+  const memoryTip = genderHint(word).replace(/<[^>]+>/g,'');
   return {
     id:`gender-${word.key}`, type:'gender', category:'词性 · GENUS',
     prompt:`___ ${word.word.replace(/^(der|die|das)\s+/,'')}`,
     context:`选择正确冠词。${word.en} · ${word.zh}`,
+    translationEn:`Choose the correct German gender article for “${word.en}”.`,
     options:['der','die','das'].map(value => ({value,label:value,sub:value === 'der' ? '阳性' : value === 'die' ? '阴性' : '中性'})),
     answer:word.gender,
-    explanation:genderHint(word).replace(/<[^>]+>/g,''),
+    explanation:memoryTip,
+    memoryTip,
     wordKey:word.key, speak:word.word
   };
 }
@@ -531,6 +692,7 @@ function makeVocabQuestion(word, pool) {
     id:`vocab-${word.key}`, type:word.topic === 'music' ? 'music' : 'interest',
     category:word.topic === 'music' ? 'KLANGWORT · 专业词汇' : `${topicMeta[word.topic].short.toUpperCase()} · 兴趣词汇`,
     prompt:word.word, context:'选择最准确的英文和中文意思。',
+    translationEn:'Choose the most accurate English meaning of this German word.',
     options, answer:word.key,
     explanation:`${word.word} = ${word.en} = ${word.zh}`,
     wordKey:word.key, speak:word.word
@@ -540,7 +702,7 @@ const genderBank = allWords.map(makeGenderQuestion);
 const musicBank = allWords.filter(word => word.topic === 'music').map(word => makeVocabQuestion(word,allWords.filter(item => item.topic === 'music')));
 const interestWords = allWords.filter(word => word.topic !== 'music');
 const interestBank = interestWords.map(word => makeVocabQuestion(word,interestWords.filter(item => item.topic === word.topic)));
-const fullBank = [...genderBank,...caseQuestions,...musicBank,...interestBank];
+const fullBank = [...genderBank,...articleBank,...caseQuestions,...musicBank,...interestBank];
 
 function take(pool,count) {
   if (!pool.length) return [];
@@ -549,18 +711,19 @@ function take(pool,count) {
 }
 function buildRound(mode) {
   if (mode === 'gender') return take(genderBank,20);
+  if (mode === 'articles') return take(articleBank,20);
   if (mode === 'cases') return take(caseQuestions,20);
   if (mode === 'music') return take(musicBank,18);
   if (mode === 'interests') return take(interestBank,18);
   if (mode === 'mock') return shuffle([
-    ...take(genderBank,10),...take(caseQuestions,10),...take(musicBank,5),...take(interestBank,5)
+    ...take(genderBank,8),...take(articleBank,8),...take(caseQuestions,8),...take(musicBank,3),...take(interestBank,3)
   ]);
   if (mode === 'mistakes') {
     const wrong = fullBank.filter(question => state.mistakes.includes(question.id));
-    return take(wrong.length ? wrong : [...genderBank,...caseQuestions],Math.min(Math.max(wrong.length,12),24));
+    return take(wrong.length ? wrong : [...genderBank,...articleBank,...caseQuestions],Math.min(Math.max(wrong.length,12),24));
   }
   return shuffle([
-    ...take(genderBank,5),...take(caseQuestions,4),...take(musicBank,3),...take(interestBank,3)
+    ...take(genderBank,4),...take(articleBank,4),...take(caseQuestions,3),...take(musicBank,2),...take(interestBank,2)
   ]);
 }
 function startRound(mode) {
@@ -581,6 +744,7 @@ function renderQuestion() {
   answerChecked = false;
   $('#questionCategory').textContent = question.category;
   $('#questionPrompt').textContent = question.prompt;
+  $('#questionEnglish').textContent = `EN · ${question.translationEn}`;
   $('#questionContext').textContent = question.context;
   $('#trainerPosition').textContent = `${roundIndex + 1} / ${round.length}`;
   $('#trainerProgress').style.width = `${roundIndex / round.length * 100}%`;
@@ -646,9 +810,12 @@ function gradeAnswer() {
   });
   const feedback = $('#questionFeedback');
   feedback.className = `question-feedback show ${correct ? 'correct' : 'wrong'}`;
+  const memoryMethod = !correct && question.memoryTip
+    ? `<span class="memory-method"><strong>背记方法 · MEMORY</strong>${question.memoryTip}</span>`
+    : '';
   feedback.innerHTML = correct
     ? `<b>Richtig · 答对了</b>${question.explanation}`
-    : `<b>正确答案：${answerLabel(question,question.answer)}</b>${question.explanation}${roundMode !== 'mock' && !question.retry ? ' 这道题会在本轮末尾再出现。' : ''}`;
+    : `<b>正确答案：${answerLabel(question,question.answer)}</b>${question.explanation}${memoryMethod}${roundMode !== 'mock' && !question.retry ? ' 这道题会在本轮末尾再出现。' : ''}`;
   $('#confirmAnswer').textContent = roundIndex === round.length - 1 ? '查看结果' : '下一题';
 }
 function finishRound() {
@@ -667,6 +834,7 @@ function finishRound() {
     : `${accuracy}% 正确率。${state.mistakes.length ? `目前还有 ${state.mistakes.length} 道错题待消灭。` : '错题已经清空。'}`;
   const groups = [
     ['词性',roundResults.filter(item => item.type === 'gender')],
+    ['冠词',roundResults.filter(item => item.type === 'article')],
     ['四格',roundResults.filter(item => item.type === 'case')],
     ['词汇',roundResults.filter(item => item.type === 'music' || item.type === 'interest')]
   ].filter(([,items]) => items.length);
@@ -798,13 +966,13 @@ window.addEventListener('offline',updateNetworkStatus);
 updateNetworkStatus();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.addEventListener('controllerchange',async () => {
-    offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v5');
+    offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v6');
     updateNetworkStatus();
   });
   navigator.serviceWorker.register('./service-worker.js')
     .then(() => navigator.serviceWorker.ready)
     .then(async () => {
-      offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v5');
+      offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v6');
       updateNetworkStatus();
     })
     .catch(() => { $('#networkStatus').textContent = '离线缓存尚未完成'; });

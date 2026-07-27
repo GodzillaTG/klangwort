@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mein-deutsch-v5';
+const CACHE_NAME = 'mein-deutsch-v6';
 const OFFLINE_PAGE = './index.html';
 const APP_ASSETS = [
   './',
