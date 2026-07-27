@@ -578,6 +578,133 @@ const articleBank = Array.from({length:TARGET_TOPIC_SIZE},(_,index) =>
   makeArticleQuestion(articleCombinations[index % articleCombinations.length],index)
 );
 
+const adjectivePatterns = [
+  {key:'weak',de:'schwach · der-Wort',zh:'弱变化 · 定冠词后',en:'weak declension after a definite article'},
+  {key:'mixed',de:'gemischt · ein-Wort',zh:'混合变化 · ein 类后',en:'mixed declension after an ein-word'},
+  {key:'strong',de:'stark · ohne Artikel',zh:'强变化 · 无冠词',en:'strong declension without an article'}
+];
+const adjectiveWords = [
+  {de:'neu',en:'new'},{de:'gut',en:'good'},{de:'wichtig',en:'important'},
+  {de:'technisch',en:'technical'},{de:'kreativ',en:'creative'},{de:'schnell',en:'fast'},
+  {de:'modern',en:'modern'},{de:'klar',en:'clear'},{de:'genau',en:'precise'},
+  {de:'ruhig',en:'quiet'},{de:'laut',en:'loud'},{de:'stark',en:'strong'},
+  {de:'schwach',en:'weak'},{de:'digital',en:'digital'},{de:'virtuell',en:'virtual'},
+  {de:'künstlich',en:'artificial'},{de:'musikalisch',en:'musical'},{de:'filmisch',en:'cinematic'},
+  {de:'spielbar',en:'playable'},{de:'sichtbar',en:'visible'},{de:'zuverlässig',en:'reliable'},
+  {de:'komplex',en:'complex'}
+];
+const adjectiveNouns = {
+  m:{noun:'Klang',genitive:'Klangs',en:'sound'},
+  f:{noun:'Musik',genitive:'Musik',en:'music'},
+  n:{noun:'Material',genitive:'Materials',en:'material'},
+  pl:{noun:'Daten',genitive:'Daten',en:'data points'}
+};
+const adjectiveEndings = {
+  weak:{
+    Nominativ:{m:'e',f:'e',n:'e',pl:'en'},
+    Akkusativ:{m:'en',f:'e',n:'e',pl:'en'},
+    Dativ:{m:'en',f:'en',n:'en',pl:'en'},
+    Genitiv:{m:'en',f:'en',n:'en',pl:'en'}
+  },
+  mixed:{
+    Nominativ:{m:'er',f:'e',n:'es',pl:'en'},
+    Akkusativ:{m:'en',f:'e',n:'es',pl:'en'},
+    Dativ:{m:'en',f:'en',n:'en',pl:'en'},
+    Genitiv:{m:'en',f:'en',n:'en',pl:'en'}
+  },
+  strong:{
+    Nominativ:{m:'er',f:'e',n:'es',pl:'e'},
+    Akkusativ:{m:'en',f:'e',n:'es',pl:'e'},
+    Dativ:{m:'em',f:'er',n:'em',pl:'en'},
+    Genitiv:{m:'en',f:'er',n:'en',pl:'er'}
+  }
+};
+function adjectiveMemoryTip(pattern,caseName,gender,ending) {
+  if (pattern.key === 'weak') {
+    return `定冠词已经显示格和词性，形容词只用 -e 或 -en。Dativ、Genitiv 和复数优先记 -en；本题是 -${ending}。`;
+  }
+  if (pattern.key === 'mixed') {
+    return `ein 类冠词没有明显词尾时，形容词负责补信号：Nominativ 阳性 -er、中性 -es；其余多数用 -en。本题是 -${ending}。`;
+  }
+  const strongRows = {
+    Nominativ:'-er · -e · -es · -e',
+    Akkusativ:'-en · -e · -es · -e',
+    Dativ:'-em · -er · -em · -en',
+    Genitiv:'-en · -er · -en · -er'
+  };
+  return `没有冠词时，形容词自己承担格和词性信号。${caseName} 横排：${strongRows[caseName]}；${gender.zh}位置是 -${ending}。`;
+}
+function adjectiveChoiceOptions(adjective,answer,index) {
+  const candidates = ['', 'e','en','em','er','es'].map(ending => `${adjective.de}${ending}`);
+  const values = [answer,...candidates.filter(value => value !== answer)].slice(0,4);
+  const shift = index % values.length;
+  return [...values.slice(shift),...values.slice(0,shift)].map(value => ({value,label:value}));
+}
+function adjectiveArticle(pattern,caseName,genderKey) {
+  if (pattern.key === 'strong') return '';
+  if (pattern.key === 'weak') return definiteDeclension[caseName][genderKey];
+  const family = genderKey === 'pl'
+    ? articleFamilies.find(item => item.key === 'mein')
+    : articleFamilies.find(item => item.key === 'ein');
+  return declinedArticle(family,caseName,genderKey);
+}
+function adjectiveEnglishDeterminer(pattern,genderKey,nounEn) {
+  if (pattern.key === 'strong') return '';
+  if (pattern.key === 'weak') return 'the';
+  if (genderKey === 'pl') return 'my';
+  return /^[aeiou]/i.test(nounEn) ? 'an' : 'a';
+}
+function makeAdjectiveQuestion(combo,index) {
+  const {adjective,pattern,caseName,gender} = combo;
+  const noun = adjectiveNouns[gender.key];
+  const ending = adjectiveEndings[pattern.key][caseName][gender.key];
+  const answer = `${adjective.de}${ending}`;
+  const article = adjectiveArticle(pattern,caseName,gender.key);
+  const nounForm = caseName === 'Genitiv' ? noun.genitive : noun.noun;
+  const phrase = [article,answer,nounForm].filter(Boolean).join(' ');
+  const determiner = adjectiveEnglishDeterminer(pattern,gender.key,noun.en);
+  const englishPhrase = [determiner,adjective.en,noun.en].filter(Boolean).join(' ');
+  const sentence = caseName === 'Nominativ'
+    ? {
+        de:`${article ? `${titleCase(article)} ` : ''}___ ${noun.noun} ${gender.key === 'pl' ? 'sind' : 'ist'} wichtig. (${adjective.de})`,
+        en:`${titleCase(englishPhrase)} ${gender.key === 'pl' ? 'are' : 'is'} important.`
+      }
+    : caseName === 'Akkusativ'
+      ? {de:`Wir verwenden ${article ? `${article} ` : ''}___ ${noun.noun}. (${adjective.de})`,en:`We use ${englishPhrase}.`}
+      : caseName === 'Dativ'
+        ? {de:`Wir arbeiten mit ${article ? `${article} ` : ''}___ ${noun.noun}. (${adjective.de})`,en:`We work with ${englishPhrase}.`}
+        : {de:`Die Qualität ${article ? `${article} ` : ''}___ ${nounForm} ist gut. (${adjective.de})`,en:`The quality of ${englishPhrase} is good.`};
+  const variant = index % 3;
+  return {
+    id:`adjective-${pattern.key}-${caseName}-${gender.key}-${adjective.de}-${index}`,
+    type:'adjective',
+    category:'形容词变位 · ADJEKTIVDEKLINATION',
+    prompt:variant === 0
+      ? `${adjective.de} · ${pattern.de} · ${gender.de} · ${caseName}`
+      : sentence.de,
+    context:variant === 0
+      ? `写出形容词“${adjective.de}”在${pattern.zh}、${gender.zh} ${caseName} 中的形式。`
+      : `补全形容词词尾。${pattern.zh}；${gender.zh}；${caseName}。`,
+    translationEn:variant === 0
+      ? `What is the ${gender.en} ${articleCaseEnglish[caseName]} form of “${adjective.de}” in ${pattern.en}?`
+      : sentence.en,
+    options:adjectiveChoiceOptions(adjective,answer,index),
+    answer,
+    explanation:`${pattern.de} + ${gender.de} + ${caseName}: ${phrase}。`,
+    memoryTip:adjectiveMemoryTip(pattern,caseName,gender,ending)
+  };
+}
+const adjectiveCombinations = adjectiveWords.flatMap(adjective =>
+  adjectivePatterns.flatMap(pattern =>
+    caseNames.flatMap(caseName =>
+      articleGenders.map(gender => ({adjective,pattern,caseName,gender}))
+    )
+  )
+);
+const adjectiveBank = Array.from({length:TARGET_TOPIC_SIZE},(_,index) =>
+  makeAdjectiveQuestion(adjectiveCombinations[(index * 37) % adjectiveCombinations.length],index)
+);
+
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const shuffle = values => [...values].sort(() => Math.random() - .5);
@@ -702,7 +829,7 @@ const genderBank = allWords.map(makeGenderQuestion);
 const musicBank = allWords.filter(word => word.topic === 'music').map(word => makeVocabQuestion(word,allWords.filter(item => item.topic === 'music')));
 const interestWords = allWords.filter(word => word.topic !== 'music');
 const interestBank = interestWords.map(word => makeVocabQuestion(word,interestWords.filter(item => item.topic === word.topic)));
-const fullBank = [...genderBank,...articleBank,...caseQuestions,...musicBank,...interestBank];
+const fullBank = [...genderBank,...articleBank,...adjectiveBank,...caseQuestions,...musicBank,...interestBank];
 
 function take(pool,count) {
   if (!pool.length) return [];
@@ -712,18 +839,19 @@ function take(pool,count) {
 function buildRound(mode) {
   if (mode === 'gender') return take(genderBank,20);
   if (mode === 'articles') return take(articleBank,20);
+  if (mode === 'adjectives') return take(adjectiveBank,20);
   if (mode === 'cases') return take(caseQuestions,20);
   if (mode === 'music') return take(musicBank,18);
   if (mode === 'interests') return take(interestBank,18);
   if (mode === 'mock') return shuffle([
-    ...take(genderBank,8),...take(articleBank,8),...take(caseQuestions,8),...take(musicBank,3),...take(interestBank,3)
+    ...take(genderBank,6),...take(articleBank,6),...take(adjectiveBank,6),...take(caseQuestions,6),...take(musicBank,3),...take(interestBank,3)
   ]);
   if (mode === 'mistakes') {
     const wrong = fullBank.filter(question => state.mistakes.includes(question.id));
-    return take(wrong.length ? wrong : [...genderBank,...articleBank,...caseQuestions],Math.min(Math.max(wrong.length,12),24));
+    return take(wrong.length ? wrong : [...genderBank,...articleBank,...adjectiveBank,...caseQuestions],Math.min(Math.max(wrong.length,12),24));
   }
   return shuffle([
-    ...take(genderBank,4),...take(articleBank,4),...take(caseQuestions,3),...take(musicBank,2),...take(interestBank,2)
+    ...take(genderBank,3),...take(articleBank,3),...take(adjectiveBank,3),...take(caseQuestions,2),...take(musicBank,2),...take(interestBank,2)
   ]);
 }
 function startRound(mode) {
@@ -835,6 +963,7 @@ function finishRound() {
   const groups = [
     ['词性',roundResults.filter(item => item.type === 'gender')],
     ['冠词',roundResults.filter(item => item.type === 'article')],
+    ['形容词',roundResults.filter(item => item.type === 'adjective')],
     ['四格',roundResults.filter(item => item.type === 'case')],
     ['词汇',roundResults.filter(item => item.type === 'music' || item.type === 'interest')]
   ].filter(([,items]) => items.length);
@@ -966,13 +1095,13 @@ window.addEventListener('offline',updateNetworkStatus);
 updateNetworkStatus();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.addEventListener('controllerchange',async () => {
-    offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v6');
+    offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v7');
     updateNetworkStatus();
   });
   navigator.serviceWorker.register('./service-worker.js')
     .then(() => navigator.serviceWorker.ready)
     .then(async () => {
-      offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v6');
+      offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v7');
       updateNetworkStatus();
     })
     .catch(() => { $('#networkStatus').textContent = '离线缓存尚未完成'; });

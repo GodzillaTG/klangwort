@@ -145,6 +145,13 @@ button{color:inherit}
 .article-family-tags span{border:1px solid #cbd2b8;border-radius:13px;background:#f7f7ee;padding:4px 7px;font:9px "DM Mono",monospace;color:#546349}
 .article-lab .case-table-wrap{margin:0}
 .article-table{background:#faf9f2}
+.adjective-lab{display:grid;grid-template-columns:.72fr 1.28fr;gap:26px;align-items:center;margin-top:13px;padding:25px;background:#f2e8df;border:1px solid #e2d3c6}
+.adjective-patterns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.adjective-patterns article{min-height:128px;padding:14px;background:#fbf8f2;border:1px solid #e4d9cf;display:flex;flex-direction:column}
+.adjective-patterns span{font:8px "DM Mono",monospace;color:#8d7567}
+.adjective-patterns b{font:18px "Playfair Display","Noto Serif SC",serif;margin:20px 0 7px}
+.adjective-patterns strong{color:var(--orange)}
+.adjective-patterns small{font-size:9px;line-height:1.5;color:var(--muted);margin-top:auto}
 .preposition-strip{display:grid;grid-template-columns:auto 1fr auto 1.45fr;gap:13px;align-items:center;margin-top:15px;background:#ebece4;padding:12px 15px}
 .preposition-strip span{font:9px "DM Mono",monospace;color:#77837b}
 .preposition-strip b{font-size:10px;color:#506159}
@@ -322,6 +329,9 @@ button{color:inherit}
   .preposition-strip span:nth-of-type(2){margin-top:8px}
   .section-actions{justify-content:flex-start}
   .article-lab{grid-template-columns:1fr;padding:20px 15px;gap:19px}
+  .adjective-lab{grid-template-columns:1fr;padding:20px 15px;gap:19px}
+  .adjective-patterns{grid-template-columns:1fr}
+  .adjective-patterns article{min-height:104px}
   .article-lab-copy h3{font-size:25px}
   .topic-tabs{margin:0 -17px 18px;padding:0 17px 5px}
   .word-grid{grid-template-columns:1fr 1fr;gap:8px}
