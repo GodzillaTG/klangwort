@@ -784,6 +784,30 @@ document.addEventListener('keydown',event => {
   }
 });
 
+let offlineReady = false;
+function updateNetworkStatus() {
+  const status = $('#networkStatus');
+  status.classList.toggle('ready',offlineReady);
+  status.classList.toggle('offline',!navigator.onLine);
+  status.textContent = !navigator.onLine
+    ? '离线模式 · 题库可用'
+    : offlineReady ? '已缓存 · 可完全离线' : '正在准备离线模式…';
+}
+window.addEventListener('online',updateNetworkStatus);
+window.addEventListener('offline',updateNetworkStatus);
+updateNetworkStatus();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  navigator.serviceWorker.addEventListener('controllerchange',async () => {
+    offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v5');
+    updateNetworkStatus();
+  });
+  navigator.serviceWorker.register('./service-worker.js')
+    .then(() => navigator.serviceWorker.ready)
+    .then(async () => {
+      offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v5');
+      updateNetworkStatus();
+    })
+    .catch(() => { $('#networkStatus').textContent = '离线缓存尚未完成'; });
+} else {
+  $('#networkStatus').textContent = '请通过正式网址安装离线版';
 }
