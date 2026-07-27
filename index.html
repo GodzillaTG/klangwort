@@ -2,96 +2,156 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#1d2a2d" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#162825" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Klangwort" />
-    <title>Klangwort — 德语音乐词典</title>
+    <meta name="apple-mobile-web-app-title" content="Mein Deutsch" />
+    <meta name="description" content="为 Sichenguo 定制的德语学习与刷题 App：Klangwort、词性、四格、AI、游戏与电影。" />
+    <meta property="og:title" content="Mein Deutsch — 我的德语训练场" />
+    <meta property="og:description" content="专业词汇、词性、四格与兴趣德语，一起刷进长期记忆。" />
+    <meta property="og:image" content="https://godzillatg.github.io/klangwort/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Mein Deutsch — 我的德语训练场" />
+    <meta name="twitter:description" content="专业词汇、词性、四格与兴趣德语，一起刷进长期记忆。" />
+    <meta name="twitter:image" content="https://godzillatg.github.io/klangwort/og.png" />
+    <title>Mein Deutsch — 我的德语训练场</title>
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icon-180.png" />
     <link rel="manifest" href="manifest.json" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="practice.css" />
-    <link rel="stylesheet" href="mobile.css" />
   </head>
   <body>
     <main class="app-shell">
       <aside class="sidebar">
-        <a class="brand" href="#top"><span class="brand-mark">k</span><span>klangwort</span></a>
-        <p class="side-label">DEUTSCH · MUSIC</p>
-        <nav class="nav-list" aria-label="词典导航">
-          <a class="nav-item active" href="#top"><i>◉</i><span>今日词汇 <small>Today</small></span></a>
-          <a class="nav-item" href="#composer"><i>♩</i><span>作曲 <small>Komposition</small></span></a>
-          <a class="nav-item" href="#tonmeister"><i>◌</i><span>录音制作 <small>Tonmeister</small></span></a>
-          <a class="nav-item" href="#practice"><i>✦</i><span>复习 <small>Practice</small></span></a>
+        <a class="brand" href="#home"><span class="brand-mark">m</span><span>mein deutsch</span></a>
+        <p class="side-kicker">FÜR SICHENGUO</p>
+        <nav class="nav-list" aria-label="学习导航">
+          <a class="nav-item active" href="#home"><i>⌂</i><span>首页<small>Heute</small></span></a>
+          <a class="nav-item" href="#gender"><i>◒</i><span>词性<small>Genus</small></span></a>
+          <a class="nav-item" href="#cases"><i>Ⅳ</i><span>四格<small>Kasus</small></span></a>
+          <a class="nav-item" href="#words"><i>✦</i><span>词库<small>Meine Wörter</small></span></a>
+          <a class="nav-item" href="#exam"><i>✓</i><span>刷题<small>Prüfung</small></span></a>
         </nav>
-        <div class="progress"><div class="progress-ring"><b id="knownCount">0</b><span>/ 24</span></div><p>已掌握<br /><b>核心音乐词汇</b></p></div>
+        <div class="side-progress">
+          <div class="mini-ring"><b id="sideMastered">0</b><span>掌握</span></div>
+          <div><p>今天已答 <b id="sideAnswered">0</b> 题</p><small>一点一点，变成直觉。</small></div>
+        </div>
       </aside>
 
-      <section class="content" id="top">
-        <header class="topbar"><div>德语音乐词典 <span>/</span> 中文 + English</div><button class="search-button" id="searchButton">⌕ <span>搜索词汇</span><kbd>⌘ K</kbd></button></header>
+      <section class="content">
+        <header class="topbar">
+          <div class="breadcrumb">Mein Deutsch <span>/</span> 个人训练场</div>
+          <div class="top-actions"><button id="globalSearch" class="search-button" aria-label="搜索词汇">⌕ <span>搜索词汇</span><kbd>⌘ K</kbd></button><button id="resetToday" class="avatar-button" aria-label="今日学习状态">SG</button></div>
+        </header>
 
-        <section class="hero">
-          <div><p class="eyebrow">MUSIK AUF DEUTSCH</p><h1>用两种语言，<br /><em>听懂德语音乐。</em></h1><p>从乐谱上的 <b>Partitur</b> 到控制台前的 <b>Mischpult</b>。<br />每个德语词都有英语与中文解释、发音和实际语境。</p><a href="#composer">开始学词 <span>↓</span></a></div>
-          <div class="word-orbit" aria-hidden="true"><span>PARTITUR</span><span>MIKROFON</span><span>KLINGT</span><b>DE<br />MUSIC</b><i></i><i></i><i></i></div>
-        </section>
-
-        <section class="daily-section">
-          <div class="section-heading"><div><p class="eyebrow">HEUTE · 3 WÖRTER</p><h2>今日的声音词</h2></div><button class="outline-button" id="newDaily">↻ 换一组</button></div>
-          <div class="daily-grid" id="dailyGrid"></div>
-        </section>
-
-        <section class="vocabulary-section" id="composer">
-          <div class="section-heading"><div><p class="eyebrow">KOMPONIST:INNEN</p><h2>作曲家的语言</h2><p>写下、组织与排练音乐时最常用的德语。</p></div><span class="section-count">12 WÖRTER</span></div>
-          <div class="filter-row" data-group="composer"><button class="filter active" data-filter="all">全部 All</button><button class="filter" data-filter="score">乐谱与结构</button><button class="filter" data-filter="sound">音乐元素</button><button class="filter" data-filter="performance">排练与演出</button></div>
-          <div class="vocab-grid" id="composerGrid"></div>
-        </section>
-
-        <section class="tonmeister-section" id="tonmeister">
-          <div class="tonmeister-header"><div><p class="eyebrow">TONMEISTER:INNEN</p><h2>录音制作的语言</h2><p>捕捉、平衡、编辑与完成声音的核心词汇。</p></div><div class="studio-note"><span>STUDIO NOTE 01</span><p><b>der Klang</b> 不只是 “sound”。<br />它也指声音的质地、色彩与感受。</p></div></div>
-          <div class="filter-row dark-filters" data-group="tonmeister"><button class="filter active" data-filter="all">全部 All</button><button class="filter" data-filter="capture">拾音</button><button class="filter" data-filter="mix">混音与空间</button><button class="filter" data-filter="finish">编辑与完成</button></div>
-          <div class="vocab-grid dark-grid" id="tonmeisterGrid"></div>
-        </section>
-
-        <section class="phrase-section"><div class="phrase-art"><span>♫</span><i></i><i></i><i></i></div><div><p class="eyebrow">IM KONTEXT</p><h2>在真实语境中听见它</h2><div class="phrase"><p class="de">„Die <b>Partitur</b> braucht eine klarere <b>Dynamik</b>.“</p><p><b>EN</b> The score needs clearer dynamics.</p><p><b>中</b> 这份总谱需要更清晰的力度变化。</p></div><div class="phrase"><p class="de">„Wir stellen das <b>Mikrofon</b> näher an das Cello.“</p><p><b>EN</b> We are placing the microphone closer to the cello.</p><p><b>中</b> 我们把麦克风放得离大提琴更近一些。</p></div></div></section>
-
-        <section class="practice-section" id="practice">
-          <div class="practice-heading">
-            <div><p class="eyebrow">ÜBUNGSZENTRUM</p><h2>音乐德语强化训练</h2><p>认词、英译德、中译德和完整句子交替出现。答错的题会在本轮末尾再次出现，并自动进入错题强化。</p></div>
-            <div class="practice-stats"><span><b id="practiceKnown">0</b><small>已掌握</small></span><span><b id="mistakeCount">0</b><small>待强化</small></span></div>
+        <section class="hero" id="home">
+          <div class="hero-copy">
+            <p class="eyebrow">DEIN PERSÖNLICHER LERNRAUM</p>
+            <h1>不是学所有德语，<br /><em>只练你真正需要的。</em></h1>
+            <p>专业音乐词汇、最容易混淆的词性和四格，<br />再加上 AI、游戏、电影——每天刷到形成直觉。</p>
+            <button class="primary-button" data-start="daily">开始今日 15 题 <span>→</span></button>
           </div>
-
-          <div class="training-launcher" id="practiceIntro">
-            <button class="mode-card featured-mode" data-session="mixed"><span class="mode-icon">✦</span><div><b>混合训练</b><small>Mixed · 10 题</small><p>认词、翻译和写句子交替练习</p></div><em>→</em></button>
-            <button class="mode-card" data-session="composer"><span class="mode-icon">♩</span><div><b>作曲专项</b><small>Komposition · 10 题</small><p>乐谱、结构、排练与演出</p></div><em>→</em></button>
-            <button class="mode-card" data-session="tonmeister"><span class="mode-icon">◉</span><div><b>Tonmeister 专项</b><small>Recording · 10 题</small><p>拾音、混音、空间与母带</p></div><em>→</em></button>
-            <button class="mode-card mistake-mode" data-session="mistakes"><span class="mode-icon">↻</span><div><b>错题强化</b><small>Memory drill</small><p>集中重练之前答错的内容</p></div><em>→</em></button>
+          <div class="hero-score">
+            <p>HEUTE</p>
+            <strong id="heroAccuracy">—</strong>
+            <span>今日正确率</span>
+            <div class="score-line"><i id="heroProgress"></i></div>
+            <small><b id="heroStreak">0</b> 连续答对 · <b id="heroMistakes">0</b> 道错题待复习</small>
           </div>
+        </section>
 
-          <div class="trainer" id="trainer" hidden>
-            <div class="trainer-top"><button id="exitTraining" aria-label="退出训练">×</button><div class="training-progress"><i id="trainingProgress"></i></div><span id="trainingPosition">1 / 10</span></div>
-            <div class="trainer-body">
-              <div class="question-meta"><span id="questionType">认词 · RECOGNITION</span><button id="questionAudio" class="audio-button" hidden>◖ 听发音</button></div>
-              <h3 id="questionPrompt"></h3>
-              <p class="question-help" id="questionHelp"></p>
-              <div class="answer-area" id="answerArea"></div>
-              <div class="answer-feedback" id="answerFeedback" aria-live="polite"></div>
-            </div>
-            <div class="trainer-footer"><span id="keyboardHint">选择一个答案</span><button class="check-button" id="checkAnswer" disabled>检查答案</button></div>
+        <section class="overview-section">
+          <div class="section-heading"><div><p class="eyebrow">DEIN LEHRPLAN</p><h2>你的四大学习板块</h2></div><p>不是平均用力。词性和四格占每天训练的 60%。</p></div>
+          <div class="course-grid">
+            <article class="course-card music-card"><div class="course-top"><span>01</span><i>♫</i></div><h3>Klangwort</h3><p>作曲、Tonmeister、录音制作和音乐表达。</p><div class="course-meta"><b>24</b><span>专业词汇</span></div><button data-jump="#words" data-topic="music">进入词库 →</button></article>
+            <article class="course-card gender-card"><div class="course-top"><span>02</span><i>der</i></div><h3>阴阳中性</h3><p>把 der / die / das 和名词当作一个整体记住。</p><div class="gender-dots"><span>der</span><span>die</span><span>das</span></div><button data-start="gender">开始专项 →</button></article>
+            <article class="course-card case-card"><div class="course-top"><span>03</span><i>Ⅳ</i></div><h3>德语四格</h3><p>主格、宾格、与格、属格，用句子判断角色。</p><div class="course-meta"><b>4</b><span>Kasus</span></div><button data-start="cases">开始专项 →</button></article>
+            <article class="course-card interest-card"><div class="course-top"><span>04</span><i>AI</i></div><h3>Meine Welt</h3><p>用你感兴趣的 AI、游戏和电影建立词汇量。</p><div class="interest-tags"><span>AI</span><span>Games</span><span>Film</span></div><button data-jump="#words" data-topic="ai">浏览兴趣词 →</button></article>
           </div>
+        </section>
 
-          <div class="session-result" id="sessionResult" hidden>
-            <span class="result-icon">♪</span><p class="eyebrow">LEKTION GESCHAFFT</p><h3>这一轮完成了！</h3><div class="result-score"><b id="resultScore">8 / 10</b><span id="resultMessage">很好，再巩固一次会记得更牢。</span></div><div class="result-actions"><button id="repeatSession">再练一轮</button><button id="reviewMistakes">强化错题</button><button id="backToDictionary">返回词典</button></div>
+        <section class="gender-section" id="gender">
+          <div class="section-heading light"><div><p class="eyebrow">DER · DIE · DAS</p><h2>词性不是规则题，<br /><em>是配对记忆题。</em></h2></div><button class="ghost-button" data-start="gender">刷 20 题 →</button></div>
+          <div class="gender-layout">
+            <div class="gender-rule-card der-card"><div><b>der</b><span>阳性 · masculine</span></div><p>星期、月份、季节、男性人物；常见后缀 <strong>-er · -ling · -ismus</strong></p><small>der Film · der Algorithmus · der Tonmeister</small></div>
+            <div class="gender-rule-card die-card"><div><b>die</b><span>阴性 · feminine</span></div><p>常见后缀 <strong>-ung · -heit · -keit · -schaft · -tion · -ik</strong></p><small>die Aufnahme · die Intelligenz · die Grafik</small></div>
+            <div class="gender-rule-card das-card"><div><b>das</b><span>中性 · neuter</span></div><p>常见后缀 <strong>-chen · -lein · -ment · -um</strong>；动词名词化</p><small>das Mikrofon · das Spiel · das Streaming</small></div>
+          </div>
+          <div class="memory-tip"><span>记忆原则</span><p>不要背 <s>Algorithmus = 算法</s>，要背 <b>der Algorithmus</b>。冠词是单词的一部分。</p></div>
+        </section>
+
+        <section class="cases-section" id="cases">
+          <div class="section-heading"><div><p class="eyebrow">DIE VIER FÄLLE</p><h2>先找角色，再变冠词</h2><p>每道题都问两次：它在句子里做什么？所以应该用哪个格？</p></div><button class="outline-button" data-start="cases">四格专项 20 题</button></div>
+          <div class="case-role-grid">
+            <article><span class="case-index">01</span><b>Nominativ</b><em>主格</em><p>谁在做动作？<br /><strong>Wer? Was?</strong></p><small><mark>Der Komponist</mark> schreibt.</small></article>
+            <article><span class="case-index">02</span><b>Akkusativ</b><em>宾格</em><p>动作直接作用于谁？<br /><strong>Wen? Was?</strong></p><small>Ich höre <mark>den Klang</mark>.</small></article>
+            <article><span class="case-index">03</span><b>Dativ</b><em>与格</em><p>给谁、对谁、和谁？<br /><strong>Wem?</strong></p><small>Ich helfe <mark>dem Spieler</mark>.</small></article>
+            <article><span class="case-index">04</span><b>Genitiv</b><em>属格</em><p>谁的？表示所属。<br /><strong>Wessen?</strong></p><small>Die Idee <mark>des Films</mark>.</small></article>
+          </div>
+          <div class="case-table-wrap">
+            <table class="case-table">
+              <thead><tr><th>Kasus</th><th>阳性</th><th>阴性</th><th>中性</th><th>复数</th></tr></thead>
+              <tbody>
+                <tr><th>Nominativ</th><td>der</td><td>die</td><td>das</td><td>die</td></tr>
+                <tr><th>Akkusativ</th><td class="changed">den</td><td>die</td><td>das</td><td>die</td></tr>
+                <tr><th>Dativ</th><td class="changed">dem</td><td class="changed">der</td><td class="changed">dem</td><td class="changed">den + n</td></tr>
+                <tr><th>Genitiv</th><td class="changed">des + s/es</td><td class="changed">der</td><td class="changed">des + s/es</td><td class="changed">der</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="preposition-strip"><span>永远 + Akk.</span><b>durch · für · gegen · ohne · um</b><span>永远 + Dat.</span><b>aus · bei · mit · nach · seit · von · zu</b></div>
+        </section>
+
+        <section class="words-section" id="words">
+          <div class="section-heading"><div><p class="eyebrow">MEINE WÖRTER</p><h2>专业词汇与兴趣词库</h2><p>所有名词都带冠词；每张卡都有中英解释和德语例句。</p></div><div class="word-count"><b id="visibleWordCount">0</b><span>Wörter</span></div></div>
+          <div class="topic-tabs" id="topicTabs">
+            <button class="active" data-topic="music">♫ Klangwort</button>
+            <button data-topic="ai">AI · 人工智能</button>
+            <button data-topic="games">Games · 游戏</button>
+            <button data-topic="film">Film · 电影</button>
+          </div>
+          <div class="word-grid" id="wordGrid"></div>
+          <button class="load-more" id="loadMoreWords">显示更多 <span>↓</span></button>
+        </section>
+
+        <section class="exam-section" id="exam">
+          <div class="exam-heading"><div><p class="eyebrow">PRÜFUNGSZENTRUM</p><h2>像科目一一样，<br />把错误刷到消失。</h2><p>专项练习答错会在本轮末尾重现。模拟考试 30 题，正确率 90% 及格。</p></div><div class="exam-badge"><span>PASS</span><b>90%</b><small>27 / 30</small></div></div>
+          <div class="exam-modes">
+            <button class="exam-mode primary-exam" data-start="mock"><span>模拟考试</span><b>30 题 · 全部板块</b><small>限一次作答，不回炉</small><i>→</i></button>
+            <button class="exam-mode" data-start="daily"><span>今日训练</span><b>15 题 · 智能混合</b><small>词性与四格优先</small><i>→</i></button>
+            <button class="exam-mode" data-start="gender"><span>专项</span><b>der · die · das</b><small>20 题 · 错题回炉</small><i>→</i></button>
+            <button class="exam-mode" data-start="cases"><span>专项</span><b>四格判断</b><small>20 题 · 介词与冠词</small><i>→</i></button>
+            <button class="exam-mode" data-start="music"><span>专项</span><b>Klangwort</b><small>专业词汇认词</small><i>→</i></button>
+            <button class="exam-mode" data-start="interests"><span>专项</span><b>AI · Games · Film</b><small>兴趣词汇认词</small><i>→</i></button>
+            <button class="exam-mode mistakes-mode" data-start="mistakes"><span>错题本</span><b><strong id="examMistakeCount">0</strong> 道待消灭</b><small>只练你答错的题</small><i>↻</i></button>
           </div>
         </section>
       </section>
     </main>
-    <div class="word-modal" id="wordModal" aria-hidden="true"><div class="modal-panel"><button class="close" id="closeModal" aria-label="关闭">×</button><div id="modalContent"></div></div></div>
-    <div class="search-modal" id="searchModal" aria-hidden="true"><div class="search-panel"><button class="close" id="closeSearch" aria-label="关闭">×</button><label for="searchInput">搜索德语音乐词汇</label><input id="searchInput" type="search" placeholder="例如：Mikrofon、score、混音" autocomplete="off" /><div id="searchResults"></div></div></div>
+
+    <div class="trainer" id="trainer" hidden>
+      <header class="trainer-header"><button id="exitTrainer" aria-label="退出练习">×</button><div class="trainer-progress"><i id="trainerProgress"></i></div><span id="trainerPosition">1 / 20</span></header>
+      <main class="trainer-main">
+        <div class="question-kicker"><span id="questionCategory">词性 · GENUS</span><button id="speakQuestion" hidden>◖ 听发音</button></div>
+        <h2 id="questionPrompt"></h2>
+        <p id="questionContext" class="question-context"></p>
+        <div class="choice-grid" id="choiceGrid"></div>
+        <div class="question-feedback" id="questionFeedback"></div>
+      </main>
+      <footer class="trainer-footer"><div><b id="streakDisplay">0</b><span>连续答对</span></div><button id="confirmAnswer" disabled>确定</button></footer>
+    </div>
+
+    <div class="result-screen" id="resultScreen" hidden>
+      <div class="result-card"><span class="result-symbol" id="resultSymbol">✓</span><p class="eyebrow" id="resultKicker">TRAINING BEENDET</p><h2 id="resultTitle">完成这一轮</h2><strong id="resultScore">18 / 20</strong><p id="resultCopy"></p><div class="result-breakdown" id="resultBreakdown"></div><div class="result-actions"><button id="repeatTraining">再刷一轮</button><button id="trainMistakes">错题强化</button><button id="closeResult">返回首页</button></div></div>
+    </div>
+
+    <div class="word-modal" id="wordModal" hidden><div class="word-panel"><button id="closeWord" aria-label="关闭">×</button><div id="wordDetail"></div></div></div>
+    <div class="search-modal" id="searchModal" hidden><div class="search-panel"><button id="closeSearch" aria-label="关闭">×</button><label for="searchInput">搜索你的德语词库</label><input id="searchInput" type="search" placeholder="德语、English 或中文" autocomplete="off" /><div id="searchResults"></div></div></div>
+
     <script src="app.js"></script>
   </body>
 </html>

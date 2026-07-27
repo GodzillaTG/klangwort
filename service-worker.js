@@ -1,12 +1,11 @@
-const CACHE_NAME = 'klangwort-v1';
+const CACHE_NAME = 'mein-deutsch-v2';
 const APP_ASSETS = [
   './',
   './index.html',
   './style.css',
-  './practice.css',
-  './mobile.css',
   './app.js',
   './manifest.json',
+  './og.png',
   './icon.svg',
   './icon-180.png',
   './icon-512.png'
