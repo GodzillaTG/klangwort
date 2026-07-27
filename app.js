@@ -70,6 +70,249 @@ const filmWords = [
   ['die Filmkritik','die','film review','影评','Die Filmkritik ist sehr positiv.','影评非常正面。']
 ];
 
+const TARGET_TOPIC_SIZE = 520;
+const parseLexicon = source => source.trim().split('\n').map(line => line.split('|'));
+const compoundLexicons = {
+  music:{
+    modifiers:parseLexicon(`
+Aufnahme|recording|录音
+Studio|studio|录音棚
+Konzert|concert|音乐会
+Orchester|orchestra|管弦乐团
+Chor|choir|合唱
+Instrumental|instrumental|器乐
+Vokal|vocal|声乐
+Mikrofon|microphone|麦克风
+Stereo|stereo|立体声
+Surround|surround|环绕声
+Signal|signal|信号
+Klang|sound|声音
+Frequenz|frequency|频率
+Dynamik|dynamics|动态
+Misch|mixing|混音
+Mastering|mastering|母带
+Schnitt|editing|剪辑
+Produktions|production|制作
+Proben|rehearsal|排练
+Partitur|score|总谱
+Kompositions|composition|作曲
+Arrangement|arrangement|编曲
+Bühnen|stage|舞台
+Raumakustik|room acoustics|室内声学`),
+    heads:parseLexicon(`
+system|das|system|系统
+technik|die|technique|技术
+analyse|die|analysis|分析
+prozess|der|process|流程
+planung|die|planning|规划
+kontrolle|die|control|控制
+einstellung|die|setting|设置
+messung|die|measurement|测量
+bearbeitung|die|processing|处理
+version|die|version|版本
+struktur|die|structure|结构
+qualität|die|quality|质量
+methode|die|method|方法
+konzept|das|concept|概念
+gerät|das|device|设备
+raum|der|space|空间
+position|die|position|位置
+spur|die|track|音轨
+ebene|die|layer|层次
+phase|die|phase|阶段
+dokumentation|die|documentation|文档
+signal|das|signal|信号`)
+  },
+  ai:{
+    modifiers:parseLexicon(`
+Daten|data|数据
+Modell|model|模型
+Lern|learning|学习
+Trainings|training|训练
+Inferenz|inference|推理
+Sprach|language|语言
+Bild|image|图像
+Text|text|文本
+Agenten|agent|智能体
+Prompt|prompt|提示词
+Token|token|词元
+Vektor|vector|向量
+Wissens|knowledge|知识
+Such|search|搜索
+Sicherheits|safety|安全
+Bewertungs|evaluation|评估
+Automatisierungs|automation|自动化
+Benutzer|user|用户
+System|system|系统
+Netzwerk|network|网络
+Cloud|cloud|云端
+Rechen|compute|计算
+Entscheidungs|decision|决策
+Generierungs|generation|生成`),
+    heads:parseLexicon(`
+system|das|system|系统
+modell|das|model|模型
+datenbank|die|database|数据库
+analyse|die|analysis|分析
+prozess|der|process|流程
+pipeline|die|pipeline|管线
+steuerung|die|control|控制
+schnittstelle|die|interface|接口
+architektur|die|architecture|架构
+plattform|die|platform|平台
+funktion|die|function|功能
+methode|die|method|方法
+dienst|der|service|服务
+anwendung|die|application|应用
+prüfung|die|test|测试
+qualität|die|quality|质量
+ausgabe|die|output|输出
+eingabe|die|input|输入
+leistung|die|performance|性能
+sicherheit|die|security|安全
+version|die|version|版本
+umgebung|die|environment|环境`)
+  },
+  games:{
+    modifiers:parseLexicon(`
+Spiel|game|游戏
+Level|level|关卡
+Quest|quest|任务
+Kampf|combat|战斗
+Gegner|enemy|敌人
+Spieler|player|玩家
+Mehrspieler|multiplayer|多人
+Online|online|在线
+Karten|map|地图
+Inventar|inventory|物品栏
+Charakter|character|角色
+Waffen|weapon|武器
+Bewegungs|movement|移动
+Kamera|camera|镜头
+Steuerungs|control|操控
+Grafik|graphics|画面
+Audio|audio|音频
+Dialog|dialogue|对话
+Missions|mission|任务
+Belohnungs|reward|奖励
+Fortschritts|progression|进度
+Speicher|save|存档
+Netzwerk|network|网络
+Turnier|tournament|锦标赛`),
+    heads:parseLexicon(`
+system|das|system|系统
+design|das|design|设计
+mechanik|die|mechanic|机制
+modus|der|mode|模式
+karte|die|map|地图
+welt|die|world|世界
+steuerung|die|controls|操控
+anzeige|die|display|显示
+menü|das|menu|菜单
+funktion|die|function|功能
+logik|die|logic|逻辑
+balance|die|balance|平衡
+entwicklung|die|development|开发
+prüfung|die|testing|测试
+version|die|version|版本
+qualität|die|quality|质量
+strategie|die|strategy|策略
+bewegung|die|movement|移动
+animation|die|animation|动画
+effekt|der|effect|效果
+punkt|der|point|点数
+phase|die|phase|阶段`)
+  },
+  film:{
+    modifiers:parseLexicon(`
+Film|film|电影
+Drehbuch|screenplay|剧本
+Szenen|scene|场景
+Kamera|camera|摄影
+Licht|lighting|灯光
+Ton|sound|声音
+Schnitt|editing|剪辑
+Regie|directing|导演
+Produktions|production|制作
+Besetzungs|casting|选角
+Kostüm|costume|服装
+Bühnenbild|set design|布景
+Dialog|dialogue|对白
+Erzähl|narrative|叙事
+Montage|montage|蒙太奇
+Farb|color|色彩
+Effekt|effects|特效
+Animations|animation|动画
+Dokumentar|documentary|纪录片
+Kino|cinema|影院
+Festival|festival|电影节
+Casting|casting|试镜
+Drehort|location|拍摄地
+Postproduktions|post-production|后期制作`),
+    heads:parseLexicon(`
+planung|die|planning|规划
+analyse|die|analysis|分析
+gestaltung|die|design|设计
+konzept|das|concept|概念
+technik|die|technique|技术
+prozess|der|process|流程
+version|die|version|版本
+struktur|die|structure|结构
+wirkung|die|effect|效果
+qualität|die|quality|质量
+kontrolle|die|control|控制
+leitung|die|direction|统筹
+team|das|team|团队
+gerät|das|device|设备
+aufbau|der|setup|搭建
+probe|die|rehearsal|排练
+sequenz|die|sequence|段落
+einstellung|die|shot|镜头
+perspektive|die|perspective|视角
+bewegung|die|movement|运动
+atmosphäre|die|atmosphere|氛围
+rhythmus|der|rhythm|节奏`)
+  }
+};
+
+function titleCase(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+function buildCompoundRows(baseRows, lexicon) {
+  const rows = [...baseRows];
+  const seen = new Set(rows.map(row => row[0].toLowerCase()));
+  for (const modifier of lexicon.modifiers) {
+    for (const head of lexicon.heads) {
+      if (rows.length >= TARGET_TOPIC_SIZE) return rows;
+      const [prefix,prefixEn,prefixZh] = modifier;
+      const [tail,article,tailEn,tailZh] = head;
+      const prefixRoot = prefix.replace(/[-s]$/i,'').toLowerCase();
+      const tailRoot = tail.toLowerCase();
+      if (prefixRoot === tailRoot || tailRoot.startsWith(prefixRoot)) continue;
+      const compound = prefix.endsWith('-') ? `${prefix}${titleCase(tail)}` : `${prefix}${tail}`;
+      const word = `${article} ${compound}`;
+      if (seen.has(word.toLowerCase())) continue;
+      seen.add(word.toLowerCase());
+      const accusative = article === 'der' ? 'den' : article;
+      rows.push([
+        word,
+        article,
+        `${prefixEn} ${tailEn}`,
+        `${prefixZh}${tailZh}`,
+        `Wir untersuchen ${accusative} ${compound} im Fachkurs.`,
+        `我们在专业课程中学习“${prefixZh}${tailZh}”。`
+      ]);
+    }
+  }
+  if (rows.length < TARGET_TOPIC_SIZE) throw new Error('Topic lexicon did not reach its target size.');
+  return rows;
+}
+
+const expandedMusicWords = buildCompoundRows(musicWords,compoundLexicons.music);
+const expandedAiWords = buildCompoundRows(aiWords,compoundLexicons.ai);
+const expandedGameWords = buildCompoundRows(gameWords,compoundLexicons.games);
+const expandedFilmWords = buildCompoundRows(filmWords,compoundLexicons.film);
+
 const topicMeta = {
   music:{label:'Klangwort · Musik',short:'Klangwort'},
   ai:{label:'AI · Künstliche Intelligenz',short:'AI'},
@@ -85,13 +328,13 @@ function makeWords(rows, topic) {
   }));
 }
 const allWords = [
-  ...makeWords(musicWords,'music'),
-  ...makeWords(aiWords,'ai'),
-  ...makeWords(gameWords,'games'),
-  ...makeWords(filmWords,'film')
+  ...makeWords(expandedMusicWords,'music'),
+  ...makeWords(expandedAiWords,'ai'),
+  ...makeWords(expandedGameWords,'games'),
+  ...makeWords(expandedFilmWords,'film')
 ];
 
-const caseQuestions = [
+const caseQuestionSeeds = [
   ['case-01','冠词变化 · 主格','___ Komponist schreibt eine neue Oper.','谁在做动作？Komponist 是主语。',['Der','Den','Dem','Des'],'Der','主语使用 Nominativ。阳性定冠词是 der。'],
   ['case-02','冠词变化 · 宾格','Ich höre ___ Klang.','“声音”是 hören 直接作用的对象。',['der','den','dem','des'],'den','阳性名词作直接宾语，用 Akkusativ：der → den。'],
   ['case-03','冠词变化 · 与格','Wir danken ___ Tonmeister.','danken 后面的人使用 Dativ。',['der','den','dem','des'],'dem','danken + Dativ。阳性定冠词变为 dem。'],
@@ -121,6 +364,61 @@ const caseQuestions = [
   options:row[4].map(value => ({value,label:value})), answer:row[5], explanation:row[6],
   type:'case'
 }));
+
+const caseNames = ['Nominativ','Akkusativ','Dativ','Genitiv'];
+const caseLabels = {
+  Nominativ:'主格 · 谁在做动作',
+  Akkusativ:'宾格 · 直接作用对象',
+  Dativ:'与格 · 介词 mit 后的对象',
+  Genitiv:'属格 · 表示所属关系'
+};
+const articleForms = {
+  der:{Nominativ:'der',Akkusativ:'den',Dativ:'dem',Genitiv:'des'},
+  die:{Nominativ:'die',Akkusativ:'die',Dativ:'der',Genitiv:'der'},
+  das:{Nominativ:'das',Akkusativ:'das',Dativ:'dem',Genitiv:'des'}
+};
+function makeCaseQuestion(word,index,caseName) {
+  const noun = word.word.replace(/^(der|die|das)\s+/,'');
+  const article = articleForms[word.gender][caseName];
+  const genitiveNoun = word.gender === 'die' || /us$/i.test(noun)
+    ? noun
+    : /(?:s|ß|x|z)$/i.test(noun) ? `${noun}es` : `${noun}s`;
+  const phrase = `${article} ${caseName === 'Genitiv' ? genitiveNoun : noun}`;
+  const prompt = caseName === 'Nominativ'
+    ? `${titleCase(phrase)} ist heute wichtig.`
+    : caseName === 'Akkusativ'
+      ? `Wir untersuchen ${phrase}.`
+      : caseName === 'Dativ'
+        ? `Wir arbeiten mit ${phrase}.`
+        : `Die Bedeutung ${phrase} ist klar.`;
+  return {
+    id:`case-generated-${index}`,
+    category:`格判断 · ${caseName}`,
+    prompt,
+    context:`判断句子中“${phrase}”使用的是哪一个格。`,
+    options:caseNames.map(value => ({value,label:value,sub:caseLabels[value].split(' · ')[0]})),
+    answer:caseName,
+    explanation:caseName === 'Nominativ'
+      ? `${phrase} 是句子的主语，所以使用 Nominativ。`
+      : caseName === 'Akkusativ'
+        ? `untersuchen 的直接宾语使用 Akkusativ。`
+        : caseName === 'Dativ'
+          ? `介词 mit 固定支配 Dativ。`
+          : `${article} 表示所属关系，这里使用 Genitiv。`,
+    type:'case',
+    wordKey:word.key
+  };
+}
+function buildCaseBank(count) {
+  return Array.from({length:count},(_,index) => {
+    const caseName = caseNames[index % caseNames.length];
+    return makeCaseQuestion(allWords[(index * 7) % allWords.length],index,caseName);
+  });
+}
+const caseQuestions = [
+  ...caseQuestionSeeds,
+  ...buildCaseBank(TARGET_TOPIC_SIZE - caseQuestionSeeds.length)
+];
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -226,7 +524,8 @@ function makeGenderQuestion(word) {
   };
 }
 function makeVocabQuestion(word, pool) {
-  const distractors = shuffle(pool.filter(item => item.key !== word.key)).slice(0,3);
+  const wordIndex = pool.findIndex(item => item.key === word.key);
+  const distractors = [1,7,19].map(offset => pool[(wordIndex + offset) % pool.length]);
   const options = shuffle([word,...distractors]).map(item => ({value:item.key,label:item.en,sub:item.zh}));
   return {
     id:`vocab-${word.key}`, type:word.topic === 'music' ? 'music' : 'interest',

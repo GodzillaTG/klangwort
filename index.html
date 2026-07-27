@@ -7,13 +7,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Mein Deutsch" />
-    <meta name="description" content="为 Sichenguo 定制的德语学习与刷题 App：Klangwort、词性、四格、AI、游戏与电影。" />
+    <meta name="description" content="为 Sichenguo 定制的德语刷题 App：2,080 个 Klangwort、AI、游戏与电影词汇，配套词性和四格题库。" />
     <meta property="og:title" content="Mein Deutsch — 我的德语训练场" />
-    <meta property="og:description" content="专业词汇、词性、四格与兴趣德语，一起刷进长期记忆。" />
+    <meta property="og:description" content="2,080 个专业与兴趣词汇，加上词性和四格题库，一起刷进长期记忆。" />
     <meta property="og:image" content="https://mein-deutsch-sichenguo.godzillatg.chatgpt.site/og.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Mein Deutsch — 我的德语训练场" />
-    <meta name="twitter:description" content="专业词汇、词性、四格与兴趣德语，一起刷进长期记忆。" />
+    <meta name="twitter:description" content="2,080 个专业与兴趣词汇，加上词性和四格题库，一起刷进长期记忆。" />
     <meta name="twitter:image" content="https://mein-deutsch-sichenguo.godzillatg.chatgpt.site/og.png" />
     <title>Mein Deutsch — 我的德语训练场</title>
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
@@ -67,10 +67,10 @@
         <section class="overview-section">
           <div class="section-heading"><div><p class="eyebrow">DEIN LEHRPLAN</p><h2>你的四大学习板块</h2></div><p>不是平均用力。词性和四格占每天训练的 60%。</p></div>
           <div class="course-grid">
-            <article class="course-card music-card"><div class="course-top"><span>01</span><i>♫</i></div><h3>Klangwort</h3><p>作曲、Tonmeister、录音制作和音乐表达。</p><div class="course-meta"><b>24</b><span>专业词汇</span></div><button data-jump="#words" data-topic="music">进入词库 →</button></article>
-            <article class="course-card gender-card"><div class="course-top"><span>02</span><i>der</i></div><h3>阴阳中性</h3><p>把 der / die / das 和名词当作一个整体记住。</p><div class="gender-dots"><span>der</span><span>die</span><span>das</span></div><button data-start="gender">开始专项 →</button></article>
-            <article class="course-card case-card"><div class="course-top"><span>03</span><i>Ⅳ</i></div><h3>德语四格</h3><p>主格、宾格、与格、属格，用句子判断角色。</p><div class="course-meta"><b>4</b><span>Kasus</span></div><button data-start="cases">开始专项 →</button></article>
-            <article class="course-card interest-card"><div class="course-top"><span>04</span><i>AI</i></div><h3>Meine Welt</h3><p>用你感兴趣的 AI、游戏和电影建立词汇量。</p><div class="interest-tags"><span>AI</span><span>Games</span><span>Film</span></div><button data-jump="#words" data-topic="ai">浏览兴趣词 →</button></article>
+            <article class="course-card music-card"><div class="course-top"><span>01</span><i>♫</i></div><h3>Klangwort</h3><p>作曲、Tonmeister、录音制作和音乐表达。</p><div class="course-meta"><b>520</b><span>专业词汇</span></div><button data-jump="#words" data-topic="music">进入词库 →</button></article>
+            <article class="course-card gender-card"><div class="course-top"><span>02</span><i>der</i></div><h3>阴阳中性</h3><p>把 der / die / das 和名词当作一个整体记住。</p><div class="course-meta"><b>2,080</b><span>词性题</span></div><button data-start="gender">开始专项 →</button></article>
+            <article class="course-card case-card"><div class="course-top"><span>03</span><i>Ⅳ</i></div><h3>德语四格</h3><p>主格、宾格、与格、属格，用句子判断角色。</p><div class="course-meta"><b>520</b><span>四格题</span></div><button data-start="cases">开始专项 →</button></article>
+            <article class="course-card interest-card"><div class="course-top"><span>04</span><i>AI</i></div><h3>Meine Welt</h3><p>用你感兴趣的 AI、游戏和电影建立词汇量。</p><div class="course-meta"><b>1,560</b><span>兴趣词</span></div><button data-jump="#words" data-topic="ai">浏览兴趣词 →</button></article>
           </div>
         </section>
 
@@ -107,12 +107,12 @@
         </section>
 
         <section class="words-section" id="words">
-          <div class="section-heading"><div><p class="eyebrow">MEINE WÖRTER</p><h2>专业词汇与兴趣词库</h2><p>所有名词都带冠词；每张卡都有中英解释和德语例句。</p></div><div class="word-count"><b id="visibleWordCount">0</b><span>Wörter</span></div></div>
+          <div class="section-heading"><div><p class="eyebrow">MEINE WÖRTER</p><h2>专业词汇与兴趣词库</h2><p>每类 520 词：高频核心词加德语复合词族；全部带冠词、中英解释和例句。</p></div><div class="word-count"><b id="visibleWordCount">0</b><span>Wörter</span></div></div>
           <div class="topic-tabs" id="topicTabs">
-            <button class="active" data-topic="music">♫ Klangwort</button>
-            <button data-topic="ai">AI · 人工智能</button>
-            <button data-topic="games">Games · 游戏</button>
-            <button data-topic="film">Film · 电影</button>
+            <button class="active" data-topic="music">♫ Klangwort · 520</button>
+            <button data-topic="ai">AI · 520</button>
+            <button data-topic="games">Games · 520</button>
+            <button data-topic="film">Film · 520</button>
           </div>
           <div class="word-grid" id="wordGrid"></div>
           <button class="load-more" id="loadMoreWords">显示更多 <span>↓</span></button>
