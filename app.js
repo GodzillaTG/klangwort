@@ -1082,6 +1082,14 @@ document.addEventListener('keydown',event => {
 });
 
 let offlineReady = false;
+const OFFLINE_CACHE_NAME = 'mein-deutsch-v8';
+const OFFLINE_READY_MARKER = './offline-ready-v8';
+let workerRefreshing = false;
+async function hasOfflineCache() {
+  if (!('caches' in window) || !await caches.has(OFFLINE_CACHE_NAME)) return false;
+  const cache = await caches.open(OFFLINE_CACHE_NAME);
+  return Boolean(await cache.match(OFFLINE_READY_MARKER));
+}
 function updateNetworkStatus() {
   const status = $('#networkStatus');
   status.classList.toggle('ready',offlineReady);
@@ -1095,13 +1103,18 @@ window.addEventListener('offline',updateNetworkStatus);
 updateNetworkStatus();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.addEventListener('controllerchange',async () => {
-    offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v7');
+    offlineReady = await hasOfflineCache();
     updateNetworkStatus();
+    if (!workerRefreshing) {
+      workerRefreshing = true;
+      window.location.reload();
+    }
   });
-  navigator.serviceWorker.register('./service-worker.js')
+  navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'})
+    .then(registration => registration.update().catch(() => {}).then(() => registration))
     .then(() => navigator.serviceWorker.ready)
     .then(async () => {
-      offlineReady = !('caches' in window) || await caches.has('mein-deutsch-v7');
+      offlineReady = await hasOfflineCache();
       updateNetworkStatus();
     })
     .catch(() => { $('#networkStatus').textContent = '离线缓存尚未完成'; });

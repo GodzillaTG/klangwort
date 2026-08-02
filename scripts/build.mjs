@@ -21,6 +21,7 @@ await rm(dist, { recursive: true, force: true });
 await mkdir(client, { recursive: true });
 await mkdir(server, { recursive: true });
 await Promise.all(assets.map(file => copyFile(resolve(root, file), resolve(client, file))));
+await copyFile(resolve(root, "index.html"), resolve(client, "offline.html"));
 
 await writeFile(
   resolve(server, "index.js"),
@@ -37,4 +38,4 @@ await writeFile(
 `
 );
 
-console.log(`Built ${assets.length} static assets for Sites.`);
+console.log(`Built ${assets.length + 1} static assets for Sites.`);
