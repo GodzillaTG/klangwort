@@ -1,6 +1,6 @@
-const CACHE_NAME = 'mein-deutsch-v10';
+const CACHE_NAME = 'mein-deutsch-v11';
 const OFFLINE_PAGE = './offline.html';
-const READY_MARKER = './offline-ready-v10';
+const READY_MARKER = './offline-ready-v11';
 const APP_ASSETS = [
   OFFLINE_PAGE,
   './style.css',
@@ -28,12 +28,12 @@ const EXPECTED_CONTENT_TYPES = new Map([
   ['./goethe-exams.js', 'javascript'],
   ['./offline-audio-manifest.js', 'javascript'],
   ['./offline-audio.js', 'javascript'],
-  ['./audio/music.m4a', 'audio/'],
-  ['./audio/ai.m4a', 'audio/'],
-  ['./audio/games.m4a', 'audio/'],
-  ['./audio/film.m4a', 'audio/'],
-  ['./audio/goethe-b1.m4a', 'audio/'],
-  ['./audio/goethe-b2.m4a', 'audio/'],
+  ['./audio/music.m4a', 'm4a'],
+  ['./audio/ai.m4a', 'm4a'],
+  ['./audio/games.m4a', 'm4a'],
+  ['./audio/film.m4a', 'm4a'],
+  ['./audio/goethe-b1.m4a', 'm4a'],
+  ['./audio/goethe-b2.m4a', 'm4a'],
   ['./manifest.json', 'json'],
   ['./og.png', 'image/png'],
   ['./icon.svg', 'image/svg+xml'],
@@ -54,6 +54,7 @@ function isValidAssetResponse(asset, response) {
 
   const expectedType = EXPECTED_CONTENT_TYPES.get(asset);
   const contentType = response.headers.get('content-type') || '';
+  if (expectedType === 'm4a') return contentType.includes('audio/') || contentType.includes('application/octet-stream');
   return !expectedType || contentType.includes(expectedType);
 }
 

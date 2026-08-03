@@ -1081,8 +1081,8 @@ document.addEventListener('keydown',event => {
 });
 
 let offlineReady = false;
-const OFFLINE_CACHE_NAME = 'mein-deutsch-v10';
-const OFFLINE_READY_MARKER = './offline-ready-v10';
+const OFFLINE_CACHE_NAME = 'mein-deutsch-v11';
+const OFFLINE_READY_MARKER = './offline-ready-v11';
 let workerRefreshing = false;
 async function hasOfflineCache() {
   if (!('caches' in window) || !await caches.has(OFFLINE_CACHE_NAME)) return false;
