@@ -5,8 +5,10 @@ const root = resolve(import.meta.dirname, "..");
 const dist = resolve(root, "dist");
 const client = resolve(dist, "client");
 const server = resolve(dist, "server");
+const hosting = resolve(dist, ".openai");
 const assets = [
   "index.html",
+  "offline.html",
   "style.css",
   "app.js",
   "goethe-exams.js",
@@ -23,9 +25,10 @@ const assets = [
 await rm(dist, { recursive: true, force: true });
 await mkdir(client, { recursive: true });
 await mkdir(server, { recursive: true });
+await mkdir(hosting, { recursive: true });
 await Promise.all(assets.map(file => copyFile(resolve(root, file), resolve(client, file))));
 await cp(resolve(root, "audio"), resolve(client, "audio"), { recursive: true });
-await copyFile(resolve(root, "index.html"), resolve(client, "offline.html"));
+await copyFile(resolve(root, ".openai/hosting.json"), resolve(hosting, "hosting.json"));
 const audioFiles = await readdir(resolve(root,"audio"));
 
 await writeFile(
@@ -43,4 +46,4 @@ await writeFile(
 `
 );
 
-console.log(`Built ${assets.length + audioFiles.length + 1} static assets for Sites.`);
+console.log(`Built ${assets.length + audioFiles.length} static assets for Sites.`);
