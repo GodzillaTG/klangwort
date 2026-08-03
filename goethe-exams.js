@@ -331,7 +331,7 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
   }
   function stopTimer() {
     if (state?.timerId) clearInterval(state.timerId);
-    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    window.offlineGermanAudio?.stop();
   }
   function startTimer() {
     stopTimer();
@@ -446,12 +446,9 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
     if (key !== audioKey) return;
     const repeats = question.repeats || currentPart.repeats || 1;
     const used = state.audioPlays[audioKey] || 0;
-    if (used >= repeats || !('speechSynthesis' in window)) return;
-    const utterance = new SpeechSynthesisUtterance(question.audio || currentPart.audio);
-    utterance.lang = 'de-DE';
-    utterance.rate = state.level === 'B1' ? .88 : .94;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utterance);
+    const text = question.audio || currentPart.audio;
+    if (used >= repeats || !window.offlineGermanAudio?.has(text)) return;
+    window.offlineGermanAudio.play(text).catch(error => console.warn(error.message));
     state.audioPlays[audioKey] = used + 1;
     renderCurrent();
   }
@@ -526,7 +523,7 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
     const play = event.target.closest('[data-play-goethe]');
     if (play && state) { playAudio(play.dataset.playGoethe); return; }
     const speakPrompt = event.target.closest('[data-speak-goethe]');
-    if (speakPrompt && 'speechSynthesis' in window) { const voice=new SpeechSynthesisUtterance(speakPrompt.dataset.speakGoethe); voice.lang='de-DE'; voice.rate=.88; speechSynthesis.cancel(); speechSynthesis.speak(voice); return; }
+    if (speakPrompt) { window.offlineGermanAudio?.play(speakPrompt.dataset.speakGoethe).catch(error => console.warn(error.message)); return; }
     if (event.target.closest('[data-start-speaking]')) { beginSpeakingExam(); return; }
     if (event.target.closest('[data-restart-goethe]') && state) { openExam(state.level,state.module); return; }
     if (event.target.closest('[data-goethe-overview]') && state) { openExam(state.level,'overview'); return; }

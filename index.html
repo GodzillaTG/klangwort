@@ -55,7 +55,7 @@
             <div class="hero-actions">
               <button class="primary-button" data-start="daily">开始今日 15 题 <span>→</span></button>
               <button class="ios-install-button" id="iosInstallButton" hidden>▣ 添加到 iPhone 主屏幕</button>
-              <span class="network-status" id="networkStatus" role="status">正在准备离线模式…</span>
+              <span class="network-status" id="networkStatus" role="status">正在缓存离线题库与语音…</span>
             </div>
           </div>
           <div class="hero-score">
@@ -233,7 +233,7 @@
           <li><b>2</b><span>点击 Safari 底部的<strong>分享按钮</strong>。</span></li>
           <li><b>3</b><span>向下滑，选择<strong>“添加到主屏幕”</strong>，再点“添加”。</span></li>
         </ol>
-        <p class="install-note">首次请保持联网，等首页显示“已缓存 · 可完全离线”后再添加。以后从桌面直接打开，不需要 ChatGPT 登录，开飞行模式也能使用。</p>
+        <p class="install-note">首次请保持联网，等首页显示“已缓存 · 题库与语音可完全离线”后再添加。以后从桌面直接打开，不需要 ChatGPT 登录，开飞行模式也能使用。</p>
         <button class="install-done" id="installDone">知道了</button>
       </div>
     </div>
@@ -253,6 +253,8 @@
       </footer>
     </div>
 
+    <script src="offline-audio-manifest.js"></script>
+    <script src="offline-audio.js"></script>
     <script src="app.js"></script>
     <script src="goethe-exams.js"></script>
   </body>

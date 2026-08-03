@@ -1,11 +1,19 @@
-const CACHE_NAME = 'mein-deutsch-v9';
+const CACHE_NAME = 'mein-deutsch-v10';
 const OFFLINE_PAGE = './offline.html';
-const READY_MARKER = './offline-ready-v9';
+const READY_MARKER = './offline-ready-v10';
 const APP_ASSETS = [
   OFFLINE_PAGE,
   './style.css',
   './app.js',
   './goethe-exams.js',
+  './offline-audio-manifest.js',
+  './offline-audio.js',
+  './audio/music.m4a',
+  './audio/ai.m4a',
+  './audio/games.m4a',
+  './audio/film.m4a',
+  './audio/goethe-b1.m4a',
+  './audio/goethe-b2.m4a',
   './manifest.json',
   './og.png',
   './icon.svg',
@@ -18,6 +26,14 @@ const EXPECTED_CONTENT_TYPES = new Map([
   ['./style.css', 'text/css'],
   ['./app.js', 'javascript'],
   ['./goethe-exams.js', 'javascript'],
+  ['./offline-audio-manifest.js', 'javascript'],
+  ['./offline-audio.js', 'javascript'],
+  ['./audio/music.m4a', 'audio/'],
+  ['./audio/ai.m4a', 'audio/'],
+  ['./audio/games.m4a', 'audio/'],
+  ['./audio/film.m4a', 'audio/'],
+  ['./audio/goethe-b1.m4a', 'audio/'],
+  ['./audio/goethe-b2.m4a', 'audio/'],
   ['./manifest.json', 'json'],
   ['./og.png', 'image/png'],
   ['./icon.svg', 'image/svg+xml'],
@@ -79,14 +95,30 @@ async function offlineFallback() {
   );
 }
 
-async function networkFirstNavigation(request) {
-  try {
-    // Fetch the exact navigation request so private-site sign-in and callback
-    // redirects stay in Safari's live network flow and are never cached.
-    return await fetch(request);
-  } catch {
-    return offlineFallback();
+async function offlineFirstNavigation(request) {
+  const cached = await caches.match(assetUrl(OFFLINE_PAGE), { ignoreSearch: true });
+  if (cached) return cached;
+  try { return await fetch(request); } catch { return offlineFallback(); }
+}
+
+async function serveRangeRequest(request) {
+  const cached = await caches.match(request, { ignoreSearch: true });
+  if (!cached) return fetch(request);
+  const match = /bytes=(\d*)-(\d*)/.exec(request.headers.get('range') || '');
+  if (!match) return cached;
+  const bytes = await cached.arrayBuffer();
+  const total = bytes.byteLength;
+  const suffixLength = !match[1] ? Number(match[2] || 0) : 0;
+  const start = match[1] ? Number(match[1]) : Math.max(0,total - suffixLength);
+  const end = match[1] && match[2] ? Math.min(Number(match[2]),total - 1) : total - 1;
+  if (!Number.isFinite(start) || !Number.isFinite(end) || start > end || start >= total) {
+    return new Response(null,{status:416,headers:{'Content-Range':`bytes */${total}`}});
   }
+  const headers = new Headers(cached.headers);
+  headers.set('Accept-Ranges','bytes');
+  headers.set('Content-Range',`bytes ${start}-${end}/${total}`);
+  headers.set('Content-Length',String(end - start + 1));
+  return new Response(bytes.slice(start,end + 1),{status:206,statusText:'Partial Content',headers});
 }
 
 async function cacheFirstAsset(request) {
@@ -118,11 +150,15 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   if (event.request.mode === 'navigate') {
-    event.respondWith(networkFirstNavigation(event.request));
+    event.respondWith(offlineFirstNavigation(event.request));
     return;
   }
 
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
+  if (event.request.headers.has('range')) {
+    event.respondWith(serveRangeRequest(event.request));
+    return;
+  }
   event.respondWith(cacheFirstAsset(event.request));
 });

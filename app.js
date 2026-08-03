@@ -770,12 +770,11 @@ function renderWords() {
   $$('#topicTabs button').forEach(button => button.classList.toggle('active',button.dataset.topic === activeTopic));
 }
 function speak(text) {
-  if (!('speechSynthesis' in window)) return;
-  speechSynthesis.cancel();
-  const voice = new SpeechSynthesisUtterance(text);
-  voice.lang = 'de-DE';
-  voice.rate = .82;
-  speechSynthesis.speak(voice);
+  if (!window.offlineGermanAudio?.has(text)) {
+    console.warn('Offline German audio is unavailable for:',text);
+    return;
+  }
+  window.offlineGermanAudio.play(text).catch(error => console.warn(error.message));
 }
 function openWord(key) {
   const word = allWords.find(item => item.key === key);
@@ -1082,8 +1081,8 @@ document.addEventListener('keydown',event => {
 });
 
 let offlineReady = false;
-const OFFLINE_CACHE_NAME = 'mein-deutsch-v9';
-const OFFLINE_READY_MARKER = './offline-ready-v9';
+const OFFLINE_CACHE_NAME = 'mein-deutsch-v10';
+const OFFLINE_READY_MARKER = './offline-ready-v10';
 let workerRefreshing = false;
 async function hasOfflineCache() {
   if (!('caches' in window) || !await caches.has(OFFLINE_CACHE_NAME)) return false;
@@ -1095,8 +1094,8 @@ function updateNetworkStatus() {
   status.classList.toggle('ready',offlineReady);
   status.classList.toggle('offline',!navigator.onLine);
   status.textContent = !navigator.onLine
-    ? '离线模式 · 题库可用'
-    : offlineReady ? '已缓存 · 可完全离线' : '正在准备离线模式…';
+    ? '离线模式 · 题库与语音可用'
+    : offlineReady ? '已缓存 · 题库与语音可完全离线' : '正在缓存离线题库与语音…';
 }
 window.addEventListener('online',updateNetworkStatus);
 window.addEventListener('offline',updateNetworkStatus);
