@@ -20,6 +20,20 @@
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png" />
     <link rel="manifest" href="manifest.json" />
+    <script>
+      if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+        let refreshingForOfflineUpdate = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (refreshingForOfflineUpdate) return;
+          refreshingForOfflineUpdate = true;
+          location.reload();
+        });
+        navigator.serviceWorker
+          .register('./service-worker.js', { updateViaCache: 'none' })
+          .then(registration => registration.update())
+          .catch(() => {});
+      }
+    </script>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
