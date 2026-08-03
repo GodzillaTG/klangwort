@@ -11,9 +11,10 @@ const vocabularyContext = {};
 vm.runInNewContext(`${appSource.slice(0,appSource.indexOf("const caseSeedEnglish"))}\nglobalThis.__WORDS__=allWords;`,vocabularyContext);
 const goetheContext = {};
 vm.runInNewContext(`${goetheSource.slice(0,goetheSource.indexOf("  const moduleDescriptions"))}\n  globalThis.__EXAMS__=EXAMS;\n})();`,goetheContext);
-const manifestContext = { window:{} };
+const manifestContext = {};
 vm.runInNewContext(manifestSource,manifestContext);
-const manifest = manifestContext.window.OFFLINE_AUDIO_MANIFEST;
+const manifest = manifestContext.OFFLINE_AUDIO_MANIFEST;
+const declaredSources = manifestContext.OFFLINE_AUDIO_SOURCES;
 
 const required = new Set(vocabularyContext.__WORDS__.map(word => word.word));
 for (const exam of Object.values(goetheContext.__EXAMS__)) {
@@ -30,11 +31,16 @@ const extra = Object.keys(manifest).filter(text => !required.has(text));
 if (extra.length) throw new Error(`Manifest has ${extra.length} unexpected utterances.`);
 
 const sources = [...new Set(Object.values(manifest).map(entry => entry.src))];
+if (JSON.stringify(sources) !== JSON.stringify(declaredSources)) throw new Error('Declared offline audio sources do not match the manifest.');
 let totalBytes = 0;
+let largestBytes = 0;
 for (const source of sources) {
   const path = resolve(root,source);
   await access(path);
-  totalBytes += (await stat(path)).size;
+  const size = (await stat(path)).size;
+  totalBytes += size;
+  largestBytes = Math.max(largestBytes,size);
 }
+if (largestBytes > 600 * 1024) throw new Error(`Offline audio chunk is too large for reliable resume: ${largestBytes} bytes.`);
 
-console.log(`Offline audio verified: ${required.size} unique utterances, ${sources.length} sprites, ${(totalBytes/1024/1024).toFixed(1)} MiB.`);
+console.log(`Offline audio verified: ${required.size} unique utterances, ${sources.length} sprites, ${(totalBytes/1024/1024).toFixed(1)} MiB, largest ${(largestBytes/1024).toFixed(0)} KiB.`);

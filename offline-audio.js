@@ -1,6 +1,6 @@
 (() => {
   const manifest = window.OFFLINE_AUDIO_MANIFEST || {};
-  const sources = [...new Set(Object.values(manifest).map(entry => entry.src))];
+  const sources = window.OFFLINE_AUDIO_SOURCES || [...new Set(Object.values(manifest).map(entry => entry.src))];
   const players = new Map(sources.map(src => {
     const audio = new Audio(src);
     audio.preload = 'none';
@@ -64,5 +64,5 @@
     });
   }
 
-  window.offlineGermanAudio = { play, stop, preload, has:text => Boolean(manifest[normalize(text)]), count:Object.keys(manifest).length };
+  window.offlineGermanAudio = { play, stop, preload, has:text => Boolean(manifest[normalize(text)]), count:Object.keys(manifest).length, sourceCount:sources.length };
 })();

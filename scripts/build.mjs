@@ -1,4 +1,4 @@
-import { copyFile, cp, mkdir, rm, writeFile } from "node:fs/promises";
+import { copyFile, cp, mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
@@ -26,6 +26,7 @@ await mkdir(server, { recursive: true });
 await Promise.all(assets.map(file => copyFile(resolve(root, file), resolve(client, file))));
 await cp(resolve(root, "audio"), resolve(client, "audio"), { recursive: true });
 await copyFile(resolve(root, "index.html"), resolve(client, "offline.html"));
+const audioFiles = await readdir(resolve(root,"audio"));
 
 await writeFile(
   resolve(server, "index.js"),
@@ -42,4 +43,4 @@ await writeFile(
 `
 );
 
-console.log(`Built ${assets.length + 7} static assets for Sites.`);
+console.log(`Built ${assets.length + audioFiles.length + 1} static assets for Sites.`);

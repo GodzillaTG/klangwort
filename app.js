@@ -1081,12 +1081,12 @@ document.addEventListener('keydown',event => {
 });
 
 let offlineReady = false;
-const OFFLINE_CACHE_NAME = 'mein-deutsch-v12';
-const OFFLINE_READY_MARKER = './offline-ready-v12';
+const OFFLINE_CACHE_NAME = 'mein-deutsch-v13';
+const OFFLINE_READY_MARKER = './offline-ready-v13';
 let workerRefreshing = false;
 let workerRegistration = null;
 let offlineAudioCompleted = 0;
-let offlineAudioTotal = 6;
+let offlineAudioTotal = window.OFFLINE_AUDIO_SOURCES?.length || 0;
 let offlineRetryTimer = 0;
 async function hasOfflineCache() {
   if (!('caches' in window) || !await caches.has(OFFLINE_CACHE_NAME)) return false;

@@ -1,6 +1,7 @@
-const CACHE_NAME = 'mein-deutsch-v12';
+const CACHE_NAME = 'mein-deutsch-v13';
 const OFFLINE_PAGE = './offline.html';
-const READY_MARKER = './offline-ready-v12';
+const READY_MARKER = './offline-ready-v13';
+importScripts('./offline-audio-manifest.js');
 const CORE_ASSETS = [
   OFFLINE_PAGE,
   './style.css',
@@ -13,14 +14,7 @@ const CORE_ASSETS = [
   './icon-180.png',
   './icon-512.png'
 ];
-const AUDIO_ASSETS = [
-  './audio/music.m4a',
-  './audio/ai.m4a',
-  './audio/games.m4a',
-  './audio/film.m4a',
-  './audio/goethe-b1.m4a',
-  './audio/goethe-b2.m4a'
-];
+const AUDIO_ASSETS = (self.OFFLINE_AUDIO_SOURCES || []).map(source => `./${source}`);
 
 const EXPECTED_CONTENT_TYPES = new Map([
   ['./offline.html', 'text/html'],
@@ -29,18 +23,13 @@ const EXPECTED_CONTENT_TYPES = new Map([
   ['./goethe-exams.js', 'javascript'],
   ['./offline-audio-manifest.js', 'javascript'],
   ['./offline-audio.js', 'javascript'],
-  ['./audio/music.m4a', 'm4a'],
-  ['./audio/ai.m4a', 'm4a'],
-  ['./audio/games.m4a', 'm4a'],
-  ['./audio/film.m4a', 'm4a'],
-  ['./audio/goethe-b1.m4a', 'm4a'],
-  ['./audio/goethe-b2.m4a', 'm4a'],
   ['./manifest.json', 'json'],
   ['./og.png', 'image/png'],
   ['./icon.svg', 'image/svg+xml'],
   ['./icon-180.png', 'image/png'],
   ['./icon-512.png', 'image/png']
 ]);
+AUDIO_ASSETS.forEach(asset => EXPECTED_CONTENT_TYPES.set(asset,'m4a'));
 
 function assetUrl(asset) {
   return new URL(asset, self.location.href);
@@ -88,6 +77,13 @@ async function notifyClients(message) {
   clients.forEach(client => client.postMessage(message));
 }
 
+async function fetchWithTimeout(request,timeoutMs=45000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(),timeoutMs);
+  try { return await fetch(request,{signal:controller.signal}); }
+  finally { clearTimeout(timer); }
+}
+
 async function migratePartialAudio() {
   const keys = await caches.keys();
   const cache = await caches.open(CACHE_NAME);
@@ -118,7 +114,7 @@ async function cacheOfflineAudio() {
 
     try {
       const request = new Request(url,{cache:'reload',credentials:'same-origin'});
-      const response = await fetch(request);
+      const response = await fetchWithTimeout(request);
       if (!isValidAssetResponse(asset,response)) throw new Error(`Invalid offline audio: ${asset}`);
       await cache.put(request,await cloneAsCleanResponse(response));
       completed += 1;

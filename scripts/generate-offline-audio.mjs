@@ -143,15 +143,22 @@ const groups = {
   "goethe-b2": goetheTexts(exams.B2)
 };
 
+await rm(audioDir, { recursive: true, force: true });
 await mkdir(audioDir, { recursive: true });
 const tempRoot = await mkdtemp(resolve(tmpdir(), "mein-deutsch-audio-"));
 const manifest = {};
 try {
-  for (const [name, texts] of Object.entries(groups)) await buildSprite(name, texts, tempRoot, manifest);
-  const manifestSource = `window.OFFLINE_AUDIO_MANIFEST = ${JSON.stringify(manifest)};\n`;
+  for (const [name, texts] of Object.entries(groups)) {
+    const chunkSize = name.startsWith("goethe-") ? 5 : 80;
+    for (let start = 0, part = 1; start < texts.length; start += chunkSize, part += 1) {
+      await buildSprite(`${name}-${part}`, texts.slice(start,start + chunkSize), tempRoot, manifest);
+    }
+  }
+  const sources = [...new Set(Object.values(manifest).map(entry => entry.src))];
+  const manifestSource = `globalThis.OFFLINE_AUDIO_MANIFEST = ${JSON.stringify(manifest)};\nglobalThis.OFFLINE_AUDIO_SOURCES = ${JSON.stringify(sources)};\n`;
   await writeFile(resolve(root, "offline-audio-manifest.js"), manifestSource);
   const total = Object.keys(manifest).length;
-  console.log(`Generated ${total} fully bundled German utterances in ${Object.keys(groups).length} sprites.`);
+  console.log(`Generated ${total} fully bundled German utterances in ${sources.length} resumable sprites.`);
 } finally {
   await rm(tempRoot, { recursive: true, force: true });
 }
