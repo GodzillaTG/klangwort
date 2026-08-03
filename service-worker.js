@@ -1,24 +1,25 @@
-const CACHE_NAME = 'mein-deutsch-v11';
+const CACHE_NAME = 'mein-deutsch-v12';
 const OFFLINE_PAGE = './offline.html';
-const READY_MARKER = './offline-ready-v11';
-const APP_ASSETS = [
+const READY_MARKER = './offline-ready-v12';
+const CORE_ASSETS = [
   OFFLINE_PAGE,
   './style.css',
   './app.js',
   './goethe-exams.js',
   './offline-audio-manifest.js',
   './offline-audio.js',
+  './manifest.json',
+  './icon.svg',
+  './icon-180.png',
+  './icon-512.png'
+];
+const AUDIO_ASSETS = [
   './audio/music.m4a',
   './audio/ai.m4a',
   './audio/games.m4a',
   './audio/film.m4a',
   './audio/goethe-b1.m4a',
-  './audio/goethe-b2.m4a',
-  './manifest.json',
-  './og.png',
-  './icon.svg',
-  './icon-180.png',
-  './icon-512.png'
+  './audio/goethe-b2.m4a'
 ];
 
 const EXPECTED_CONTENT_TYPES = new Map([
@@ -69,10 +70,10 @@ async function cloneAsCleanResponse(response) {
 }
 
 async function precacheAppShell() {
-  await caches.delete(CACHE_NAME);
   const cache = await caches.open(CACHE_NAME);
 
-  for (const asset of APP_ASSETS) {
+  for (const asset of CORE_ASSETS) {
+    if (await cache.match(assetUrl(asset))) continue;
     const request = new Request(assetUrl(asset), { cache: 'reload', credentials: 'same-origin' });
     const response = await fetch(request);
     if (!isValidAssetResponse(asset, response)) {
@@ -80,10 +81,66 @@ async function precacheAppShell() {
     }
     await cache.put(request, await cloneAsCleanResponse(response));
   }
+}
+
+async function notifyClients(message) {
+  const clients = await self.clients.matchAll({type:'window',includeUncontrolled:true});
+  clients.forEach(client => client.postMessage(message));
+}
+
+async function migratePartialAudio() {
+  const keys = await caches.keys();
+  const cache = await caches.open(CACHE_NAME);
+  for (const key of keys.filter(key => key !== CACHE_NAME && key.startsWith('mein-deutsch-v'))) {
+    const oldCache = await caches.open(key);
+    for (const asset of AUDIO_ASSETS) {
+      const url = assetUrl(asset);
+      if (await cache.match(url)) continue;
+      const response = await oldCache.match(url,{ignoreSearch:true});
+      if (response?.ok) await cache.put(url,response.clone());
+    }
+    await caches.delete(key);
+  }
+}
+
+let audioCachingPromise = null;
+async function cacheOfflineAudio() {
+  const cache = await caches.open(CACHE_NAME);
+  let completed = 0;
+
+  for (const asset of AUDIO_ASSETS) {
+    const url = assetUrl(asset);
+    if (await cache.match(url)) {
+      completed += 1;
+      await notifyClients({type:'OFFLINE_AUDIO_PROGRESS',completed,total:AUDIO_ASSETS.length});
+      continue;
+    }
+
+    try {
+      const request = new Request(url,{cache:'reload',credentials:'same-origin'});
+      const response = await fetch(request);
+      if (!isValidAssetResponse(asset,response)) throw new Error(`Invalid offline audio: ${asset}`);
+      await cache.put(request,await cloneAsCleanResponse(response));
+      completed += 1;
+      await notifyClients({type:'OFFLINE_AUDIO_PROGRESS',completed,total:AUDIO_ASSETS.length});
+    } catch {
+      await notifyClients({type:'OFFLINE_AUDIO_PAUSED',completed,total:AUDIO_ASSETS.length});
+      return false;
+    }
+  }
 
   await cache.put(assetUrl(READY_MARKER), new Response('ready', {
     headers: { 'Content-Type': 'text/plain; charset=utf-8' }
   }));
+  await notifyClients({type:'OFFLINE_AUDIO_READY',completed:AUDIO_ASSETS.length,total:AUDIO_ASSETS.length});
+  return true;
+}
+
+function ensureOfflineAudio() {
+  if (!audioCachingPromise) {
+    audioCachingPromise = cacheOfflineAudio().finally(() => { audioCachingPromise = null; });
+  }
+  return audioCachingPromise;
 }
 
 async function offlineFallback() {
@@ -140,11 +197,12 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    Promise.all([
-      caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))),
-      self.clients.claim()
-    ])
+    migratePartialAudio().then(() => self.clients.claim())
   );
+});
+
+self.addEventListener('message',event => {
+  if (event.data?.type === 'CACHE_OFFLINE_AUDIO') event.waitUntil(ensureOfflineAudio());
 });
 
 self.addEventListener('fetch', event => {

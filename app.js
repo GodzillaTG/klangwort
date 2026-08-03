@@ -1081,9 +1081,13 @@ document.addEventListener('keydown',event => {
 });
 
 let offlineReady = false;
-const OFFLINE_CACHE_NAME = 'mein-deutsch-v11';
-const OFFLINE_READY_MARKER = './offline-ready-v11';
+const OFFLINE_CACHE_NAME = 'mein-deutsch-v12';
+const OFFLINE_READY_MARKER = './offline-ready-v12';
 let workerRefreshing = false;
+let workerRegistration = null;
+let offlineAudioCompleted = 0;
+let offlineAudioTotal = 6;
+let offlineRetryTimer = 0;
 async function hasOfflineCache() {
   if (!('caches' in window) || !await caches.has(OFFLINE_CACHE_NAME)) return false;
   const cache = await caches.open(OFFLINE_CACHE_NAME);
@@ -1093,11 +1097,40 @@ function updateNetworkStatus() {
   const status = $('#networkStatus');
   status.classList.toggle('ready',offlineReady);
   status.classList.toggle('offline',!navigator.onLine);
-  status.textContent = !navigator.onLine
-    ? '离线模式 · 题库与语音可用'
-    : offlineReady ? '已缓存 · 题库与语音可完全离线' : '正在缓存离线题库与语音…';
+  if (offlineReady) {
+    status.textContent = navigator.onLine ? '已缓存 · 题库与语音可完全离线' : '离线模式 · 题库与语音可用';
+  } else if (!navigator.onLine) {
+    status.textContent = `离线语音尚未完整 · 已保存 ${offlineAudioCompleted}/${offlineAudioTotal}`;
+  } else {
+    status.textContent = `正在续传离线语音 · ${offlineAudioCompleted}/${offlineAudioTotal}`;
+  }
 }
-window.addEventListener('online',updateNetworkStatus);
+async function requestOfflineAudioCache() {
+  clearTimeout(offlineRetryTimer);
+  offlineReady = await hasOfflineCache();
+  if (offlineReady) {
+    window.offlineGermanAudio?.preload();
+    updateNetworkStatus();
+    return;
+  }
+  updateNetworkStatus();
+  if (!navigator.onLine || !workerRegistration) return;
+  const worker = navigator.serviceWorker.controller || workerRegistration.active;
+  worker?.postMessage({type:'CACHE_OFFLINE_AUDIO'});
+  offlineRetryTimer = window.setTimeout(requestOfflineAudioCache,15000);
+}
+navigator.serviceWorker?.addEventListener('message',event => {
+  if (!event.data?.type?.startsWith('OFFLINE_AUDIO_')) return;
+  offlineAudioCompleted = event.data.completed ?? offlineAudioCompleted;
+  offlineAudioTotal = event.data.total ?? offlineAudioTotal;
+  if (event.data.type === 'OFFLINE_AUDIO_READY') {
+    offlineReady = true;
+    clearTimeout(offlineRetryTimer);
+    window.offlineGermanAudio?.preload();
+  }
+  updateNetworkStatus();
+});
+window.addEventListener('online',() => { updateNetworkStatus(); requestOfflineAudioCache(); });
 window.addEventListener('offline',updateNetworkStatus);
 updateNetworkStatus();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
@@ -1112,9 +1145,9 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'})
     .then(registration => registration.update().catch(() => {}).then(() => registration))
     .then(() => navigator.serviceWorker.ready)
-    .then(async () => {
-      offlineReady = await hasOfflineCache();
-      updateNetworkStatus();
+    .then(async registration => {
+      workerRegistration = registration;
+      await requestOfflineAudioCache();
     })
     .catch(() => { $('#networkStatus').textContent = '离线缓存尚未完成'; });
 } else {

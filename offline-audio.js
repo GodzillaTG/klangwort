@@ -3,13 +3,13 @@
   const sources = [...new Set(Object.values(manifest).map(entry => entry.src))];
   const players = new Map(sources.map(src => {
     const audio = new Audio(src);
-    audio.preload = 'metadata';
+    audio.preload = 'none';
     audio.playsInline = true;
-    audio.load();
     return [src,audio];
   }));
   let active = null;
   let endAt = 0;
+  let preloaded = false;
 
   function normalize(text) {
     return String(text || '').trim();
@@ -28,6 +28,15 @@
       return;
     }
     requestAnimationFrame(monitor);
+  }
+
+  function preload() {
+    if (preloaded) return;
+    preloaded = true;
+    players.forEach(audio => {
+      audio.preload = 'metadata';
+      audio.load();
+    });
   }
 
   async function play(text) {
@@ -55,5 +64,5 @@
     });
   }
 
-  window.offlineGermanAudio = { play, stop, has:text => Boolean(manifest[normalize(text)]), count:Object.keys(manifest).length };
+  window.offlineGermanAudio = { play, stop, preload, has:text => Boolean(manifest[normalize(text)]), count:Object.keys(manifest).length };
 })();
