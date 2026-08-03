@@ -8,13 +8,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Mein Deutsch" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="description" content="为 Sichenguo 定制的完全离线德语刷题 App：2,080 个词汇，配套词性、冠词、形容词变位和四格题库。" />
+    <meta name="description" content="为 Sichenguo 定制的完全离线德语刷题 App：2,080 个词汇、语法题库与 Goethe B1/B2 全真模拟考。" />
     <meta property="og:title" content="Mein Deutsch — 我的德语训练场" />
-    <meta property="og:description" content="2,080 个词汇，加上词性、冠词、形容词变位和四格题库，完全离线练习。" />
+    <meta property="og:description" content="2,080 个词汇、语法题库与 Goethe B1/B2 听说读写模拟考，完全离线练习。" />
     <meta property="og:image" content="https://mein-deutsch-sichenguo.godzillatg.chatgpt.site/og.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Mein Deutsch — 我的德语训练场" />
-    <meta name="twitter:description" content="2,080 个词汇，加上词性、冠词、形容词变位和四格题库，完全离线练习。" />
+    <meta name="twitter:description" content="2,080 个词汇、语法题库与 Goethe B1/B2 听说读写模拟考，完全离线练习。" />
     <meta name="twitter:image" content="https://mein-deutsch-sichenguo.godzillatg.chatgpt.site/og.png" />
     <title>Mein Deutsch — 我的德语训练场</title>
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
@@ -33,6 +33,7 @@
           <a class="nav-item" href="#cases"><i>Ⅳ</i><span>四格<small>Kasus</small></span></a>
           <a class="nav-item" href="#words"><i>✦</i><span>词库<small>Meine Wörter</small></span></a>
           <a class="nav-item" href="#exam"><i>✓</i><span>刷题<small>Prüfung</small></span></a>
+          <a class="nav-item" href="#goethe"><i>G</i><span>歌德<small>B1 · B2</small></span></a>
         </nav>
         <div class="side-progress">
           <div class="mini-ring"><b id="sideMastered">0</b><span>掌握</span></div>
@@ -67,12 +68,13 @@
         </section>
 
         <section class="overview-section">
-          <div class="section-heading"><div><p class="eyebrow">DEIN LEHRPLAN</p><h2>你的四大学习板块</h2></div><p>不是平均用力。词性、冠词和四格是每日训练重点。</p></div>
+          <div class="section-heading"><div><p class="eyebrow">DEIN LEHRPLAN</p><h2>你的五大学习板块</h2></div><p>日常刷题打基础，Goethe B1/B2 模考检验真实应试能力。</p></div>
           <div class="course-grid">
             <article class="course-card music-card"><div class="course-top"><span>01</span><i>♫</i></div><h3>Klangwort</h3><p>作曲、Tonmeister、录音制作和音乐表达。</p><div class="course-meta"><b>520</b><span>专业词汇</span></div><button data-jump="#words" data-topic="music">进入词库 →</button></article>
             <article class="course-card gender-card"><div class="course-top"><span>02</span><i>der</i></div><h3>阴阳中性</h3><p>把 der / die / das 和名词当作一个整体记住。</p><div class="course-meta"><b>2,080</b><span>词性题</span></div><button data-start="gender">开始专项 →</button></article>
             <article class="course-card case-card"><div class="course-top"><span>03</span><i>Ⅳ</i></div><h3>变格系统</h3><p>四格、ein 类冠词，以及形容词强弱混合变化。</p><div class="course-meta"><b>1,560</b><span>变格专项题</span></div><button data-start="adjectives">开始形容词专项 →</button></article>
             <article class="course-card interest-card"><div class="course-top"><span>04</span><i>AI</i></div><h3>Meine Welt</h3><p>用你感兴趣的 AI、游戏和电影建立词汇量。</p><div class="course-meta"><b>1,560</b><span>兴趣词</span></div><button data-jump="#words" data-topic="ai">浏览兴趣词 →</button></article>
+            <article class="course-card goethe-card"><div class="course-top"><span>05</span><i>B1·B2</i></div><h3>Goethe Prüfung</h3><p>按正式模块、题量和计时完成听说读写模拟考。</p><div class="course-meta"><b>2</b><span>完整级别</span></div><button data-jump="#goethe">进入模拟考 →</button></article>
           </div>
         </section>
 
@@ -167,6 +169,37 @@
             <button class="exam-mode mistakes-mode" data-start="mistakes"><span>错题本</span><b><strong id="examMistakeCount">0</strong> 道待消灭</b><small>只练你答错的题</small><i>↻</i></button>
           </div>
         </section>
+
+        <section class="goethe-section" id="goethe">
+          <div class="goethe-heading">
+            <div><p class="eyebrow">GOETHE-PRÜFUNG · ERWACHSENE</p><h2>B1 与 B2<br /><em>全真模拟考</em></h2></div>
+            <div class="goethe-standard"><b>60%</b><span>每个模块及格线</span><small>Lesen · Hören · Schreiben · Sprechen</small></div>
+          </div>
+          <p class="goethe-intro">按照歌德学院成人考试的模块、题量、顺序与正式计时制作。阅读和听力自动评分；写作与口语保留真实开放任务，并提供离线计时、字数统计和评分清单。</p>
+          <div class="goethe-levels">
+            <article class="goethe-level-card b1-card">
+              <header><span>NIVEAU</span><b>B1</b><p>独立运用德语 · 日常生活、旅行与工作</p></header>
+              <div class="goethe-module-list">
+                <button data-goethe-level="B1" data-goethe-module="lesen"><span>01 · LESEN</span><b>阅读 · 30 题</b><small>5 Teile · 65 Min.</small><i>→</i></button>
+                <button data-goethe-level="B1" data-goethe-module="hoeren"><span>02 · HÖREN</span><b>听力 · 30 题</b><small>4 Teile · 40 Min.</small><i>→</i></button>
+                <button data-goethe-level="B1" data-goethe-module="schreiben"><span>03 · SCHREIBEN</span><b>写作 · 3 题</b><small>60 Min.</small><i>→</i></button>
+                <button data-goethe-level="B1" data-goethe-module="sprechen"><span>04 · SPRECHEN</span><b>口语 · 3 部分</b><small>15 + 15 Min. Vorbereitung</small><i>→</i></button>
+              </div>
+              <button class="goethe-full-start" data-goethe-level="B1" data-goethe-module="overview">查看 B1 整套考试</button>
+            </article>
+            <article class="goethe-level-card b2-card">
+              <header><span>NIVEAU</span><b>B2</b><p>进阶独立运用 · 观点、论证与专业语境</p></header>
+              <div class="goethe-module-list">
+                <button data-goethe-level="B2" data-goethe-module="lesen"><span>01 · LESEN</span><b>阅读 · 30 题</b><small>5 Teile · 65 Min.</small><i>→</i></button>
+                <button data-goethe-level="B2" data-goethe-module="hoeren"><span>02 · HÖREN</span><b>听力 · 30 题</b><small>4 Teile · ca. 40 Min.</small><i>→</i></button>
+                <button data-goethe-level="B2" data-goethe-module="schreiben"><span>03 · SCHREIBEN</span><b>写作 · 2 题</b><small>75 Min.</small><i>→</i></button>
+                <button data-goethe-level="B2" data-goethe-module="sprechen"><span>04 · SPRECHEN</span><b>口语 · 2 部分</b><small>15 + 15 Min. Vorbereitung</small><i>→</i></button>
+              </div>
+              <button class="goethe-full-start" data-goethe-level="B2" data-goethe-module="overview">查看 B2 整套考试</button>
+            </article>
+          </div>
+          <div class="goethe-note"><b>训练说明</b><p>本 App 的题目为原创模拟题，不复制受版权保护的正式试卷；考试结构依据歌德学院官方成人 Modellsatz。中英辅助默认折叠，正式模拟时请勿展开。</p></div>
+        </section>
       </section>
     </main>
 
@@ -200,11 +233,27 @@
           <li><b>2</b><span>点击 Safari 底部的<strong>分享按钮</strong>。</span></li>
           <li><b>3</b><span>向下滑，选择<strong>“添加到主屏幕”</strong>，再点“添加”。</span></li>
         </ol>
-        <p class="install-note">首次请保持联网，等首页显示“已缓存 · 可离线”后再添加。第一次从桌面打开时可能需要重新登录一次，之后开飞行模式也能使用。</p>
+        <p class="install-note">首次请保持联网，等首页显示“已缓存 · 可完全离线”后再添加。以后从桌面直接打开，不需要 ChatGPT 登录，开飞行模式也能使用。</p>
         <button class="install-done" id="installDone">知道了</button>
       </div>
     </div>
 
+    <div class="goethe-exam" id="goetheExam" hidden aria-live="polite">
+      <header class="goethe-exam-header">
+        <button id="exitGoetheExam" aria-label="退出歌德模拟考">×</button>
+        <div><span id="goetheExamLevel">B1</span><b id="goetheExamModule">LESEN</b></div>
+        <div class="goethe-exam-progress"><i id="goetheExamProgress"></i></div>
+        <time id="goetheExamTimer">65:00</time>
+      </header>
+      <main class="goethe-exam-main" id="goetheExamMain"></main>
+      <footer class="goethe-exam-footer">
+        <button id="goethePrevious">← 上一题</button>
+        <span id="goetheExamPosition">1 / 30</span>
+        <button class="next" id="goetheNext">下一题 →</button>
+      </footer>
+    </div>
+
     <script src="app.js"></script>
+    <script src="goethe-exams.js"></script>
   </body>
 </html>

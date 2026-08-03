@@ -1,10 +1,11 @@
-const CACHE_NAME = 'mein-deutsch-v8';
+const CACHE_NAME = 'mein-deutsch-v9';
 const OFFLINE_PAGE = './offline.html';
-const READY_MARKER = './offline-ready-v8';
+const READY_MARKER = './offline-ready-v9';
 const APP_ASSETS = [
   OFFLINE_PAGE,
   './style.css',
   './app.js',
+  './goethe-exams.js',
   './manifest.json',
   './og.png',
   './icon.svg',
@@ -16,6 +17,7 @@ const EXPECTED_CONTENT_TYPES = new Map([
   ['./offline.html', 'text/html'],
   ['./style.css', 'text/css'],
   ['./app.js', 'javascript'],
+  ['./goethe-exams.js', 'javascript'],
   ['./manifest.json', 'json'],
   ['./og.png', 'image/png'],
   ['./icon.svg', 'image/svg+xml'],
@@ -72,7 +74,7 @@ async function offlineFallback() {
   if (cached) return cached;
 
   return new Response(
-    '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Mein Deutsch</title><body><h1>暂时无法打开</h1><p>请连接网络完成一次登录，之后即可离线使用。</p></body></html>',
+    '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Mein Deutsch</title><body><h1>暂时无法打开</h1><p>请连接网络完成首次离线缓存，之后即可离线使用。</p></body></html>',
     { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
   );
 }

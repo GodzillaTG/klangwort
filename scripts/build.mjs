@@ -9,6 +9,7 @@ const assets = [
   "index.html",
   "style.css",
   "app.js",
+  "goethe-exams.js",
   "manifest.json",
   "service-worker.js",
   "icon.svg",

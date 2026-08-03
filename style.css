@@ -75,7 +75,7 @@ button{color:inherit}
 .section-heading .eyebrow{margin:0 0 9px}
 .section-heading h2,.gender-section h2,.exam-heading h2{font:38px/.98 "Playfair Display","Noto Serif SC",serif;letter-spacing:-1.7px;margin:0}
 .section-heading>p,.section-heading>div>p:not(.eyebrow){font-size:12px;line-height:1.75;color:var(--muted);margin:11px 0 0;max-width:390px}
-.course-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+.course-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:11px}
 .course-card{min-height:272px;border:1px solid #dfe0d8;background:var(--surface);padding:19px;display:flex;flex-direction:column;transition:.2s transform,.2s box-shadow}
 .course-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
 .course-top{display:flex;justify-content:space-between;color:#8b958e;font:10px "DM Mono",monospace}
@@ -87,6 +87,7 @@ button{color:inherit}
 .gender-card{border-top:4px solid var(--blue)}
 .case-card{border-top:4px solid var(--gold)}
 .interest-card{border-top:4px solid var(--green)}
+.goethe-card{border-top:4px solid var(--lime)}
 .course-meta{display:flex;align-items:baseline;gap:7px;margin-top:18px}
 .course-meta b{font:26px "Playfair Display",serif;color:var(--orange)}
 .course-meta span{font-size:9px;color:var(--muted)}
@@ -178,7 +179,7 @@ button{color:inherit}
 .gender-pill.das{background:#e5edc4;color:#5c6e34}
 .load-more{display:block;margin:24px auto 0;border:0;background:transparent;color:#5a754f;cursor:pointer;font-size:10px;font-weight:700}
 .load-more span{font-size:15px;margin-left:5px}
-.exam-section{background:#e7e9dc;margin:0 -7.5% -75px;padding:70px 7.5% 85px}
+.exam-section{background:#e7e9dc;margin:0 -7.5%;padding:70px 7.5% 85px}
 .exam-heading{display:grid;grid-template-columns:1fr auto;gap:60px;align-items:end;margin-bottom:36px}
 .exam-heading .eyebrow{margin:0 0 10px}
 .exam-heading h2{font-size:43px}
@@ -197,6 +198,103 @@ button{color:inherit}
 .primary-exam>span,.primary-exam>small{color:#acbcb2}
 .primary-exam>i{color:var(--lime)}
 .mistakes-mode{background:#f4dfd8;border-color:#e4ae9b}
+.goethe-section{background:var(--deep);color:#f8f6ed;margin:0 -7.5% -75px;padding:72px 7.5% 88px}
+.goethe-heading{display:grid;grid-template-columns:1fr auto;align-items:end;gap:36px}
+.goethe-heading .eyebrow{color:#9fb0a6;margin:0 0 10px}
+.goethe-heading h2{font:44px/.98 "Playfair Display","Noto Serif SC",serif;letter-spacing:-1.8px;margin:0}
+.goethe-heading h2 em{font-style:italic;color:var(--lime)}
+.goethe-standard{width:145px;border-left:1px solid #49605a;padding-left:22px;display:grid}
+.goethe-standard b{font:42px "Playfair Display",serif;color:var(--lime)}
+.goethe-standard span{font-size:10px;font-weight:700}
+.goethe-standard small{font-size:8px;line-height:1.5;color:#9fb0a6;margin-top:4px}
+.goethe-intro{max-width:720px;font-size:12px;line-height:1.8;color:#afbeb6;margin:24px 0 35px}
+.goethe-levels{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.goethe-level-card{border:1px solid #405650;border-radius:12px;overflow:hidden;background:#203632}
+.goethe-level-card>header{padding:24px 25px 21px;border-bottom:1px solid #405650;display:grid;grid-template-columns:auto 1fr;column-gap:15px;align-items:center}
+.goethe-level-card>header span{grid-column:1/-1;font:9px "DM Mono",monospace;letter-spacing:1.2px;color:#99aaa2}
+.goethe-level-card>header b{font:54px/.9 "Playfair Display",serif;color:var(--lime)}
+.goethe-level-card.b2-card>header b{color:#ef9a8b}
+.goethe-level-card>header p{font-size:11px;line-height:1.55;color:#bdc9c3;margin:0}
+.goethe-module-list{display:grid}
+.goethe-module-list button{min-height:83px;border:0;border-bottom:1px solid #405650;background:transparent;color:#f8f6ed;padding:14px 20px;display:grid;grid-template-columns:1fr auto;text-align:left;cursor:pointer}
+.goethe-module-list button:hover{background:#29423d}
+.goethe-module-list button>span{grid-column:1/-1;font:8px "DM Mono",monospace;letter-spacing:.8px;color:#91a29a;margin-bottom:5px}
+.goethe-module-list button>b{font:16px "Playfair Display","Noto Serif SC",serif}
+.goethe-module-list button>small{grid-column:1;font-size:9px;color:#9eada6;margin-top:3px}
+.goethe-module-list button>i{grid-column:2;grid-row:2/4;align-self:center;font-style:normal;color:var(--lime);font-size:17px}
+.b2-card .goethe-module-list button>i{color:#ef9a8b}
+.goethe-full-start{width:calc(100% - 40px);margin:18px 20px 20px;border:1px solid #6b8178;border-radius:7px;background:transparent;color:#fff;padding:11px;cursor:pointer;font-size:10px;font-weight:700}
+.goethe-note{margin-top:18px;border:1px solid #405650;border-radius:9px;padding:15px 18px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+.goethe-note b{color:var(--lime);font-size:10px}
+.goethe-note p{margin:0;color:#9fb0a6;font-size:10px;line-height:1.65}
+.goethe-exam{position:fixed;inset:0;z-index:70;background:#f4f2e9;display:flex;flex-direction:column}
+.goethe-exam-header{height:76px;flex:0 0 auto;background:#172a26;color:#fff;padding:0 4%;display:grid;grid-template-columns:44px 130px 1fr 72px;align-items:center;gap:15px}
+.goethe-exam-header>button{width:42px;height:42px;border:0;background:transparent;color:#b8c4be;font-size:27px;cursor:pointer}
+.goethe-exam-header>div:nth-child(2){display:flex;align-items:baseline;gap:9px}
+.goethe-exam-header>div:nth-child(2) span{font:24px "Playfair Display",serif;color:var(--lime)}
+.goethe-exam-header>div:nth-child(2) b{font:9px "DM Mono",monospace;letter-spacing:1px}
+.goethe-exam-progress{height:7px;border-radius:8px;background:#40534e;overflow:hidden}
+.goethe-exam-progress i{display:block;width:0;height:100%;border-radius:inherit;background:var(--lime);transition:.25s width}
+.goethe-exam-header time{font:13px "DM Mono",monospace;text-align:right;color:#f1d77a}
+.goethe-exam-main{width:min(900px,92%);flex:1;overflow:auto;margin:auto;padding:36px 0 44px}
+.goethe-overview-head{display:flex;justify-content:space-between;align-items:end;gap:20px;border-bottom:1px solid var(--line);padding-bottom:20px}
+.goethe-overview-head span,.goethe-part-label{font:9px "DM Mono",monospace;letter-spacing:1px;color:#7a8881}
+.goethe-overview-head h2{font:39px "Playfair Display","Noto Serif SC",serif;margin:5px 0 0}
+.goethe-overview-head p{font-size:11px;color:var(--muted);max-width:370px;line-height:1.7;margin:0}
+.goethe-overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:22px 0}
+.goethe-overview-module{border:1px solid var(--line);border-radius:9px;background:#fbfaf5;padding:18px;display:grid;grid-template-columns:1fr auto;gap:6px}
+.goethe-overview-module span{font:8px "DM Mono",monospace;color:#839089}
+.goethe-overview-module b{font:20px "Playfair Display",serif}
+.goethe-overview-module time{grid-row:1/3;grid-column:2;align-self:center;font:14px "DM Mono",monospace;color:var(--orange)}
+.goethe-overview-module p{grid-column:1/-1;margin:6px 0 0;font-size:10px;line-height:1.6;color:var(--muted)}
+.goethe-start-module{border:0;border-bottom:3px solid #6c9538;border-radius:8px;background:#8fc04f;color:#fff;padding:11px 16px;cursor:pointer;font-weight:700}
+.goethe-question-head{border-bottom:1px solid var(--line);padding-bottom:17px;margin-bottom:19px}
+.goethe-question-head>div{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.goethe-question-head h2{font:27px/1.22 "Playfair Display","Noto Serif SC",serif;margin:8px 0}
+.goethe-instruction{font-size:11px;line-height:1.65;color:#68766f;margin:0}
+.goethe-source{border-left:4px solid #b8ca6d;border-radius:0 8px 8px 0;background:#fbfaf5;padding:18px 20px;margin:18px 0;max-height:290px;overflow:auto}
+.goethe-source h3{font:18px "Playfair Display",serif;margin:0 0 9px}
+.goethe-source p{white-space:pre-line;font-size:12px;line-height:1.75;margin:0;color:#3d4b45}
+.goethe-source pre{white-space:pre-wrap;margin:0;font:11px/1.75 "DM Sans","Noto Sans SC",sans-serif;color:#3d4b45}
+.goethe-audio{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #ccd5c9;border-radius:9px;background:#e8edde;padding:13px 15px;margin:18px 0}
+.goethe-audio button{border:0;border-radius:7px;background:#1d3430;color:#fff;padding:10px 14px;cursor:pointer;font-size:11px;font-weight:700}
+.goethe-audio button:disabled{opacity:.45;cursor:not-allowed}
+.goethe-audio span{font-size:9px;color:#6f7c75;text-align:right}
+.goethe-question{font:22px/1.35 "Playfair Display","Noto Serif SC",serif;margin:21px 0 14px}
+.goethe-choices{display:grid;gap:8px}
+.goethe-choice{border:1px solid #d7d9d0;border-bottom-width:3px;border-radius:8px;background:#fff;padding:13px 15px;text-align:left;cursor:pointer;display:grid;grid-template-columns:26px 1fr;align-items:start;gap:9px;font-size:12px;line-height:1.5}
+.goethe-choice i{width:23px;height:23px;border:1px solid #c7ccc4;border-radius:50%;display:grid;place-items:center;font-style:normal;font:9px "DM Mono",monospace}
+.goethe-choice.selected{border-color:#87a745;background:#eef3d8}
+.goethe-choice.selected i{background:#8db54d;border-color:#8db54d;color:#fff}
+.goethe-assist{margin-top:15px;border-top:1px dashed #d2d5cd;padding-top:10px}
+.goethe-assist summary{cursor:pointer;font-size:9px;color:#87928c}
+.goethe-assist p{font-size:11px;line-height:1.6;color:#64716b}
+.goethe-production-card{border:1px solid var(--line);border-radius:10px;background:#fbfaf5;padding:22px;margin-top:18px}
+.goethe-production-card h3{font:24px "Playfair Display","Noto Serif SC",serif;margin:7px 0 11px}
+.goethe-production-card p,.goethe-production-card li{font-size:12px;line-height:1.7;color:#4f5e57}
+.goethe-production-card textarea{width:100%;min-height:260px;resize:vertical;border:1px solid #ccd1c8;border-radius:8px;background:#fff;padding:14px;font:14px/1.7 "DM Sans","Noto Sans SC",sans-serif;outline:none}
+.goethe-production-card textarea:focus{border-color:#8aa845;box-shadow:0 0 0 3px #e7edcd}
+.goethe-word-count{text-align:right;font:9px "DM Mono",monospace;color:#7b8780;margin-top:6px}
+.goethe-rubric{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.goethe-rubric summary{font-size:10px;cursor:pointer;color:#65736c;font-weight:700}
+.goethe-rubric label{display:flex;gap:9px;align-items:flex-start;font-size:11px;margin-top:9px;color:#58665f}
+.goethe-speaking-points{display:grid;gap:8px;margin:15px 0}
+.goethe-speaking-points span{border-left:3px solid var(--lime);background:#edf0df;padding:11px 13px;font-size:11px;line-height:1.55}
+.goethe-speak-control{display:flex;gap:8px;flex-wrap:wrap}
+.goethe-speak-control button{border:1px solid #bfc8bd;border-radius:7px;background:#fff;padding:9px 12px;cursor:pointer;font-size:10px}
+.goethe-result{text-align:center;padding:30px 0}
+.goethe-result .score-ring{width:150px;height:150px;border-radius:50%;margin:0 auto 23px;background:#1b302c;color:#fff;display:grid;place-content:center}
+.goethe-result .score-ring b{font:43px "Playfair Display",serif;color:var(--lime)}
+.goethe-result .score-ring span{font-size:9px;color:#a9b8b1}
+.goethe-result h2{font:38px "Playfair Display","Noto Serif SC",serif;margin:0 0 8px}
+.goethe-result>p{font-size:12px;line-height:1.7;color:var(--muted)}
+.goethe-result-actions{display:flex;justify-content:center;gap:8px;margin-top:22px;flex-wrap:wrap}
+.goethe-result-actions button{border:1px solid #c8cec5;border-radius:7px;background:#fff;padding:10px 15px;cursor:pointer;font-size:11px}
+.goethe-result-actions .primary{background:#8db54d;border-color:#769d39;color:#fff;font-weight:700}
+.goethe-exam-footer{min-height:82px;flex:0 0 auto;border-top:1px solid var(--line);background:#fbfaf5;padding:14px 5%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.goethe-exam-footer button{justify-self:start;border:1px solid #c9cec6;border-radius:7px;background:#fff;padding:10px 14px;cursor:pointer;font-size:11px}
+.goethe-exam-footer button.next{justify-self:end;background:#1c322e;color:#fff;border-color:#1c322e}
+.goethe-exam-footer span{font:10px "DM Mono",monospace;color:#78837d}
 .trainer{position:fixed;inset:0;z-index:50;background:var(--paper);display:flex;flex-direction:column}
 .trainer-header{height:74px;flex:0 0 auto;padding:0 5%;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:17px}
 .trainer-header>button{width:40px;height:40px;border:0;background:transparent;font-size:26px;color:#828c86;cursor:pointer}
@@ -287,7 +385,7 @@ button{color:inherit}
   .app-shell{display:block;width:100%;min-height:100dvh}
   .sidebar{width:100%;height:calc(67px + env(safe-area-inset-bottom));min-height:0;position:fixed;inset:auto 0 0;z-index:30;padding:5px 8px env(safe-area-inset-bottom);border:0;border-top:1px solid var(--line);background:rgba(250,249,244,.94);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
   .brand,.side-kicker,.side-progress{display:none}
-  .nav-list{height:61px;display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
+  .nav-list{height:61px;display:grid;grid-template-columns:repeat(6,1fr);gap:2px}
   .nav-item{height:57px;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:4px 2px;font-size:9px;text-align:center}
   .nav-item i{font-size:18px;line-height:19px}
   .nav-item span{line-height:11px}
@@ -338,13 +436,38 @@ button{color:inherit}
   .word-card{min-height:183px;padding:14px}
   .word-card h3{font-size:19px;margin-top:20px;overflow-wrap:anywhere}
   .word-card .example{display:none}
-  .exam-section{margin:0 -17px calc(-92px - env(safe-area-inset-bottom));padding:54px 17px calc(100px + env(safe-area-inset-bottom))}
+  .exam-section{margin:0 -17px;padding:54px 17px}
   .exam-heading{grid-template-columns:1fr auto;gap:14px;align-items:start}
   .exam-heading h2{font-size:35px}
   .exam-badge{width:78px;height:78px}
   .exam-badge b{font-size:21px}
   .exam-modes{grid-template-columns:1fr}
   .exam-mode{min-height:115px}
+  .goethe-section{margin:0 -17px calc(-92px - env(safe-area-inset-bottom));padding:54px 17px calc(106px + env(safe-area-inset-bottom))}
+  .goethe-heading{grid-template-columns:1fr auto;gap:12px;align-items:start}
+  .goethe-heading h2{font-size:34px}
+  .goethe-standard{width:92px;padding-left:12px}
+  .goethe-standard b{font-size:31px}
+  .goethe-levels{grid-template-columns:1fr}
+  .goethe-level-card>header{padding:21px 18px}
+  .goethe-module-list button{min-height:78px;padding:13px 17px}
+  .goethe-note{grid-template-columns:1fr;gap:6px}
+  .goethe-exam-header{height:calc(66px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 12px 0;grid-template-columns:36px 90px 1fr 55px;gap:8px}
+  .goethe-exam-header>button{width:36px}
+  .goethe-exam-header>div:nth-child(2) span{font-size:20px}
+  .goethe-exam-header>div:nth-child(2) b{font-size:8px}
+  .goethe-exam-header time{font-size:11px}
+  .goethe-exam-main{width:100%;padding:25px 17px 34px}
+  .goethe-overview-head{display:grid}
+  .goethe-overview-head h2{font-size:31px}
+  .goethe-overview-grid{grid-template-columns:1fr}
+  .goethe-source{max-height:235px;padding:15px}
+  .goethe-question-head h2{font-size:24px}
+  .goethe-question{font-size:20px}
+  .goethe-choice{min-height:58px}
+  .goethe-production-card{padding:17px 14px}
+  .goethe-production-card textarea{min-height:230px}
+  .goethe-exam-footer{min-height:calc(76px + env(safe-area-inset-bottom));padding:11px 13px calc(11px + env(safe-area-inset-bottom))}
   .trainer-header{height:calc(64px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 15px 0}
   .trainer-main{width:100%;padding:37px 19px 24px}
   .trainer-main h2{font-size:30px}

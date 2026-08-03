@@ -995,7 +995,7 @@ function activateNav(hash) {
 function syncNav() {
   const marker = window.scrollY + Math.min(window.innerHeight * .28,180);
   let active = '#home';
-  ['#gender','#cases','#words','#exam'].forEach(hash => {
+  ['#gender','#cases','#words','#exam','#goethe'].forEach(hash => {
     const section = $(hash);
     if (section && section.getBoundingClientRect().top + window.scrollY <= marker) active = hash;
   });
@@ -1082,8 +1082,8 @@ document.addEventListener('keydown',event => {
 });
 
 let offlineReady = false;
-const OFFLINE_CACHE_NAME = 'mein-deutsch-v8';
-const OFFLINE_READY_MARKER = './offline-ready-v8';
+const OFFLINE_CACHE_NAME = 'mein-deutsch-v9';
+const OFFLINE_READY_MARKER = './offline-ready-v9';
 let workerRefreshing = false;
 async function hasOfflineCache() {
   if (!('caches' in window) || !await caches.has(OFFLINE_CACHE_NAME)) return false;
