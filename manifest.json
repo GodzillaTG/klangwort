@@ -4,7 +4,7 @@
   "description": "为 Sichenguo 定制的完全离线德语刷题 App：Klangwort、词性、冠词、形容词变位、四格、AI、游戏与电影。",
   "lang": "zh-CN",
   "id": "./",
-  "start_url": "./",
+  "start_url": "./?app=home",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",

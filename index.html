@@ -247,8 +247,22 @@
           <li><b>2</b><span>点击 Safari 底部的<strong>分享按钮</strong>。</span></li>
           <li><b>3</b><span>向下滑，选择<strong>“添加到主屏幕”</strong>，再点“添加”。</span></li>
         </ol>
-        <p class="install-note">首次请保持联网，等首页显示“已缓存 · 题库与语音可完全离线”后再添加。以后从桌面直接打开，不需要 ChatGPT 登录，开飞行模式也能使用。</p>
+        <p class="install-note">添加后，请从主屏幕打开一次并保持联网。iPhone 会把主屏幕 App 与 Safari 的缓存分开，因此主屏幕版会再保存一次完整题库与全部 2,067 条音频；完成后不需要 ChatGPT 登录，开飞行模式也能使用。</p>
         <button class="install-done" id="installDone">知道了</button>
+      </div>
+    </div>
+
+    <div class="offline-setup-modal" id="offlineSetupModal" hidden>
+      <div class="offline-setup-panel">
+        <span class="offline-setup-icon">↓</span>
+        <p class="eyebrow">HOME SCREEN · VOLLSTÄNDIG OFFLINE</p>
+        <h2 id="offlineSetupTitle">正在保存主屏幕离线版</h2>
+        <p class="offline-setup-copy">iPhone 的主屏幕 App 使用独立缓存，需要在这里重新下载一次。请保持本页打开，已完成的分包会保留并自动续传。</p>
+        <div class="offline-setup-meta"><strong id="offlineSetupCount">0 / 33</strong><span>2,067 条完整德语音频 · 约 12.6MB</span></div>
+        <div class="offline-setup-track"><i id="offlineSetupProgress"></i></div>
+        <p class="offline-setup-state" id="offlineSetupState">准备下载完整题库与全部音频…</p>
+        <button class="offline-setup-action" id="offlineSetupAction">继续下载全部音频</button>
+        <button class="offline-setup-later" id="offlineSetupLater">稍后继续</button>
       </div>
     </div>
 

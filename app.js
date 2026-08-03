@@ -1049,7 +1049,8 @@ $('#closeSearch').addEventListener('click',() => { $('#searchModal').hidden = tr
 $('#searchModal').addEventListener('click',event => { if (event.target === $('#searchModal')) $('#searchModal').hidden = true; });
 $('#searchInput').addEventListener('input',event => searchWords(event.target.value));
 const isAppleMobile = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+const launchedAsHomeApp = new URLSearchParams(location.search).get('app') === 'home';
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true || launchedAsHomeApp;
 if (isAppleMobile && !isStandalone) $('#iosInstallButton').hidden = false;
 if (isStandalone) document.body.classList.add('standalone-mode');
 $('#iosInstallButton').addEventListener('click',() => { $('#installModal').hidden = false; });
@@ -1081,17 +1082,66 @@ document.addEventListener('keydown',event => {
 });
 
 let offlineReady = false;
-const OFFLINE_CACHE_NAME = 'mein-deutsch-v13';
-const OFFLINE_READY_MARKER = './offline-ready-v14';
+const OFFLINE_CACHE_NAME = 'mein-deutsch-v15';
+const OFFLINE_READY_MARKER = './offline-ready-v15';
 let workerRefreshing = false;
 let workerRegistration = null;
 let offlineAudioCompleted = 0;
 let offlineAudioTotal = window.OFFLINE_AUDIO_SOURCES?.length || 0;
 let offlineRetryTimer = 0;
+let offlineCacheChecked = false;
+let offlineSetupDismissed = false;
+let offlineWakeLock = null;
 async function hasOfflineCache() {
   if (!('caches' in window) || !await caches.has(OFFLINE_CACHE_NAME)) return false;
   const cache = await caches.open(OFFLINE_CACHE_NAME);
   return Boolean(await cache.match(OFFLINE_READY_MARKER));
+}
+async function protectStandaloneStorage() {
+  if (!isStandalone) return;
+  try { await navigator.storage?.persist?.(); } catch {}
+}
+async function holdScreenAwake() {
+  if (!isStandalone || offlineReady || document.hidden || offlineWakeLock || !navigator.wakeLock?.request) return;
+  try {
+    offlineWakeLock = await navigator.wakeLock.request('screen');
+    offlineWakeLock.addEventListener('release',() => { offlineWakeLock = null; },{once:true});
+  } catch {}
+}
+function releaseScreenAwake() {
+  if (!offlineWakeLock) return;
+  offlineWakeLock.release().catch(() => {});
+  offlineWakeLock = null;
+}
+function updateStandaloneSetup() {
+  if (!isStandalone || !offlineCacheChecked) return;
+  const modal = $('#offlineSetupModal');
+  if (!modal) return;
+  if (offlineSetupDismissed && !offlineReady) return;
+
+  modal.hidden = false;
+  const total = Math.max(offlineAudioTotal,1);
+  const completed = Math.min(offlineAudioCompleted,total);
+  $('#offlineSetupCount').textContent = `${completed} / ${offlineAudioTotal}`;
+  $('#offlineSetupProgress').style.width = `${Math.round(completed / total * 100)}%`;
+  const action = $('#offlineSetupAction');
+
+  if (offlineReady) {
+    $('#offlineSetupTitle').textContent = '主屏幕离线版已完成';
+    $('#offlineSetupState').textContent = '题库与全部 2,067 条德语音频均已保存在这个主屏幕 App 中。';
+    action.textContent = '完成，开始学习';
+    action.classList.add('ready');
+    $('#offlineSetupLater').hidden = true;
+    releaseScreenAwake();
+  } else {
+    $('#offlineSetupTitle').textContent = navigator.onLine ? '正在保存主屏幕离线版' : '等待联网后继续';
+    $('#offlineSetupState').textContent = navigator.onLine
+      ? `正在续传完整音频包，已保存 ${completed}/${offlineAudioTotal} 个分包。请保持此页打开。`
+      : `当前离线，已保存 ${completed}/${offlineAudioTotal} 个分包；联网后会从这里继续。`;
+    action.textContent = navigator.onLine ? '继续下载全部音频' : '联网后继续下载';
+    action.classList.remove('ready');
+    $('#offlineSetupLater').hidden = false;
+  }
 }
 function updateNetworkStatus() {
   const status = $('#networkStatus');
@@ -1101,17 +1151,26 @@ function updateNetworkStatus() {
     status.textContent = navigator.onLine ? '已缓存 · 题库与语音可完全离线' : '离线模式 · 题库与语音可用';
   } else if (!navigator.onLine) {
     status.textContent = `离线语音尚未完整 · 已保存 ${offlineAudioCompleted}/${offlineAudioTotal}`;
+  } else if (isStandalone) {
+    status.textContent = `主屏幕完整离线包 · ${offlineAudioCompleted}/${offlineAudioTotal}`;
   } else {
     status.textContent = `正在续传离线语音 · ${offlineAudioCompleted}/${offlineAudioTotal}`;
   }
+  updateStandaloneSetup();
 }
 async function requestOfflineAudioCache() {
   clearTimeout(offlineRetryTimer);
   offlineReady = await hasOfflineCache();
+  offlineCacheChecked = true;
   if (offlineReady) {
+    offlineAudioCompleted = offlineAudioTotal;
     window.offlineGermanAudio?.preload();
     updateNetworkStatus();
     return;
+  }
+  if (isStandalone) {
+    protectStandaloneStorage();
+    holdScreenAwake();
   }
   updateNetworkStatus();
   if (!navigator.onLine || !workerRegistration) return;
@@ -1121,6 +1180,7 @@ async function requestOfflineAudioCache() {
 }
 navigator.serviceWorker?.addEventListener('message',event => {
   if (!event.data?.type?.startsWith('OFFLINE_AUDIO_')) return;
+  offlineCacheChecked = true;
   offlineAudioCompleted = event.data.completed ?? offlineAudioCompleted;
   offlineAudioTotal = event.data.total ?? offlineAudioTotal;
   if (event.data.type === 'OFFLINE_AUDIO_READY') {
@@ -1132,6 +1192,24 @@ navigator.serviceWorker?.addEventListener('message',event => {
 });
 window.addEventListener('online',() => { updateNetworkStatus(); requestOfflineAudioCache(); });
 window.addEventListener('offline',updateNetworkStatus);
+$('#offlineSetupAction')?.addEventListener('click',() => {
+  if (offlineReady) {
+    $('#offlineSetupModal').hidden = true;
+    return;
+  }
+  offlineSetupDismissed = false;
+  protectStandaloneStorage();
+  holdScreenAwake();
+  requestOfflineAudioCache();
+});
+$('#offlineSetupLater')?.addEventListener('click',() => {
+  offlineSetupDismissed = true;
+  $('#offlineSetupModal').hidden = true;
+  releaseScreenAwake();
+});
+document.addEventListener('visibilitychange',() => {
+  if (!document.hidden && isStandalone && !offlineReady && !$('#offlineSetupModal')?.hidden) holdScreenAwake();
+});
 updateNetworkStatus();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.addEventListener('controllerchange',async () => {

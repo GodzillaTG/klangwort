@@ -1,6 +1,6 @@
-const CACHE_NAME = 'mein-deutsch-v14';
+const CACHE_NAME = 'mein-deutsch-v15';
 const OFFLINE_PAGE = './offline.html';
-const READY_MARKER = './offline-ready-v14';
+const READY_MARKER = './offline-ready-v15';
 importScripts('./offline-audio-manifest.js');
 const CORE_ASSETS = [
   './index.html',
