@@ -1,8 +1,9 @@
-const CACHE_NAME = 'mein-deutsch-v13';
+const CACHE_NAME = 'mein-deutsch-v14';
 const OFFLINE_PAGE = './offline.html';
-const READY_MARKER = './offline-ready-v13';
+const READY_MARKER = './offline-ready-v14';
 importScripts('./offline-audio-manifest.js');
 const CORE_ASSETS = [
+  './index.html',
   OFFLINE_PAGE,
   './style.css',
   './app.js',
@@ -17,6 +18,7 @@ const CORE_ASSETS = [
 const AUDIO_ASSETS = (self.OFFLINE_AUDIO_SOURCES || []).map(source => `./${source}`);
 
 const EXPECTED_CONTENT_TYPES = new Map([
+  ['./index.html', 'text/html'],
   ['./offline.html', 'text/html'],
   ['./style.css', 'text/css'],
   ['./app.js', 'javascript'],
@@ -95,8 +97,12 @@ async function migratePartialAudio() {
       const response = await oldCache.match(url,{ignoreSearch:true});
       if (response?.ok) await cache.put(url,response.clone());
     }
-    await caches.delete(key);
   }
+  await Promise.all(
+    keys
+      .filter(key => key !== CACHE_NAME && (key.startsWith('mein-deutsch-v') || key.startsWith('klangwort-v')))
+      .map(key => caches.delete(key))
+  );
 }
 
 let audioCachingPromise = null;
@@ -149,10 +155,20 @@ async function offlineFallback() {
   );
 }
 
-async function offlineFirstNavigation(request) {
-  const cached = await caches.match(assetUrl(OFFLINE_PAGE), { ignoreSearch: true });
-  if (cached) return cached;
-  try { return await fetch(request); } catch { return offlineFallback(); }
+async function networkFirstNavigation(request) {
+  const cache = await caches.open(CACHE_NAME);
+  try {
+    const response = await fetchWithTimeout(request,12000);
+    const contentType = response.headers.get('content-type') || '';
+    if (!response.ok || response.redirected || !contentType.includes('text/html')) {
+      throw new Error('Invalid navigation response');
+    }
+    await cache.put(assetUrl('./index.html'),await cloneAsCleanResponse(response.clone()));
+    return response;
+  } catch {
+    const cached = await cache.match(assetUrl('./index.html'),{ignoreSearch:true});
+    return cached || offlineFallback();
+  }
 }
 
 async function serveRangeRequest(request) {
@@ -205,7 +221,7 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   if (event.request.mode === 'navigate') {
-    event.respondWith(offlineFirstNavigation(event.request));
+    event.respondWith(networkFirstNavigation(event.request));
     return;
   }
 

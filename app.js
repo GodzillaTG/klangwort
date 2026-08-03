@@ -1082,7 +1082,7 @@ document.addEventListener('keydown',event => {
 
 let offlineReady = false;
 const OFFLINE_CACHE_NAME = 'mein-deutsch-v13';
-const OFFLINE_READY_MARKER = './offline-ready-v13';
+const OFFLINE_READY_MARKER = './offline-ready-v14';
 let workerRefreshing = false;
 let workerRegistration = null;
 let offlineAudioCompleted = 0;
