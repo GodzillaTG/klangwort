@@ -7,6 +7,8 @@
   let activeSource = null;
   let activeFallback = null;
   let requestId = 0;
+  const appleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
   function normalize(text) {
     return String(text || '').trim();
@@ -113,20 +115,31 @@
   }
 
   async function playWithElement(entry, text, currentRequest) {
-    const audio = new Audio(entry.src);
+    const audio = new Audio();
     audio.preload = 'auto';
     audio.playsInline = true;
+    audio.setAttribute('playsinline','');
+    audio.src = entry.src;
     activeFallback = audio;
     report('loading', { text });
 
-    await new Promise((resolve, reject) => {
-      audio.addEventListener('loadedmetadata', resolve, { once: true });
-      audio.addEventListener('error', () => reject(new Error('Audio file could not be loaded.')), { once: true });
-      audio.load();
-    });
+    const needsSeek = entry.start > 0.01;
+    audio.muted = needsSeek;
+    const metadataReady = needsSeek && audio.readyState < 1
+      ? new Promise((resolve, reject) => {
+          audio.addEventListener('loadedmetadata', resolve, { once: true });
+          audio.addEventListener('error', () => reject(new Error('Audio file could not be loaded.')), { once: true });
+        })
+      : Promise.resolve();
+    // Call play() before the first await so iPhone sees it as part of the user's tap.
+    const playbackStarted = audio.play();
+    if (needsSeek) {
+      await metadataReady;
+      audio.currentTime = entry.start;
+      audio.muted = false;
+    }
+    await playbackStarted;
     if (currentRequest !== requestId) throw new DOMException('Playback was replaced.','AbortError');
-    audio.currentTime = entry.start;
-    await audio.play();
     report('playing', { text, duration: entry.duration });
     window.setTimeout(() => {
       if (activeFallback !== audio) return;
@@ -148,8 +161,13 @@
     const currentRequest = ++requestId;
     stopActive();
     try {
-      const usedWebAudio = await playWithWebAudio(entry, normalized, currentRequest);
-      if (!usedWebAudio) await playWithElement(entry, normalized, currentRequest);
+      const useMediaElement = appleMobile || entry.src.includes('/goethe-');
+      if (useMediaElement) {
+        await playWithElement(entry, normalized, currentRequest);
+      } else {
+        const usedWebAudio = await playWithWebAudio(entry, normalized, currentRequest);
+        if (!usedWebAudio) await playWithElement(entry, normalized, currentRequest);
+      }
     } catch (error) {
       if (error?.name === 'AbortError') throw error;
       if (currentRequest === requestId) stopActive();
@@ -172,6 +190,6 @@
     has: text => Boolean(manifest[normalize(text)]),
     count: Object.keys(manifest).length,
     sourceCount: sources.length,
-    mode: (window.AudioContext || window.webkitAudioContext) ? 'web-audio' : 'html-audio'
+    mode: appleMobile ? 'html-audio' : (window.AudioContext || window.webkitAudioContext) ? 'web-audio' : 'html-audio'
   };
 })();
