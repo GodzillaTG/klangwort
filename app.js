@@ -1101,8 +1101,8 @@ document.addEventListener('keydown',event => {
 });
 
 let offlineReady = false;
-const OFFLINE_CACHE_NAME = 'mein-deutsch-v16';
-const OFFLINE_READY_MARKER = './offline-ready-v16';
+const OFFLINE_CACHE_NAME = 'mein-deutsch-v17';
+const OFFLINE_READY_MARKER = './offline-ready-v17';
 let workerRefreshing = false;
 let workerRegistration = null;
 let offlineAudioCompleted = 0;
