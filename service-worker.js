@@ -1,6 +1,6 @@
-const CACHE_NAME = 'mein-deutsch-v17';
+const CACHE_NAME = 'mein-deutsch-v18';
 const OFFLINE_PAGE = './offline.html';
-const READY_MARKER = './offline-ready-v17';
+const READY_MARKER = './offline-ready-v18';
 importScripts('./offline-audio-manifest.js');
 const CORE_ASSETS = [
   './index.html',
@@ -38,14 +38,22 @@ function assetUrl(asset) {
 }
 
 function isValidAssetResponse(asset, response) {
-  if (!response.ok || response.redirected) return false;
+  if (!response.ok) return false;
 
   const requestedUrl = assetUrl(asset);
   const finalUrl = response.url ? new URL(response.url) : requestedUrl;
-  if (finalUrl.origin !== self.location.origin || finalUrl.pathname !== requestedUrl.pathname) return false;
+  if (finalUrl.origin !== self.location.origin) return false;
 
   const expectedType = EXPECTED_CONTENT_TYPES.get(asset);
   const contentType = response.headers.get('content-type') || '';
+  const canonicalHtmlPath = requestedUrl.pathname.endsWith('/index.html')
+    ? requestedUrl.pathname.slice(0,-'index.html'.length)
+    : requestedUrl.pathname.endsWith('.html')
+      ? requestedUrl.pathname.slice(0,-'.html'.length)
+      : requestedUrl.pathname;
+  const acceptedPath = finalUrl.pathname === requestedUrl.pathname
+    || (expectedType === 'text/html' && finalUrl.pathname === canonicalHtmlPath);
+  if (!acceptedPath) return false;
   if (expectedType === 'm4a') return contentType.includes('audio/') || contentType.includes('application/octet-stream');
   return !expectedType || contentType.includes(expectedType);
 }
