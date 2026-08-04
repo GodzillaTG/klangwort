@@ -1,6 +1,10 @@
 import { access, readFile, stat } from "node:fs/promises";
 import { resolve } from "node:path";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import vm from "node:vm";
+
+const run = promisify(execFile);
 
 const root = resolve(import.meta.dirname, "..");
 const appSource = await readFile(resolve(root,"app.js"),"utf8");
@@ -40,6 +44,22 @@ for (const source of sources) {
   const size = (await stat(path)).size;
   totalBytes += size;
   largestBytes = Math.max(largestBytes,size);
+
+  const {stdout} = await run("ffprobe",[
+    "-v","error","-select_streams","a:0",
+    "-show_entries","stream=codec_name:format=duration","-of","json",path
+  ]);
+  const probe = JSON.parse(stdout);
+  const duration = Number(probe.format?.duration);
+  if (probe.streams?.[0]?.codec_name !== "aac" || !Number.isFinite(duration)) {
+    throw new Error(`Audio sprite is not a valid AAC file: ${source}`);
+  }
+  const latestEnd = Math.max(...Object.values(manifest)
+    .filter(entry => entry.src === source)
+    .map(entry => entry.start + entry.duration));
+  if (latestEnd > duration + 0.1) {
+    throw new Error(`Audio cue exceeds sprite duration: ${source} (${latestEnd} > ${duration})`);
+  }
 }
 if (largestBytes > 600 * 1024) throw new Error(`Offline audio chunk is too large for reliable resume: ${largestBytes} bytes.`);
 

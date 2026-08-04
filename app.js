@@ -772,10 +772,29 @@ function renderWords() {
 function speak(text) {
   if (!window.offlineGermanAudio?.has(text)) {
     console.warn('Offline German audio is unavailable for:',text);
+    showAudioMessage('error','这条语音尚未包含在离线包中。');
     return;
   }
   window.offlineGermanAudio.play(text).catch(error => console.warn(error.message));
 }
+let audioMessageTimer = 0;
+function showAudioMessage(state,message) {
+  const toast = $('#audioToast');
+  if (!toast) return;
+  clearTimeout(audioMessageTimer);
+  toast.dataset.state = state;
+  toast.textContent = message;
+  toast.hidden = false;
+  if (state !== 'loading') {
+    audioMessageTimer = window.setTimeout(() => { toast.hidden = true; },state === 'error' ? 5000 : 1800);
+  }
+}
+window.addEventListener('offline-audio-status',event => {
+  const {state,message} = event.detail || {};
+  if (state === 'loading') showAudioMessage('loading','正在加载离线语音…');
+  else if (state === 'playing') showAudioMessage('playing','正在播放语音');
+  else if (state === 'error') showAudioMessage('error',message || '语音加载失败，请再点一次重试。');
+});
 function openWord(key) {
   const word = allWords.find(item => item.key === key);
   if (!word) return;
@@ -1082,8 +1101,8 @@ document.addEventListener('keydown',event => {
 });
 
 let offlineReady = false;
-const OFFLINE_CACHE_NAME = 'mein-deutsch-v15';
-const OFFLINE_READY_MARKER = './offline-ready-v15';
+const OFFLINE_CACHE_NAME = 'mein-deutsch-v16';
+const OFFLINE_READY_MARKER = './offline-ready-v16';
 let workerRefreshing = false;
 let workerRegistration = null;
 let offlineAudioCompleted = 0;

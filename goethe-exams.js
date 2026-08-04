@@ -357,7 +357,7 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
     stopTimer();
     document.body.classList.add('training-active');
     $g('#goetheExam').hidden = false;
-    state = {level,module,index:0,answers:{},drafts:{},audioPlays:{},secondsLeft:0,timerId:null,finished:false,phase:'exam'};
+    state = {level,module,index:0,answers:{},drafts:{},audioPlays:{},audioLoadingKey:null,secondsLeft:0,timerId:null,finished:false,phase:'exam'};
     if (module === 'overview') {
       renderOverview();
       return;
@@ -400,7 +400,8 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
     const audioKey = question.audioKey || currentPart.audioKey;
     const repeats = question.repeats || currentPart.repeats || 1;
     const used = state.audioPlays[audioKey] || 0;
-    const audio = audioText ? `<div class="goethe-audio"><button data-play-goethe="${escapeHtml(audioKey)}" ${used>=repeats?'disabled':''}>◖ 录音播放</button><span>允许播放 ${repeats} 次 · 已播放 ${used} 次</span></div>` : '';
+    const loading = state.audioLoadingKey === audioKey;
+    const audio = audioText ? `<div class="goethe-audio"><button data-play-goethe="${escapeHtml(audioKey)}" ${used>=repeats||loading?'disabled':''}>${loading?'正在加载…':'◖ 录音播放'}</button><span>${loading?'加载成功后才计次数 · ':''}允许播放 ${repeats} 次 · 已播放 ${used} 次</span></div>` : '';
     const choices = question.options.map((option,index) => `<button class="goethe-choice ${selected===option?'selected':''}" data-goethe-answer="${escapeHtml(option)}"><i>${String.fromCharCode(97+index)}</i><span>${escapeHtml(option)}</span></button>`).join('');
     const timing = currentPart.minutes ? `${currentPart.minutes} MIN. EMPFOHLEN · ${config.minutes} MIN. GESAMT` : `${config.minutes} MINUTEN`;
     $g('#goetheExamMain').innerHTML = `<div class="goethe-question-head"><div><span class="goethe-part-label">${currentPart.title} · AUFGABE ${state.index+1}</span><span>${timing}</span></div><h2>${escapeHtml(currentPart.instruction)}</h2></div>${source}${audio}<p class="goethe-question">${escapeHtml(question.prompt)}</p><div class="goethe-choices">${choices}</div><details class="goethe-assist"><summary>EN · practice support</summary><p>${escapeHtml(question.en)}</p>${audioText?`<p><b>Transcript:</b> ${escapeHtml(audioText)}</p>`:''}</details>`;
@@ -438,7 +439,7 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
     state.answers[question.id] = value;
     renderCurrent();
   }
-  function playAudio(key) {
+  async function playAudio(key) {
     const config = EXAMS[state.level].modules[state.module];
     const question = state.questions[state.index];
     const currentPart = config.parts[question.partIndex];
@@ -447,10 +448,22 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
     const repeats = question.repeats || currentPart.repeats || 1;
     const used = state.audioPlays[audioKey] || 0;
     const text = question.audio || currentPart.audio;
-    if (used >= repeats || !window.offlineGermanAudio?.has(text)) return;
-    window.offlineGermanAudio.play(text).catch(error => console.warn(error.message));
-    state.audioPlays[audioKey] = used + 1;
+    if (used >= repeats || state.audioLoadingKey || !window.offlineGermanAudio?.has(text)) return;
+    const currentState = state;
+    state.audioLoadingKey = audioKey;
     renderCurrent();
+    try {
+      await window.offlineGermanAudio.play(text);
+      if (state !== currentState) return;
+      state.audioPlays[audioKey] = used + 1;
+    } catch (error) {
+      console.warn(error.message);
+    } finally {
+      if (state === currentState) {
+        state.audioLoadingKey = null;
+        renderCurrent();
+      }
+    }
   }
   function next() {
     const config = EXAMS[state.level].modules[state.module];
