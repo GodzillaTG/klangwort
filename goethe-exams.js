@@ -86,7 +86,7 @@ H · Kinder lesen vor: Ehrenamtliche für die Stadtbibliothek gesucht, Mittwoch 
   ]);
   const b1TourAudio = `Willkommen im neuen Medienhaus. Im Erdgeschoss finden Sie die Bibliothek und das Café. Die Ausstellung zur Geschichte des Radios liegt im ersten Stock und ist heute vollständig geöffnet. Unsere Führung beginnt dort um zehn Uhr dreißig. Fotografieren dürfen Sie ohne Blitz. Um zwölf Uhr treffen wir uns wieder im Café. Wer anschließend das Tonstudio besuchen möchte, muss sich vorher an der Information anmelden, denn dort gibt es nur zwölf Plätze. Das Museum schließt heute wegen einer Veranstaltung bereits um siebzehn Uhr.`;
   const b1ConversationAudio = `Mann: Wie war dein erster Tag im neuen Coworking-Büro? Frau: Viel ruhiger als erwartet. Ich hatte zuerst Angst, dass ständig jemand telefoniert. Mann: Gibt es dort feste Arbeitsplätze? Frau: Nur für Teams. Einzelpersonen suchen sich jeden Morgen einen freien Tisch. Ich war schon um acht Uhr da und konnte am Fenster sitzen. Mann: Und die Technik? Frau: Sehr gut. Nur das WLAN war am Vormittag kurz weg. Dafür hat mir eine Mitarbeiterin sofort geholfen. In der Küche habe ich zwei Designerinnen kennengelernt. Wir wollen nächste Woche zusammen Mittag essen. Mann: Bleibst du dort? Frau: Ja, mindestens drei Monate. Danach entscheidet meine Firma, ob wir ein eigenes Büro mieten.`;
-  const b1DiscussionAudio = `Moderatorin: Heute diskutieren wir über kostenlose Kulturangebote. Lena: Ich finde, Museen sollten wenigstens einen kostenlosen Tag im Monat anbieten. So können auch Familien mit wenig Geld kommen. Paul: Grundsätzlich ja, aber Kultur kostet. Musiker, Techniker und Aufsichtspersonal müssen bezahlt werden. Lena: Natürlich. Die Stadt könnte solche Tage finanzieren. Paul: Mir wäre ein günstiges Jahresticket lieber. Dann kommen Besucher nicht alle gleichzeitig. Moderatorin: Und was ist mit Online-Angeboten? Lena: Digitale Führungen sind hilfreich, ersetzen aber nicht das echte Erlebnis. Paul: Für Menschen auf dem Land können sie trotzdem sehr wichtig sein.`;
+  const b1DiscussionAudio = `Moderatorin: Heute diskutieren wir über kostenlose Kulturangebote. Bei mir sind Lena und Paul. Lena, Sie beginnen. Lena: Ich finde, Museen sollten wenigstens einen kostenlosen Tag im Monat anbieten. So können auch Familien mit wenig Geld kommen. Paul: Grundsätzlich ja, aber Kultur kostet. Musiker, Techniker und Aufsichtspersonal müssen bezahlt werden. Lena: Natürlich. Die Stadt könnte solche Tage finanzieren. Paul: Mir wäre ein günstiges Jahresticket lieber. Dann kommen Besucher nicht alle gleichzeitig. Moderatorin: Und was ist mit Online-Angeboten? Lena: Digitale Führungen sind hilfreich, ersetzen aber nicht das echte Erlebnis. Paul: Für Menschen auf dem Land können sie trotzdem sehr wichtig sein.`;
   const b1Listening = [
     part('Teil 1', 'Sie hören fünf kurze Texte. Jeden Text hören Sie zweimal. Lösen Sie zu jedem Text zwei Aufgaben.', '', '', b1Listening1),
     part('Teil 2', 'Sie hören einen Text einmal. Wählen Sie bei jeder Aufgabe a, b oder c.', '', '', [
@@ -211,8 +211,8 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
     q(`b2-h-${String(index*2+1).padStart(2,'0')}`,index===0?'Die Sprecherin liest vor allem zur Ablenkung.':index===1?'Der Sprecher sieht Nachteile einer rein digitalen Bezahlung.':index===2?'Die Sprecherin berichtet von einem Praktikum bei einem Gericht.':index===3?'Die Gruppe bereitet gerade eine Präsentation vor.':'Unbegrenzte Erreichbarkeit verbessert laut Daten die Konzentration.',tf,audio.truth,'Decide whether the statement matches the recording.',{audio:audio.text,audioKey:audio.key,repeats:1}),
     q(`b2-h-${String(index*2+2).padStart(2,'0')}`,index===0?'Welche Wirkung hat Literatur auf die Sprecherin?':index===1?'Was sollte nach Meinung des Sprechers erhalten bleiben?':index===2?'Was durfte die Praktikantin nicht tun?':index===3?'Was muss die Gruppe schreiben?':'Welche Maßnahme empfiehlt die Studie?',index===0?['Sie vergisst den Alltag.','Sie nimmt alltägliche Details bewusster wahr.','Sie kann bei Lärm besser denken.']:index===1?['Eine Zahlungsmöglichkeit ohne digitale Technik.','Ein Verbot von Bankkarten.','Ein Rabatt für ältere Menschen.']:index===2?['Verhandlungen beobachten.','Vertrauliche Akten lesen.','Fragen stellen.']:index===3?['einen Aufsatz.','eine Seminararbeit.','einen Roman.']:['Mehr Videokonferenzen.','Nachrichten zu festen Zeiten beantworten.','Private Handys verbieten.'],audio.detail,'Choose the correct detail.',{audio:audio.text,audioKey:audio.key,repeats:1})
   ]);
-  const b2InterviewAudio = `Moderator: Frau Professor Klein, warum werden Städte im Sommer immer heißer? Klein: Dichte Bebauung speichert Wärme, während Pflanzen fehlen, die Wasser verdunsten lassen. Moderator: Helfen einzelne Bäume? Klein: Ja, aber entscheidend sind zusammenhängende grüne Flächen. Sie kühlen auch benachbarte Straßen. Moderator: Manche Städte streichen Dächer weiß. Klein: Helle Flächen reflektieren Sonnenlicht. Das ist günstig, löst aber nicht das gesamte Problem. Moderator: Was halten Sie von Klimaanlagen? Klein: Sie schützen einzelne Innenräume, geben jedoch Wärme nach außen ab und verbrauchen Strom. Moderator: Welche Maßnahme wirkt besonders schnell? Klein: Schatten an Haltestellen und Schulhöfen. Langfristig müssen wir Flächen entsiegeln, damit Regenwasser im Boden bleibt.`;
-  const b2PanelAudio = `Moderator: Heute sprechen wir über lebenslanges Lernen. Frau Yilmaz: Weiterbildung sollte zur bezahlten Arbeitszeit gehören. Sonst können vor allem Menschen mit Familie kaum teilnehmen. Herr Roth: Betriebe müssen Angebote machen, aber Beschäftigte tragen ebenfalls Verantwortung. Nicht jeder Kurs ist für die Arbeit relevant. Frau Yilmaz: Gerade unerwartete Themen führen oft zu Innovation. Herr Roth: Trotzdem brauchen kleine Unternehmen Planungssicherheit. Moderator: Welche Rolle spielen Onlinekurse? Frau Yilmaz: Sie schaffen Flexibilität, aber ohne Austausch brechen viele ab. Herr Roth: Kurze digitale Einheiten lassen sich gut in den Alltag integrieren. Für komplexe Fähigkeiten bevorzuge ich Präsenz.`;
+  const b2InterviewAudio = `Moderator: Bei mir ist heute Frau Professor Klein. Frau Professor Klein, warum werden Städte im Sommer immer heißer? Klein: Dichte Bebauung speichert Wärme, während Pflanzen fehlen, die Wasser verdunsten lassen. Moderator: Helfen einzelne Bäume? Klein: Ja, aber entscheidend sind zusammenhängende grüne Flächen. Sie kühlen auch benachbarte Straßen. Moderator: Manche Städte streichen Dächer weiß. Klein: Helle Flächen reflektieren Sonnenlicht. Das ist günstig, löst aber nicht das gesamte Problem. Moderator: Was halten Sie von Klimaanlagen? Klein: Sie schützen einzelne Innenräume, geben jedoch Wärme nach außen ab und verbrauchen Strom. Moderator: Welche Maßnahme wirkt besonders schnell? Klein: Schatten an Haltestellen und Schulhöfen. Langfristig müssen wir Flächen entsiegeln, damit Regenwasser im Boden bleibt.`;
+  const b2PanelAudio = `Moderator: Heute sprechen wir über lebenslanges Lernen. Im Studio begrüße ich Frau Yilmaz und Herrn Roth. Frau Yilmaz, beginnen wir mit Ihnen. Frau Yilmaz: Weiterbildung sollte zur bezahlten Arbeitszeit gehören. Sonst können vor allem Menschen mit Familie kaum teilnehmen. Herr Roth: Betriebe müssen Angebote machen, aber Beschäftigte tragen ebenfalls Verantwortung. Nicht jeder Kurs ist für die Arbeit relevant. Frau Yilmaz: Gerade unerwartete Themen führen oft zu Innovation. Herr Roth: Trotzdem brauchen kleine Unternehmen Planungssicherheit. Moderator: Welche Rolle spielen Onlinekurse? Frau Yilmaz: Sie schaffen Flexibilität, aber ohne Austausch brechen viele ab. Herr Roth: Kurze digitale Einheiten lassen sich gut in den Alltag integrieren. Für komplexe Fähigkeiten bevorzuge ich Präsenz.`;
   const b2LectureAudio = `Guten Abend. Mein Vortrag beschäftigt sich mit der Frage, warum wir Geräusche unterschiedlich wahrnehmen. Lautstärke allein erklärt nicht, ob ein Klang als störend empfunden wird. Ebenso wichtig sind Erwartung, Kontrolle und Bedeutung. Das Rattern eines Zuges kann Reisende beruhigen, während ein leises, unbekanntes Summen im Schlafzimmer nervös macht. Studien zeigen außerdem, dass selbst gewählte Geräusche weniger belasten. Wer Musik einschaltet, erlebt dieselbe Lautstärke anders als eine Person, die unfreiwillig Musik aus der Nachbarwohnung hört. In der Stadtplanung reicht es deshalb nicht, nur Dezibel zu messen. Ruhige Rückzugsorte, verständliche Informationen über Bauarbeiten und zeitliche Regeln können die Belastung reduzieren. Vollständige Stille ist jedoch weder möglich noch immer wünschenswert. Auch positive Klänge, etwa Stimmen oder Naturgeräusche, gehören zu lebendigen Orten.`;
   const b2Listening = [
     part('Teil 1','Sie hören fünf Gespräche und Äußerungen. Jeden Text hören Sie einmal. Lösen Sie zu jedem Text zwei Aufgaben.','','',b2Listening1),
@@ -357,7 +357,7 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
     stopTimer();
     document.body.classList.add('training-active');
     $g('#goetheExam').hidden = false;
-    state = {level,module,index:0,answers:{},drafts:{},audioPlays:{},secondsLeft:0,timerId:null,finished:false,phase:'exam'};
+    state = {level,module,index:0,answers:{},drafts:{},audioPlays:{},audioLoadingKey:null,secondsLeft:0,timerId:null,finished:false,phase:'exam'};
     if (module === 'overview') {
       renderOverview();
       return;
@@ -400,7 +400,8 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
     const audioKey = question.audioKey || currentPart.audioKey;
     const repeats = question.repeats || currentPart.repeats || 1;
     const used = state.audioPlays[audioKey] || 0;
-    const audio = audioText ? `<div class="goethe-audio"><button data-play-goethe="${escapeHtml(audioKey)}" ${used>=repeats?'disabled':''}>◖ 录音播放</button><span>允许播放 ${repeats} 次 · 已播放 ${used} 次</span></div>` : '';
+    const loading = state.audioLoadingKey === audioKey;
+    const audio = audioText ? `<div class="goethe-audio"><button data-play-goethe="${escapeHtml(audioKey)}" ${used>=repeats||loading?'disabled':''}>${loading?'正在加载…':'◖ 录音播放'}</button><span>${loading?'加载成功后才计次数 · ':''}允许播放 ${repeats} 次 · 已播放 ${used} 次</span></div>` : '';
     const choices = question.options.map((option,index) => `<button class="goethe-choice ${selected===option?'selected':''}" data-goethe-answer="${escapeHtml(option)}"><i>${String.fromCharCode(97+index)}</i><span>${escapeHtml(option)}</span></button>`).join('');
     const timing = currentPart.minutes ? `${currentPart.minutes} MIN. EMPFOHLEN · ${config.minutes} MIN. GESAMT` : `${config.minutes} MINUTEN`;
     $g('#goetheExamMain').innerHTML = `<div class="goethe-question-head"><div><span class="goethe-part-label">${currentPart.title} · AUFGABE ${state.index+1}</span><span>${timing}</span></div><h2>${escapeHtml(currentPart.instruction)}</h2></div>${source}${audio}<p class="goethe-question">${escapeHtml(question.prompt)}</p><div class="goethe-choices">${choices}</div><details class="goethe-assist"><summary>EN · practice support</summary><p>${escapeHtml(question.en)}</p>${audioText?`<p><b>Transcript:</b> ${escapeHtml(audioText)}</p>`:''}</details>`;
@@ -438,7 +439,7 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
     state.answers[question.id] = value;
     renderCurrent();
   }
-  function playAudio(key) {
+  async function playAudio(key) {
     const config = EXAMS[state.level].modules[state.module];
     const question = state.questions[state.index];
     const currentPart = config.parts[question.partIndex];
@@ -447,10 +448,22 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
     const repeats = question.repeats || currentPart.repeats || 1;
     const used = state.audioPlays[audioKey] || 0;
     const text = question.audio || currentPart.audio;
-    if (used >= repeats || !window.offlineGermanAudio?.has(text)) return;
-    window.offlineGermanAudio.play(text).catch(error => console.warn(error.message));
-    state.audioPlays[audioKey] = used + 1;
+    if (used >= repeats || state.audioLoadingKey || !window.offlineGermanAudio?.has(text)) return;
+    const currentState = state;
+    state.audioLoadingKey = audioKey;
     renderCurrent();
+    try {
+      await window.offlineGermanAudio.play(text);
+      if (state !== currentState) return;
+      state.audioPlays[audioKey] = used + 1;
+    } catch (error) {
+      console.warn(error.message);
+    } finally {
+      if (state === currentState) {
+        state.audioLoadingKey = null;
+        renderCurrent();
+      }
+    }
   }
   function next() {
     const config = EXAMS[state.level].modules[state.module];
