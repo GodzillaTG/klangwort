@@ -8,13 +8,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Mein Deutsch" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="description" content="为 Sichenguo 定制的完全离线德语刷题 App：2,080 个词汇、语法题库与 Goethe B1/B2 全真模拟考。" />
+    <meta name="description" content="为 Sichenguo 定制的完全离线德语刷题 App：3,080 个词汇、B1-C1 分级语法题库与 Goethe B1/B2 全真模拟考。" />
     <meta property="og:title" content="Mein Deutsch — 我的德语训练场" />
-    <meta property="og:description" content="2,080 个词汇、语法题库与 Goethe B1/B2 听说读写模拟考，完全离线练习。" />
+    <meta property="og:description" content="3,080 个词汇、B1-C1 分级语法题库与 Goethe B1/B2 听说读写模拟考，完全离线练习。" />
     <meta property="og:image" content="https://mein-deutsch-sichenguo.godzillatg.chatgpt.site/og.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Mein Deutsch — 我的德语训练场" />
-    <meta name="twitter:description" content="2,080 个词汇、语法题库与 Goethe B1/B2 听说读写模拟考，完全离线练习。" />
+    <meta name="twitter:description" content="3,080 个词汇、B1-C1 分级语法题库与 Goethe B1/B2 听说读写模拟考，完全离线练习。" />
     <meta name="twitter:image" content="https://mein-deutsch-sichenguo.godzillatg.chatgpt.site/og.png" />
     <title>Mein Deutsch — 我的德语训练场</title>
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
@@ -85,7 +85,7 @@
           <div class="section-heading"><div><p class="eyebrow">DEIN LEHRPLAN</p><h2>你的五大学习板块</h2></div><p>日常刷题打基础，Goethe B1/B2 模考检验真实应试能力。</p></div>
           <div class="course-grid">
             <article class="course-card music-card"><div class="course-top"><span>01</span><i>♫</i></div><h3>Klangwort</h3><p>作曲、Tonmeister、录音制作和音乐表达。</p><div class="course-meta"><b>520</b><span>专业词汇</span></div><button data-jump="#words" data-topic="music">进入词库 →</button></article>
-            <article class="course-card gender-card"><div class="course-top"><span>02</span><i>der</i></div><h3>阴阳中性</h3><p>把 der / die / das 和名词当作一个整体记住。</p><div class="course-meta"><b>2,080</b><span>词性题</span></div><button data-start="gender">开始专项 →</button></article>
+            <article class="course-card gender-card"><div class="course-top"><span>02</span><i>der</i></div><h3>阴阳中性</h3><p>把 der / die / das 和名词当作一个整体记住。</p><div class="course-meta"><b>2,481</b><span>词性题</span></div><button data-start="gender">开始专项 →</button></article>
             <article class="course-card case-card"><div class="course-top"><span>03</span><i>Ⅳ</i></div><h3>变格系统</h3><p>四格、ein 类冠词，以及形容词强弱混合变化。</p><div class="course-meta"><b>1,560</b><span>变格专项题</span></div><button data-start="adjectives">开始形容词专项 →</button></article>
             <article class="course-card interest-card"><div class="course-top"><span>04</span><i>AI</i></div><h3>Meine Welt</h3><p>用你感兴趣的 AI、游戏和电影建立词汇量。</p><div class="course-meta"><b>1,560</b><span>兴趣词</span></div><button data-jump="#words" data-topic="ai">浏览兴趣词 →</button></article>
             <article class="course-card goethe-card"><div class="course-top"><span>05</span><i>B1·B2</i></div><h3>Goethe Prüfung</h3><p>按正式模块、题量和计时完成听说读写模拟考。</p><div class="course-meta"><b>2</b><span>完整级别</span></div><button data-jump="#goethe">进入模拟考 →</button></article>
@@ -158,12 +158,15 @@
         </section>
 
         <section class="words-section" id="words">
-          <div class="section-heading"><div><p class="eyebrow">MEINE WÖRTER</p><h2>专业词汇与兴趣词库</h2><p>每类 520 词：高频核心词加德语复合词族；全部带冠词、中英解释和例句。</p></div><div class="word-count"><b id="visibleWordCount">0</b><span>Wörter</span></div></div>
+          <div class="section-heading"><div><p class="eyebrow">MEINE WÖRTER</p><h2>专业、兴趣与考试词库</h2><p>原有 2,080 个个性化词汇，加上 B1-C1 共 1,000 个考试高频词；全部提供英文、中文、词性和语境例句。</p></div><div class="word-count"><b id="visibleWordCount">0</b><span>Wörter</span></div></div>
           <div class="topic-tabs" id="topicTabs">
             <button class="active" data-topic="music">♫ Klangwort · 520</button>
             <button data-topic="ai">AI · 520</button>
             <button data-topic="games">Games · 520</button>
             <button data-topic="film">Film · 520</button>
+            <button data-topic="exam-b1">B1 Prüfung · 400</button>
+            <button data-topic="exam-b2">B2 Prüfung · 350</button>
+            <button data-topic="exam-c1">C1 Prüfung · 250</button>
           </div>
           <div class="word-grid" id="wordGrid"></div>
           <button class="load-more" id="loadMoreWords">显示更多 <span>↓</span></button>
@@ -180,6 +183,12 @@
             <button class="exam-mode" data-start="cases"><span>专项</span><b>四格判断</b><small>20 题 · 介词与冠词</small><i>→</i></button>
             <button class="exam-mode" data-start="music"><span>专项</span><b>Klangwort</b><small>专业词汇认词</small><i>→</i></button>
             <button class="exam-mode" data-start="interests"><span>专项</span><b>AI · Games · Film</b><small>兴趣词汇认词</small><i>→</i></button>
+            <button class="exam-mode" data-start="exam-vocab-b1"><span>B1 词汇</span><b>400 高频考试词</b><small>认词 · 反向翻译 · 语境完形</small><i>→</i></button>
+            <button class="exam-mode" data-start="exam-vocab-b2"><span>B2 词汇</span><b>350 进阶考试词</b><small>观点 · 社会 · 工作 · 学术</small><i>→</i></button>
+            <button class="exam-mode" data-start="exam-vocab-c1"><span>C1 词汇</span><b>250 高阶考试词</b><small>正式表达 · 抽象概念 · 论证</small><i>→</i></button>
+            <button class="exam-mode grammar-mode" data-start="grammar-b1"><span>B1 语法</span><b>完整句法训练</b><small>从句 · 时态 · 四格 · 基础被动</small><i>→</i></button>
+            <button class="exam-mode grammar-mode" data-start="grammar-b2"><span>B2 语法</span><b>复杂结构训练</b><small>虚拟式 · 被动替代 · 连接与搭配</small><i>→</i></button>
+            <button class="exam-mode grammar-mode" data-start="grammar-c1"><span>C1 语法</span><b>正式书面句法</b><small>间接引语 · 名词化 · 分词结构</small><i>→</i></button>
             <button class="exam-mode mistakes-mode" data-start="mistakes"><span>错题本</span><b><strong id="examMistakeCount">0</strong> 道待消灭</b><small>只练你答错的题</small><i>↻</i></button>
           </div>
         </section>
@@ -247,7 +256,7 @@
           <li><b>2</b><span>点击 Safari 底部的<strong>分享按钮</strong>。</span></li>
           <li><b>3</b><span>向下滑，选择<strong>“添加到主屏幕”</strong>，再点“添加”。</span></li>
         </ol>
-        <p class="install-note">添加后，请从主屏幕打开一次并保持联网。iPhone 会把主屏幕 App 与 Safari 的缓存分开，因此主屏幕版会再保存一次完整题库与全部 2,067 条音频；完成后不需要 ChatGPT 登录，开飞行模式也能使用。</p>
+        <p class="install-note">添加后，请从主屏幕打开一次并保持联网。iPhone 会把主屏幕 App 与 Safari 的缓存分开，因此主屏幕版会再保存一次完整题库与全部 <span id="offlineAudioInstallSummary">德语音频</span>；完成后不需要 ChatGPT 登录，开飞行模式也能使用。</p>
         <button class="install-done" id="installDone">知道了</button>
       </div>
     </div>
@@ -258,7 +267,7 @@
         <p class="eyebrow">HOME SCREEN · VOLLSTÄNDIG OFFLINE</p>
         <h2 id="offlineSetupTitle">正在保存主屏幕离线版</h2>
         <p class="offline-setup-copy">iPhone 的主屏幕 App 使用独立缓存，需要在这里重新下载一次。请保持本页打开，已完成的分包会保留并自动续传。</p>
-        <div class="offline-setup-meta"><strong id="offlineSetupCount">0 / 49</strong><span>2,067 条完整德语音频 · 约 14MB</span></div>
+        <div class="offline-setup-meta"><strong id="offlineSetupCount">0 / 0</strong><span id="offlineAudioSummary">完整德语音频</span></div>
         <div class="offline-setup-track"><i id="offlineSetupProgress"></i></div>
         <p class="offline-setup-state" id="offlineSetupState">准备下载完整题库与全部音频…</p>
         <button class="offline-setup-action" id="offlineSetupAction">继续下载全部音频</button>
@@ -285,6 +294,8 @@
 
     <script src="offline-audio-manifest.js"></script>
     <script src="offline-audio.js"></script>
+    <script src="exam-vocabulary.js"></script>
+    <script src="grammar-content.js"></script>
     <script src="app.js"></script>
     <script src="goethe-exams.js"></script>
   </body>

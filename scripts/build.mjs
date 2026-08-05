@@ -10,6 +10,8 @@ const assets = [
   "index.html",
   "offline.html",
   "style.css",
+  "exam-vocabulary.js",
+  "grammar-content.js",
   "app.js",
   "goethe-exams.js",
   "offline-audio-manifest.js",

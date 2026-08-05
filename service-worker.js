@@ -1,11 +1,13 @@
-const CACHE_NAME = 'mein-deutsch-v19';
+const CACHE_NAME = 'mein-deutsch-v20';
 const OFFLINE_PAGE = './offline.html';
-const READY_MARKER = './offline-ready-v19';
+const READY_MARKER = './offline-ready-v20';
 importScripts('./offline-audio-manifest.js');
 const CORE_ASSETS = [
   './index.html',
   OFFLINE_PAGE,
   './style.css',
+  './exam-vocabulary.js',
+  './grammar-content.js',
   './app.js',
   './goethe-exams.js',
   './offline-audio-manifest.js',
@@ -21,6 +23,8 @@ const EXPECTED_CONTENT_TYPES = new Map([
   ['./index.html', 'text/html'],
   ['./offline.html', 'text/html'],
   ['./style.css', 'text/css'],
+  ['./exam-vocabulary.js', 'javascript'],
+  ['./grammar-content.js', 'javascript'],
   ['./app.js', 'javascript'],
   ['./goethe-exams.js', 'javascript'],
   ['./offline-audio-manifest.js', 'javascript'],

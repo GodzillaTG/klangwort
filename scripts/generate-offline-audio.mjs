@@ -13,6 +13,7 @@ const gapSeconds = 0.22;
 const gap = Buffer.alloc(Math.round(sampleRate * gapSeconds) * 2);
 const dialogueGap = Buffer.alloc(Math.round(sampleRate * 0.42) * 2);
 const goetheOnly = process.argv.includes("--goethe-only");
+const examOnly = process.argv.includes("--exam-only");
 const naturalVoices = [
   "Sandy (German (Germany))",
   "Reed (German (Germany))",
@@ -202,39 +203,50 @@ async function buildSprite(name, texts, tempRoot, manifest) {
   console.log(`[${name}] wrote ${basename(outputPath)} (${(frameCursor / sampleRate / 60).toFixed(1)} min)`);
 }
 
-const [appSource, goetheSource] = await Promise.all([
+const [appSource, goetheSource, examVocabularySource] = await Promise.all([
   readFile(resolve(root, "app.js"), "utf8"),
-  readFile(resolve(root, "goethe-exams.js"), "utf8")
+  readFile(resolve(root, "goethe-exams.js"), "utf8"),
+  readFile(resolve(root, "exam-vocabulary.js"), "utf8")
 ]);
 const words = readVocabulary(appSource);
 const exams = readGoetheExams(goetheSource);
+const examVocabularyContext = {};
+vm.runInNewContext(examVocabularySource, examVocabularyContext);
+const examVocabulary = examVocabularyContext.EXAM_VOCABULARY;
 const allGroups = {
   music: unique(words.filter(word => word.topic === "music").map(word => word.word)),
   ai: unique(words.filter(word => word.topic === "ai").map(word => word.word)),
   games: unique(words.filter(word => word.topic === "games").map(word => word.word)),
   film: unique(words.filter(word => word.topic === "film").map(word => word.word)),
+  "exam-b1": unique(examVocabulary.filter(word => word.level === "B1").map(word => word.gender ? `${word.gender} ${word.de}` : word.de)),
+  "exam-b2": unique(examVocabulary.filter(word => word.level === "B2").map(word => word.gender ? `${word.gender} ${word.de}` : word.de)),
+  "exam-c1": unique(examVocabulary.filter(word => word.level === "C1").map(word => word.gender ? `${word.gender} ${word.de}` : word.de)),
   "goethe-b1": goetheTexts(exams.B1),
   "goethe-b2": goetheTexts(exams.B2)
 };
 
-if (!goetheOnly) await rm(audioDir, { recursive: true, force: true });
+if (!goetheOnly && !examOnly) await rm(audioDir, { recursive: true, force: true });
 await mkdir(audioDir, { recursive: true });
 const tempRoot = await mkdtemp(resolve(tmpdir(), "mein-deutsch-audio-"));
 let manifest = {};
-if (goetheOnly) {
+if (goetheOnly || examOnly) {
   const manifestContext = {};
   vm.runInNewContext(await readFile(resolve(root, "offline-audio-manifest.js"), "utf8"), manifestContext);
   manifest = { ...manifestContext.OFFLINE_AUDIO_MANIFEST };
   for (const [text, entry] of Object.entries(manifest)) {
-    if (entry.src.includes("audio/goethe-")) delete manifest[text];
+    if (goetheOnly && entry.src.includes("audio/goethe-")) delete manifest[text];
+    if (examOnly && entry.src.includes("audio/exam-")) delete manifest[text];
   }
   for (const file of await readdir(audioDir)) {
-    if (/^goethe-b[12]-\d+\.m4a$/.test(file)) await unlink(resolve(audioDir, file));
+    if (goetheOnly && /^goethe-b[12]-\d+\.m4a$/.test(file)) await unlink(resolve(audioDir, file));
+    if (examOnly && /^exam-(?:b1|b2|c1)-[0-9]+\.m4a$/.test(file)) await unlink(resolve(audioDir, file));
   }
 }
 const groups = goetheOnly
   ? { "goethe-b1": allGroups["goethe-b1"], "goethe-b2": allGroups["goethe-b2"] }
-  : allGroups;
+  : examOnly
+    ? { "exam-b1": allGroups["exam-b1"], "exam-b2": allGroups["exam-b2"], "exam-c1": allGroups["exam-c1"] }
+    : allGroups;
 try {
   for (const [name, texts] of Object.entries(groups)) {
     // Keep each exam recording independent, like a real listening-test track.

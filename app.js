@@ -317,7 +317,10 @@ const topicMeta = {
   music:{label:'Klangwort · Musik',short:'Klangwort'},
   ai:{label:'AI · Künstliche Intelligenz',short:'AI'},
   games:{label:'Games · Spiele',short:'Games'},
-  film:{label:'Film · Kino',short:'Film'}
+  film:{label:'Film · Kino',short:'Film'},
+  'exam-b1':{label:'B1 · Prüfungswortschatz',short:'B1'},
+  'exam-b2':{label:'B2 · Prüfungswortschatz',short:'B2'},
+  'exam-c1':{label:'C1 · Prüfungswortschatz',short:'C1'}
 };
 
 function makeWords(rows, topic) {
@@ -327,12 +330,28 @@ function makeWords(rows, topic) {
     example:row[4], exampleZh:row[5], topic
   }));
 }
-const allWords = [
+const interestAndMusicWords = [
   ...makeWords(expandedMusicWords,'music'),
   ...makeWords(expandedAiWords,'ai'),
   ...makeWords(expandedGameWords,'games'),
   ...makeWords(expandedFilmWords,'film')
 ];
+const examWords = (globalThis.EXAM_VOCABULARY || []).map((row,index) => ({
+  key:row.id || `exam-${index}`,
+  word:row.gender ? `${row.gender} ${row.de}` : row.de,
+  lemma:row.de,
+  gender:row.gender || '',
+  en:row.en,
+  zh:row.zh,
+  example:row.exampleDe,
+  exampleEn:row.exampleEn,
+  exampleZh:row.exampleZh,
+  topic:`exam-${row.level.toLowerCase()}`,
+  level:row.level,
+  pos:row.pos,
+  examTopic:row.topic
+}));
+const allWords = [...interestAndMusicWords,...examWords];
 
 const caseSeedEnglish = {
   'case-01':'The composer is writing a new opera.',
@@ -403,6 +422,32 @@ const articleForms = {
   die:{Nominativ:'die',Akkusativ:'die',Dativ:'der',Genitiv:'der'},
   das:{Nominativ:'das',Akkusativ:'das',Dativ:'dem',Genitiv:'des'}
 };
+const caseScenarioTemplates = {
+  Nominativ:[
+    [(phrase,word) => `${titleCase(phrase)} spielt heute eine wichtige Rolle.`, word => `The ${word.en} plays an important role today.`,'句子的主语执行或承担动作。'],
+    [(phrase,word) => `${titleCase(phrase)} verändert den gesamten Ablauf.`, word => `The ${word.en} changes the entire process.`,'谁改变流程？标记主语。'],
+    [(phrase,word) => `${titleCase(phrase)} wurde ausführlich erklärt.`, word => `The ${word.en} was explained in detail.`,'被动态中的对象仍是语法主语。'],
+    [(phrase,word) => `${titleCase(phrase)} bleibt für das Team entscheidend.`, word => `The ${word.en} remains crucial for the team.`,'sein/bleiben 后的主语使用主格。']
+  ],
+  Akkusativ:[
+    [(phrase,word) => `Wir analysieren ${phrase} im Seminar.`, word => `We analyse the ${word.en} in the seminar.`,'analysieren 的直接宾语。'],
+    [(phrase,word) => `Das Team überprüft ${phrase} ein zweites Mal.`, word => `The team checks the ${word.en} a second time.`,'überprüfen 的直接宾语。'],
+    [(phrase,word) => `Die Redaktion beschreibt ${phrase} sehr genau.`, word => `The editorial team describes the ${word.en} very precisely.`,'beschreiben 的直接宾语。'],
+    [(phrase,word) => `Ohne ${phrase} kann das Projekt nicht beginnen.`, word => `The project cannot begin without the ${word.en}.`,'ohne 固定支配 Akkusativ。']
+  ],
+  Dativ:[
+    [(phrase,word) => `Wir arbeiten seit Monaten mit ${phrase}.`, word => `We have worked with the ${word.en} for months.`,'mit 固定支配 Dativ。'],
+    [(phrase,word) => `Die Entscheidung hängt von ${phrase} ab.`, word => `The decision depends on the ${word.en}.`,'von 固定支配 Dativ。'],
+    [(phrase,word) => `Bei ${phrase} ist besondere Sorgfalt nötig.`, word => `Special care is needed with the ${word.en}.`,'bei 固定支配 Dativ。'],
+    [(phrase,word) => `Wir widmen uns heute ${phrase}.`, word => `Today we devote ourselves to the ${word.en}.`,'sich widmen 支配 Dativ。']
+  ],
+  Genitiv:[
+    [(phrase,word) => `Die Bedeutung ${phrase} wird oft unterschätzt.`, word => `The significance of the ${word.en} is often underestimated.`,'所属关系使用 Genitiv。'],
+    [(phrase,word) => `Wegen ${phrase} wurde der Termin verschoben.`, word => `The appointment was postponed because of the ${word.en}.`,'wegen 在正式书面语中支配 Genitiv。'],
+    [(phrase,word) => `Trotz ${phrase} wurde das Vorhaben umgesetzt.`, word => `Despite the ${word.en}, the plan was implemented.`,'trotz 在正式书面语中支配 Genitiv。'],
+    [(phrase,word) => `Während ${phrase} blieb das Studio geschlossen.`, word => `The studio remained closed during the ${word.en}.`,'während 作介词时支配 Genitiv。']
+  ]
+};
 function makeCaseQuestion(word,index,caseName) {
   const noun = word.word.replace(/^(der|die|das)\s+/,'');
   const article = articleForms[word.gender][caseName];
@@ -410,20 +455,9 @@ function makeCaseQuestion(word,index,caseName) {
     ? noun
     : /(?:s|ß|x|z)$/i.test(noun) ? `${noun}es` : `${noun}s`;
   const phrase = `${article} ${caseName === 'Genitiv' ? genitiveNoun : noun}`;
-  const prompt = caseName === 'Nominativ'
-    ? `${titleCase(phrase)} ist heute wichtig.`
-    : caseName === 'Akkusativ'
-      ? `Wir untersuchen ${phrase}.`
-      : caseName === 'Dativ'
-        ? `Wir arbeiten mit ${phrase}.`
-        : `Die Bedeutung ${phrase} ist klar.`;
-  const translationEn = caseName === 'Nominativ'
-    ? `The ${word.en} is important today.`
-    : caseName === 'Akkusativ'
-      ? `We examine the ${word.en}.`
-      : caseName === 'Dativ'
-        ? `We work with the ${word.en}.`
-        : `The meaning of the ${word.en} is clear.`;
+  const scenario = caseScenarioTemplates[caseName][Math.floor(index / caseNames.length) % caseScenarioTemplates[caseName].length];
+  const prompt = scenario[0](phrase,word);
+  const translationEn = scenario[1](word);
   return {
     id:`case-generated-${index}`,
     category:`格判断 · ${caseName}`,
@@ -432,21 +466,16 @@ function makeCaseQuestion(word,index,caseName) {
     translationEn,
     options:caseNames.map(value => ({value,label:value,sub:caseLabels[value].split(' · ')[0]})),
     answer:caseName,
-    explanation:caseName === 'Nominativ'
-      ? `${phrase} 是句子的主语，所以使用 Nominativ。`
-      : caseName === 'Akkusativ'
-        ? `untersuchen 的直接宾语使用 Akkusativ。`
-        : caseName === 'Dativ'
-          ? `介词 mit 固定支配 Dativ。`
-          : `${article} 表示所属关系，这里使用 Genitiv。`,
+    explanation:`${scenario[2]} “${phrase}” 因此使用 ${caseName}。`,
     type:'case',
     wordKey:word.key
   };
 }
 function buildCaseBank(count) {
+  const eligibleWords = allWords.filter(word => ['der','die','das'].includes(word.gender));
   return Array.from({length:count},(_,index) => {
     const caseName = caseNames[index % caseNames.length];
-    return makeCaseQuestion(allWords[(index * 7) % allWords.length],index,caseName);
+    return makeCaseQuestion(eligibleWords[(index * 7) % eligibleWords.length],index,caseName);
   });
 }
 const caseQuestions = [
@@ -472,6 +501,40 @@ const articleGenders = [
   {key:'n',de:'Neutrum',zh:'中性',en:'neuter',noun:'Modell',genitive:'Modells',nounEn:'model'},
   {key:'pl',de:'Plural',zh:'复数',en:'plural',noun:'Daten',genitive:'Daten',nounEn:'data'}
 ];
+const articleNounSets = {
+  m:[
+    {noun:'Algorithmus',genitive:'Algorithmus',dative:'Algorithmus',nounEn:'algorithm'},
+    {noun:'Film',genitive:'Films',dative:'Film',nounEn:'film'},
+    {noun:'Antrag',genitive:'Antrags',dative:'Antrag',nounEn:'application'},
+    {noun:'Beruf',genitive:'Berufs',dative:'Beruf',nounEn:'profession'},
+    {noun:'Vertrag',genitive:'Vertrags',dative:'Vertrag',nounEn:'contract'},
+    {noun:'Kurs',genitive:'Kurses',dative:'Kurs',nounEn:'course'}
+  ],
+  f:[
+    {noun:'Kamera',genitive:'Kamera',dative:'Kamera',nounEn:'camera'},
+    {noun:'Aufnahme',genitive:'Aufnahme',dative:'Aufnahme',nounEn:'recording'},
+    {noun:'Entscheidung',genitive:'Entscheidung',dative:'Entscheidung',nounEn:'decision'},
+    {noun:'Bewerbung',genitive:'Bewerbung',dative:'Bewerbung',nounEn:'application'},
+    {noun:'Erfahrung',genitive:'Erfahrung',dative:'Erfahrung',nounEn:'experience'},
+    {noun:'Umwelt',genitive:'Umwelt',dative:'Umwelt',nounEn:'environment'}
+  ],
+  n:[
+    {noun:'Modell',genitive:'Modells',dative:'Modell',nounEn:'model'},
+    {noun:'Studio',genitive:'Studios',dative:'Studio',nounEn:'studio'},
+    {noun:'Ergebnis',genitive:'Ergebnisses',dative:'Ergebnis',nounEn:'result'},
+    {noun:'Projekt',genitive:'Projekts',dative:'Projekt',nounEn:'project'},
+    {noun:'Problem',genitive:'Problems',dative:'Problem',nounEn:'problem'},
+    {noun:'Unternehmen',genitive:'Unternehmens',dative:'Unternehmen',nounEn:'company'}
+  ],
+  pl:[
+    {noun:'Daten',genitive:'Daten',dative:'Daten',nounEn:'data'},
+    {noun:'Regeln',genitive:'Regeln',dative:'Regeln',nounEn:'rules'},
+    {noun:'Kosten',genitive:'Kosten',dative:'Kosten',nounEn:'costs'},
+    {noun:'Ergebnisse',genitive:'Ergebnisse',dative:'Ergebnissen',nounEn:'results'},
+    {noun:'Teilnehmer',genitive:'Teilnehmer',dative:'Teilnehmern',nounEn:'participants'},
+    {noun:'Medien',genitive:'Medien',dative:'Medien',nounEn:'media'}
+  ]
+};
 const articleCaseEnglish = {
   Nominativ:'nominative',
   Akkusativ:'accusative',
@@ -520,27 +583,28 @@ function articleChoiceOptions(family,answer,index) {
   const shift = index % values.length;
   return [...values.slice(shift),...values.slice(0,shift)].map(value => ({value,label:value}));
 }
-function articleSentence(family,caseName,gender,answer) {
-  const noun = caseName === 'Genitiv' ? gender.genitive : gender.noun;
+function articleSentence(family,caseName,gender,answer,index) {
+  const nounData = articleNounSets[gender.key][Math.floor(index / articleCombinations.length) % articleNounSets[gender.key].length];
+  const noun = caseName === 'Genitiv' ? nounData.genitive : caseName === 'Dativ' ? nounData.dative : nounData.noun;
   const phrase = `${answer} ${noun}`;
   const englishDeterminer = family.key === 'ein'
-    ? (/^[aeiou]/i.test(gender.nounEn) ? 'an' : 'a')
+    ? (/^[aeiou]/i.test(nounData.nounEn) ? 'an' : 'a')
     : family.en;
   if (caseName === 'Nominativ') return {
-    de:`___ ${gender.noun} ist wichtig.`,
-    en:`${titleCase(englishDeterminer)} ${gender.nounEn} is important.`
+    de:`___ ${nounData.noun} ist für diese Aufgabe wichtig.`,
+    en:`${titleCase(englishDeterminer)} ${nounData.nounEn} is important for this task.`
   };
   if (caseName === 'Akkusativ') return {
-    de:`Wir benutzen ___ ${gender.noun}.`,
-    en:`We use ${englishDeterminer} ${gender.nounEn}.`
+    de:`Wir überprüfen ___ ${nounData.noun} noch einmal.`,
+    en:`We check ${englishDeterminer} ${nounData.nounEn} once more.`
   };
   if (caseName === 'Dativ') return {
-    de:`Wir arbeiten mit ___ ${gender.noun}.`,
-    en:`We work with ${englishDeterminer} ${gender.nounEn}.`
+    de:`Wir arbeiten seit Wochen mit ___ ${noun}.`,
+    en:`We have worked with ${englishDeterminer} ${nounData.nounEn} for weeks.`
   };
   return {
     de:`Die Qualität ___ ${noun} ist gut.`,
-    en:`The quality of ${englishDeterminer} ${gender.nounEn} is good.`,
+    en:`The quality of ${englishDeterminer} ${nounData.nounEn} is good.`,
     phrase
   };
 }
@@ -554,20 +618,20 @@ const articleCombinations = articleFamilies.flatMap(family =>
 function makeArticleQuestion(combo,index) {
   const {family,caseName,gender} = combo;
   const answer = declinedArticle(family,caseName,gender.key);
-  const variant = Math.floor(index / articleCombinations.length) % 3;
-  const sentence = articleSentence(family,caseName,gender,answer);
+  const variant = index % 3;
+  const sentence = articleSentence(family,caseName,gender,answer,index);
   const directPrompt = `${family.label} · ${gender.de} · ${caseName}`;
   return {
     id:`article-${family.key}-${caseName}-${gender.key}-${index}`,
     type:'article',
     category:'冠词变格 · ARTIKEL',
-    prompt:variant === 1 ? sentence.de : directPrompt,
-    context:variant === 1
-      ? `填写正确冠词。基础形式：${family.label}；${gender.zh}；${caseName}。`
-      : `写出 ${family.label} 在${gender.zh} ${caseName} 中的正确形式。`,
-    translationEn:variant === 1
-      ? sentence.en
-      : `What is the ${gender.en} ${articleCaseEnglish[caseName]} form of “${family.label}”?`,
+    prompt:variant === 0 ? directPrompt : sentence.de,
+    context:variant === 0
+      ? `写出 ${family.label} 在${gender.zh} ${caseName} 中的正确形式。`
+      : `填写正确冠词。基础形式：${family.label}；${gender.zh}；${caseName}。`,
+    translationEn:variant === 0
+      ? `What is the ${gender.en} ${articleCaseEnglish[caseName]} form of “${family.label}”?`
+      : sentence.en,
     options:articleChoiceOptions(family,answer,index),
     answer,
     explanation:`${family.label} + ${gender.de} + ${caseName} = ${answer}。`,
@@ -594,10 +658,38 @@ const adjectiveWords = [
   {de:'komplex',en:'complex'}
 ];
 const adjectiveNouns = {
-  m:{noun:'Klang',genitive:'Klangs',en:'sound'},
-  f:{noun:'Musik',genitive:'Musik',en:'music'},
-  n:{noun:'Material',genitive:'Materials',en:'material'},
-  pl:{noun:'Daten',genitive:'Daten',en:'data points'}
+  m:[
+    {noun:'Klang',genitive:'Klangs',dative:'Klang',en:'sound'},
+    {noun:'Vertrag',genitive:'Vertrags',dative:'Vertrag',en:'contract'},
+    {noun:'Vorschlag',genitive:'Vorschlags',dative:'Vorschlag',en:'proposal'},
+    {noun:'Bericht',genitive:'Berichts',dative:'Bericht',en:'report'},
+    {noun:'Ansatz',genitive:'Ansatzes',dative:'Ansatz',en:'approach'},
+    {noun:'Arbeitsplatz',genitive:'Arbeitsplatzes',dative:'Arbeitsplatz',en:'workplace'}
+  ],
+  f:[
+    {noun:'Musik',genitive:'Musik',dative:'Musik',en:'music'},
+    {noun:'Methode',genitive:'Methode',dative:'Methode',en:'method'},
+    {noun:'Entscheidung',genitive:'Entscheidung',dative:'Entscheidung',en:'decision'},
+    {noun:'Technologie',genitive:'Technologie',dative:'Technologie',en:'technology'},
+    {noun:'Lösung',genitive:'Lösung',dative:'Lösung',en:'solution'},
+    {noun:'Erfahrung',genitive:'Erfahrung',dative:'Erfahrung',en:'experience'}
+  ],
+  n:[
+    {noun:'Material',genitive:'Materials',dative:'Material',en:'material'},
+    {noun:'Ergebnis',genitive:'Ergebnisses',dative:'Ergebnis',en:'result'},
+    {noun:'Projekt',genitive:'Projekts',dative:'Projekt',en:'project'},
+    {noun:'Modell',genitive:'Modells',dative:'Modell',en:'model'},
+    {noun:'Konzept',genitive:'Konzepts',dative:'Konzept',en:'concept'},
+    {noun:'Verfahren',genitive:'Verfahrens',dative:'Verfahren',en:'procedure'}
+  ],
+  pl:[
+    {noun:'Daten',genitive:'Daten',dative:'Daten',en:'data points'},
+    {noun:'Ergebnisse',genitive:'Ergebnisse',dative:'Ergebnissen',en:'results'},
+    {noun:'Regeln',genitive:'Regeln',dative:'Regeln',en:'rules'},
+    {noun:'Methoden',genitive:'Methoden',dative:'Methoden',en:'methods'},
+    {noun:'Teilnehmer',genitive:'Teilnehmer',dative:'Teilnehmern',en:'participants'},
+    {noun:'Anforderungen',genitive:'Anforderungen',dative:'Anforderungen',en:'requirements'}
+  ]
 };
 const adjectiveEndings = {
   weak:{
@@ -656,11 +748,12 @@ function adjectiveEnglishDeterminer(pattern,genderKey,nounEn) {
 }
 function makeAdjectiveQuestion(combo,index) {
   const {adjective,pattern,caseName,gender} = combo;
-  const noun = adjectiveNouns[gender.key];
+  const nounChoices = adjectiveNouns[gender.key];
+  const noun = nounChoices[Math.floor(index / adjectiveWords.length) % nounChoices.length];
   const ending = adjectiveEndings[pattern.key][caseName][gender.key];
   const answer = `${adjective.de}${ending}`;
   const article = adjectiveArticle(pattern,caseName,gender.key);
-  const nounForm = caseName === 'Genitiv' ? noun.genitive : noun.noun;
+  const nounForm = caseName === 'Genitiv' ? noun.genitive : caseName === 'Dativ' ? noun.dative : noun.noun;
   const phrase = [article,answer,nounForm].filter(Boolean).join(' ');
   const determiner = adjectiveEnglishDeterminer(pattern,gender.key,noun.en);
   const englishPhrase = [determiner,adjective.en,noun.en].filter(Boolean).join(' ');
@@ -672,7 +765,7 @@ function makeAdjectiveQuestion(combo,index) {
     : caseName === 'Akkusativ'
       ? {de:`Wir verwenden ${article ? `${article} ` : ''}___ ${noun.noun}. (${adjective.de})`,en:`We use ${englishPhrase}.`}
       : caseName === 'Dativ'
-        ? {de:`Wir arbeiten mit ${article ? `${article} ` : ''}___ ${noun.noun}. (${adjective.de})`,en:`We work with ${englishPhrase}.`}
+        ? {de:`Wir arbeiten mit ${article ? `${article} ` : ''}___ ${nounForm}. (${adjective.de})`,en:`We work with ${englishPhrase}.`}
         : {de:`Die Qualität ${article ? `${article} ` : ''}___ ${nounForm} ist gut. (${adjective.de})`,en:`The quality of ${englishPhrase} is good.`};
   const variant = index % 3;
   return {
@@ -707,7 +800,14 @@ const adjectiveBank = Array.from({length:TARGET_TOPIC_SIZE},(_,index) =>
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
-const shuffle = values => [...values].sort(() => Math.random() - .5);
+const shuffle = values => {
+  const copy = [...values];
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(Math.random() * (index + 1));
+    [copy[index],copy[swap]] = [copy[swap],copy[index]];
+  }
+  return copy;
+};
 const dateKey = () => new Date().toISOString().slice(0,10);
 const STORAGE_KEY = 'mein-deutsch-personal-v1';
 const defaultState = {
@@ -754,12 +854,12 @@ function updateDashboard() {
   $('#sideAnswered').textContent = state.todayAnswered;
   $('#examMistakeCount').textContent = state.mistakes.length;
 }
-function genderClass(gender) { return gender === 'der' ? 'der' : gender === 'die' ? 'die' : 'das'; }
+function genderClass(gender) { return gender === 'der' ? 'der' : gender === 'die' ? 'die' : gender === 'das' ? 'das' : 'word-type'; }
 function wordCard(word) {
   return `<article class="word-card" data-word="${word.key}">
     <div class="word-card-top"><span class="word-category">${topicMeta[word.topic].label}</span><button data-speak="${word.word}" aria-label="播放 ${word.word}">◖</button></div>
     <h3>${word.word}</h3><p class="en">${word.en}</p><p class="zh">${word.zh}</p>
-    <p class="example">${word.example}</p><span class="gender-pill ${genderClass(word.gender)}">${word.gender}</span>
+    <p class="example">${word.example}</p><span class="gender-pill ${genderClass(word.gender)}">${word.gender || (word.pos || 'Wortart')}</span>
   </article>`;
 }
 function renderWords() {
@@ -799,15 +899,16 @@ function openWord(key) {
   const word = allWords.find(item => item.key === key);
   if (!word) return;
   $('#wordDetail').innerHTML = `
-    <p class="detail-topic">${topicMeta[word.topic].label.toUpperCase()}</p>
-    <h2>${word.word}</h2><span class="detail-gender">${word.gender} · ${word.gender === 'der' ? '阳性' : word.gender === 'die' ? '阴性' : '中性'}</span>
+    <p class="detail-topic">${topicMeta[word.topic].label.toUpperCase()}${word.examTopic ? ` · ${word.examTopic}` : ''}</p>
+    <h2>${word.word}</h2><span class="detail-gender">${word.gender ? `${word.gender} · ${word.gender === 'der' ? '阳性' : word.gender === 'die' ? '阴性' : '中性'}` : `${word.level || ''} · ${word.pos || 'Wortart'}`}</span>
     <div class="detail-translation"><b>EN</b><span>${word.en}</span><b>中</b><span>${word.zh}</span></div>
-    <h4>IM SATZ · 例句</h4><div class="detail-example"><strong>„${word.example}“</strong><span>${word.exampleZh}</span></div>
+    <h4>IM SATZ · 例句</h4><div class="detail-example"><strong>„${word.example}“</strong><span>${word.exampleEn ? `EN · ${word.exampleEn}<br>` : ''}${word.exampleZh}</span></div>
     <h4>记忆方式</h4><p>${genderHint(word)}</p>
     <button class="detail-speak" data-speak="${word.word}">◖ 听德语发音</button>`;
   $('#wordModal').hidden = false;
 }
 function genderHint(word) {
+  if (!word.gender) return `先把 <b>${word.word}</b> 放回例句中记忆，再用英文与中文释义做反向回忆。`;
   const noun = word.word.toLowerCase();
   if (word.gender === 'die' && /(ung|heit|keit|schaft|tion|ik|enz)$/.test(noun)) return `看到词尾就联想到 die：<b>${word.word}</b>。把冠词和名词一起念三遍。`;
   if (word.gender === 'das' && /(chen|lein|ment|um|ing)$/.test(noun)) return `这个词的结尾常提示中性。整体记忆：<b>${word.word}</b>。`;
@@ -843,16 +944,76 @@ function makeVocabQuestion(word, pool) {
     wordKey:word.key, speak:word.word
   };
 }
-const genderBank = allWords.map(makeGenderQuestion);
+const genderBank = allWords.filter(word => ['der','die','das'].includes(word.gender)).map(makeGenderQuestion);
 const musicBank = allWords.filter(word => word.topic === 'music').map(word => makeVocabQuestion(word,allWords.filter(item => item.topic === 'music')));
 const interestWords = allWords.filter(word => word.topic !== 'music');
-const interestBank = interestWords.map(word => makeVocabQuestion(word,interestWords.filter(item => item.topic === word.topic)));
-const fullBank = [...genderBank,...articleBank,...adjectiveBank,...caseQuestions,...musicBank,...interestBank];
+const personalInterestWords = interestWords.filter(word => ['ai','games','film'].includes(word.topic));
+const interestBank = personalInterestWords.map(word => makeVocabQuestion(word,personalInterestWords.filter(item => item.topic === word.topic)));
+
+function examDistractors(word,pool) {
+  const sameType = pool.filter(item => item.key !== word.key && item.pos === word.pos);
+  const fallback = pool.filter(item => item.key !== word.key);
+  return shuffle(sameType.length >= 3 ? sameType : fallback).slice(0,3);
+}
+function makeExamVocabQuestions(word,pool) {
+  const distractors = examDistractors(word,pool);
+  const meaningOptions = shuffle([word,...distractors]).map(item => ({value:item.key,label:item.en,sub:item.zh}));
+  const germanOptions = shuffle([word,...distractors]).map(item => ({value:item.key,label:item.word,sub:item.pos}));
+  const questions = [
+    {
+      id:`exam-vocab-meaning-${word.key}`, type:'examVocab', level:word.level,
+      category:`${word.level} · PRÜFUNGSWORTSCHATZ`, prompt:word.word,
+      context:`正向认词 · ${word.examTopic}。选择最准确的英文与中文意思。`,
+      translationEn:'Choose the most accurate English and Chinese meaning.',
+      options:meaningOptions, answer:word.key,
+      explanation:`${word.word} = ${word.en} = ${word.zh}。例句：${word.example}`,
+      wordKey:word.key, speak:word.word
+    },
+    {
+      id:`exam-vocab-reverse-${word.key}`, type:'examVocab', level:word.level,
+      category:`${word.level} · RÜCKÜBERSETZUNG`, prompt:`${word.en} · ${word.zh}`,
+      context:'英中反向翻译 · 选择对应的德语词。',
+      translationEn:'Choose the German word that matches this meaning.',
+      options:germanOptions, answer:word.key,
+      explanation:`正确表达是 ${word.word}。${word.example}`,
+      wordKey:word.key, speak:word.word
+    }
+  ];
+  const escapedLemma = word.lemma.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const cloze = word.example.replace(new RegExp(escapedLemma,'i'),'___');
+  if (cloze !== word.example) {
+    questions.push({
+      id:`exam-vocab-context-${word.key}`, type:'examVocab', level:word.level,
+      category:`${word.level} · KONTEXTLÜCKE`, prompt:cloze,
+      context:`语境完形 · ${word.exampleZh}`,
+      translationEn:word.exampleEn || `Complete the sentence with “${word.en}”.`,
+      options:germanOptions, answer:word.key,
+      explanation:`完整句子：${word.example} · ${word.exampleEn || ''}`,
+      wordKey:word.key, speak:word.word
+    });
+  }
+  return questions;
+}
+const examVocabBank = examWords.flatMap(word => makeExamVocabQuestions(word,examWords.filter(item => item.level === word.level)));
+const levelledGrammarBank = globalThis.LEVELLED_GRAMMAR_QUESTIONS || [];
+const fullBank = [...genderBank,...articleBank,...adjectiveBank,...caseQuestions,...musicBank,...interestBank,...examVocabBank,...levelledGrammarBank];
 
 function take(pool,count) {
   if (!pool.length) return [];
   const mixed = shuffle(pool);
   return Array.from({length:count},(_,index) => ({...mixed[index % mixed.length]}));
+}
+function takeUniqueWords(pool,count) {
+  const selected = [];
+  const seen = new Set();
+  for (const question of shuffle(pool)) {
+    const key = question.wordKey || question.id;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    selected.push({...question});
+    if (selected.length === count) break;
+  }
+  return selected;
 }
 function buildRound(mode) {
   if (mode === 'gender') return take(genderBank,20);
@@ -861,15 +1022,25 @@ function buildRound(mode) {
   if (mode === 'cases') return take(caseQuestions,20);
   if (mode === 'music') return take(musicBank,18);
   if (mode === 'interests') return take(interestBank,18);
+  if (mode.startsWith('exam-vocab-')) {
+    const level = mode.slice(-2).toUpperCase();
+    return takeUniqueWords(examVocabBank.filter(question => question.level === level),20);
+  }
+  if (mode.startsWith('grammar-')) {
+    const level = mode.slice(-2).toUpperCase();
+    return take(levelledGrammarBank.filter(question => question.level === level),20);
+  }
   if (mode === 'mock') return shuffle([
-    ...take(genderBank,6),...take(articleBank,6),...take(adjectiveBank,6),...take(caseQuestions,6),...take(musicBank,3),...take(interestBank,3)
+    ...take(genderBank,4),...take(articleBank,4),...take(adjectiveBank,4),...take(caseQuestions,4),
+    ...take(levelledGrammarBank,6),...takeUniqueWords(examVocabBank,4),...take(musicBank,2),...take(interestBank,2)
   ]);
   if (mode === 'mistakes') {
     const wrong = fullBank.filter(question => state.mistakes.includes(question.id));
     return take(wrong.length ? wrong : [...genderBank,...articleBank,...adjectiveBank,...caseQuestions],Math.min(Math.max(wrong.length,12),24));
   }
   return shuffle([
-    ...take(genderBank,3),...take(articleBank,3),...take(adjectiveBank,3),...take(caseQuestions,2),...take(musicBank,2),...take(interestBank,2)
+    ...take(genderBank,2),...take(articleBank,2),...take(adjectiveBank,2),...take(caseQuestions,2),
+    ...take(levelledGrammarBank,3),...takeUniqueWords(examVocabBank,2),...take(musicBank,1),...take(interestBank,1)
   ]);
 }
 function startRound(mode) {
@@ -983,7 +1154,9 @@ function finishRound() {
     ['冠词',roundResults.filter(item => item.type === 'article')],
     ['形容词',roundResults.filter(item => item.type === 'adjective')],
     ['四格',roundResults.filter(item => item.type === 'case')],
-    ['词汇',roundResults.filter(item => item.type === 'music' || item.type === 'interest')]
+    ['句法语法',roundResults.filter(item => item.type === 'grammar')],
+    ['考试词汇',roundResults.filter(item => item.type === 'examVocab')],
+    ['兴趣词汇',roundResults.filter(item => item.type === 'music' || item.type === 'interest')]
   ].filter(([,items]) => items.length);
   $('#resultBreakdown').innerHTML = groups.map(([label,items]) =>
     `<span><b>${items.filter(item => item.correct).length}/${items.length}</b>${label}</span>`
@@ -1101,12 +1274,15 @@ document.addEventListener('keydown',event => {
 });
 
 let offlineReady = false;
-const OFFLINE_CACHE_NAME = 'mein-deutsch-v19';
-const OFFLINE_READY_MARKER = './offline-ready-v19';
+const OFFLINE_CACHE_NAME = 'mein-deutsch-v20';
+const OFFLINE_READY_MARKER = './offline-ready-v20';
 let workerRefreshing = false;
 let workerRegistration = null;
 let offlineAudioCompleted = 0;
 let offlineAudioTotal = window.OFFLINE_AUDIO_SOURCES?.length || 0;
+const offlineUtteranceTotal = Object.keys(window.OFFLINE_AUDIO_MANIFEST || {}).length;
+if ($('#offlineAudioSummary')) $('#offlineAudioSummary').textContent = `${offlineUtteranceTotal.toLocaleString('en-US')} 条完整德语音频`;
+if ($('#offlineAudioInstallSummary')) $('#offlineAudioInstallSummary').textContent = `${offlineUtteranceTotal.toLocaleString('en-US')} 条音频`;
 let offlineRetryTimer = 0;
 let offlineCacheChecked = false;
 let offlineSetupDismissed = false;
@@ -1147,7 +1323,7 @@ function updateStandaloneSetup() {
 
   if (offlineReady) {
     $('#offlineSetupTitle').textContent = '主屏幕离线版已完成';
-    $('#offlineSetupState').textContent = '题库与全部 2,067 条德语音频均已保存在这个主屏幕 App 中。';
+    $('#offlineSetupState').textContent = `题库与全部 ${offlineUtteranceTotal.toLocaleString('en-US')} 条德语音频均已保存在这个主屏幕 App 中。`;
     action.textContent = '完成，开始学习';
     action.classList.add('ready');
     $('#offlineSetupLater').hidden = true;

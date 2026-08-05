@@ -9,6 +9,7 @@ const run = promisify(execFile);
 const root = resolve(import.meta.dirname, "..");
 const appSource = await readFile(resolve(root,"app.js"),"utf8");
 const goetheSource = await readFile(resolve(root,"goethe-exams.js"),"utf8");
+const examVocabularySource = await readFile(resolve(root,"exam-vocabulary.js"),"utf8");
 const manifestSource = await readFile(resolve(root,"offline-audio-manifest.js"),"utf8");
 
 const vocabularyContext = {};
@@ -17,10 +18,13 @@ const goetheContext = {};
 vm.runInNewContext(`${goetheSource.slice(0,goetheSource.indexOf("  const moduleDescriptions"))}\n  globalThis.__EXAMS__=EXAMS;\n})();`,goetheContext);
 const manifestContext = {};
 vm.runInNewContext(manifestSource,manifestContext);
+const examVocabularyContext = {};
+vm.runInNewContext(examVocabularySource,examVocabularyContext);
 const manifest = manifestContext.OFFLINE_AUDIO_MANIFEST;
 const declaredSources = manifestContext.OFFLINE_AUDIO_SOURCES;
 
 const required = new Set(vocabularyContext.__WORDS__.map(word => word.word));
+for (const word of examVocabularyContext.EXAM_VOCABULARY) required.add(word.gender ? `${word.gender} ${word.de}` : word.de);
 for (const exam of Object.values(goetheContext.__EXAMS__)) {
   for (const part of exam.modules.hoeren.parts) {
     for (const question of part.questions) required.add(question.audio || part.audio);

@@ -1,7 +1,7 @@
 {
   "name": "Mein Deutsch — 我的德语训练场",
   "short_name": "Mein Deutsch",
-  "description": "为 Sichenguo 定制的完全离线德语刷题 App：Klangwort、词性、冠词、形容词变位、四格、AI、游戏与电影。",
+  "description": "为 Sichenguo 定制的完全离线德语刷题 App：Klangwort、B1-C1 考试词汇、分级语法、四格、AI、游戏与电影。",
   "lang": "zh-CN",
   "id": "./",
   "start_url": "./?app=home",
