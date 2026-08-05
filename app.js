@@ -1069,7 +1069,7 @@ function buildRound(mode) {
   }
   if (mode === 'mock') return shuffle([
     ...take(genderBank,4),...take(articleBank,4),...take(adjectiveBank,4),...take(caseQuestions,4),
-    ...take(levelledGrammarBank,6),...takeUniqueWords(examVocabBank,4),...take(musicBank,2),...take(interestBank,2)
+    ...take(levelledGrammarBank,10),...take(musicBank,2),...take(interestBank,2)
   ]);
   if (mode === 'mistakes') {
     const wrong = fullBank.filter(question => state.mistakes.includes(question.id));
@@ -1077,7 +1077,7 @@ function buildRound(mode) {
   }
   return shuffle([
     ...take(genderBank,2),...take(articleBank,2),...take(adjectiveBank,2),...take(caseQuestions,2),
-    ...take(levelledGrammarBank,3),...takeUniqueWords(examVocabBank,2),...take(musicBank,1),...take(interestBank,1)
+    ...take(levelledGrammarBank,5),...take(musicBank,1),...take(interestBank,1)
   ]);
 }
 function startRound(mode) {
