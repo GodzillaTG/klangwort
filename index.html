@@ -46,6 +46,7 @@
           <a class="nav-item" href="#gender"><i>◒</i><span>词性<small>Genus</small></span></a>
           <a class="nav-item" href="#cases"><i>Ⅳ</i><span>四格<small>Kasus</small></span></a>
           <a class="nav-item" href="#words"><i>✦</i><span>词库<small>Meine Wörter</small></span></a>
+          <a class="nav-item" href="#exam-vocabulary"><i>W</i><span>考词<small>Prüfungswort</small></span></a>
           <a class="nav-item" href="#exam"><i>✓</i><span>刷题<small>Prüfung</small></span></a>
           <a class="nav-item" href="#goethe"><i>G</i><span>歌德<small>B1 · B2</small></span></a>
         </nav>
@@ -82,13 +83,14 @@
         </section>
 
         <section class="overview-section">
-          <div class="section-heading"><div><p class="eyebrow">DEIN LEHRPLAN</p><h2>你的五大学习板块</h2></div><p>日常刷题打基础，Goethe B1/B2 模考检验真实应试能力。</p></div>
+          <div class="section-heading"><div><p class="eyebrow">DEIN LEHRPLAN</p><h2>你的六大学习板块</h2></div><p>日常刷题打基础，Goethe B1/B2 模考检验真实应试能力。</p></div>
           <div class="course-grid">
             <article class="course-card music-card"><div class="course-top"><span>01</span><i>♫</i></div><h3>Klangwort</h3><p>作曲、Tonmeister、录音制作和音乐表达。</p><div class="course-meta"><b>520</b><span>专业词汇</span></div><button data-jump="#words" data-topic="music">进入词库 →</button></article>
             <article class="course-card gender-card"><div class="course-top"><span>02</span><i>der</i></div><h3>阴阳中性</h3><p>把 der / die / das 和名词当作一个整体记住。</p><div class="course-meta"><b>2,481</b><span>词性题</span></div><button data-start="gender">开始专项 →</button></article>
             <article class="course-card case-card"><div class="course-top"><span>03</span><i>Ⅳ</i></div><h3>变格系统</h3><p>四格、ein 类冠词，以及形容词强弱混合变化。</p><div class="course-meta"><b>1,560</b><span>变格专项题</span></div><button data-start="adjectives">开始形容词专项 →</button></article>
             <article class="course-card interest-card"><div class="course-top"><span>04</span><i>AI</i></div><h3>Meine Welt</h3><p>用你感兴趣的 AI、游戏和电影建立词汇量。</p><div class="course-meta"><b>1,560</b><span>兴趣词</span></div><button data-jump="#words" data-topic="ai">浏览兴趣词 →</button></article>
-            <article class="course-card goethe-card"><div class="course-top"><span>05</span><i>B1·B2</i></div><h3>Goethe Prüfung</h3><p>按正式模块、题量和计时完成听说读写模拟考。</p><div class="course-meta"><b>2</b><span>完整级别</span></div><button data-jump="#goethe">进入模拟考 →</button></article>
+            <article class="course-card exam-vocab-card"><div class="course-top"><span>05</span><i>W</i></div><h3>Prüfungswortschatz</h3><p>B1、B2、C1 各自独立训练，不混级抽题。</p><div class="course-meta"><b>1,000</b><span>考试词汇</span></div><button data-jump="#exam-vocabulary">选择等级 →</button></article>
+            <article class="course-card goethe-card"><div class="course-top"><span>06</span><i>B1·B2</i></div><h3>Goethe Prüfung</h3><p>按正式模块、题量和计时完成听说读写模拟考。</p><div class="course-meta"><b>2</b><span>完整级别</span></div><button data-jump="#goethe">进入模拟考 →</button></article>
           </div>
         </section>
 
@@ -172,6 +174,51 @@
           <button class="load-more" id="loadMoreWords">显示更多 <span>↓</span></button>
         </section>
 
+        <section class="exam-vocabulary-intro" id="exam-vocabulary">
+          <div>
+            <p class="eyebrow">PRÜFUNGSWORTSCHATZ · 独立训练</p>
+            <h2>每个等级分开练，<br /><em>清楚知道自己在学什么。</em></h2>
+            <p>B1、B2、C1 不再混合抽题。每个等级都有独立进度、四种训练方式和本级错题本。</p>
+          </div>
+          <div class="exam-vocabulary-total"><span>GESAMT</span><b><strong id="examWordMastered">0</strong> / 1000</b><small>已掌握考试词汇</small><div><i id="examWordProgress"></i></div></div>
+        </section>
+
+        <section class="exam-level-section exam-level-b1" id="exam-vocab-b1">
+          <header class="exam-level-heading"><div><p class="eyebrow">NIVEAU B1 · 400 WÖRTER</p><h2>B1 常用考试词汇</h2><p>只练 B1：日常生活、工作、出行、住房、健康与基础观点表达。</p></div><div class="exam-level-progress"><b><strong id="examB1Mastered">0</strong> / 400</b><span>已掌握</span><small><strong id="examB1Mistakes">0</strong> 道 B1 错题</small></div></header>
+          <div class="exam-level-actions">
+            <button class="featured" data-start="exam-vocab-b1"><span>B1 综合训练</span><b>20 题 · 四种题型</b><small>本轮只出现 B1 词汇</small><i>→</i></button>
+            <button data-start="exam-vocab-b1-recognition"><span>B1 认词</span><b>Deutsch → EN / 中</b><small>看到德语，选中英文词义</small><i>→</i></button>
+            <button data-start="exam-vocab-b1-reverse-en"><span>B1 主动回忆</span><b>English → Deutsch</b><small>从英文回忆德语</small><i>→</i></button>
+            <button data-start="exam-vocab-b1-reverse-zh"><span>B1 主动回忆</span><b>中文 → Deutsch</b><small>从中文回忆德语</small><i>→</i></button>
+            <button data-start="exam-vocab-b1-context"><span>B1 语境</span><b>德语例句完形</b><small>在句子中找回词汇</small><i>→</i></button>
+            <button class="level-mistakes" id="examB1MistakesButton" data-start="exam-vocab-b1-mistakes"><span>B1 错题本</span><b>只练本级错题</b><small>答对后自动移出</small><i>↻</i></button>
+          </div>
+        </section>
+
+        <section class="exam-level-section exam-level-b2" id="exam-vocab-b2">
+          <header class="exam-level-heading"><div><p class="eyebrow">NIVEAU B2 · 350 WÖRTER</p><h2>B2 常用考试词汇</h2><p>只练 B2：社会议题、职业、教育、媒体、观点论证与进阶抽象表达。</p></div><div class="exam-level-progress"><b><strong id="examB2Mastered">0</strong> / 350</b><span>已掌握</span><small><strong id="examB2Mistakes">0</strong> 道 B2 错题</small></div></header>
+          <div class="exam-level-actions">
+            <button class="featured" data-start="exam-vocab-b2"><span>B2 综合训练</span><b>20 题 · 四种题型</b><small>本轮只出现 B2 词汇</small><i>→</i></button>
+            <button data-start="exam-vocab-b2-recognition"><span>B2 认词</span><b>Deutsch → EN / 中</b><small>看到德语，选中英文词义</small><i>→</i></button>
+            <button data-start="exam-vocab-b2-reverse-en"><span>B2 主动回忆</span><b>English → Deutsch</b><small>从英文回忆德语</small><i>→</i></button>
+            <button data-start="exam-vocab-b2-reverse-zh"><span>B2 主动回忆</span><b>中文 → Deutsch</b><small>从中文回忆德语</small><i>→</i></button>
+            <button data-start="exam-vocab-b2-context"><span>B2 语境</span><b>德语例句完形</b><small>在句子中找回词汇</small><i>→</i></button>
+            <button class="level-mistakes" id="examB2MistakesButton" data-start="exam-vocab-b2-mistakes"><span>B2 错题本</span><b>只练本级错题</b><small>答对后自动移出</small><i>↻</i></button>
+          </div>
+        </section>
+
+        <section class="exam-level-section exam-level-c1" id="exam-vocab-c1">
+          <header class="exam-level-heading"><div><p class="eyebrow">NIVEAU C1 · 250 WÖRTER</p><h2>C1 常用考试词汇</h2><p>只练 C1：正式书面语、学术讨论、精确论证、复杂关系与高阶抽象概念。</p></div><div class="exam-level-progress"><b><strong id="examC1Mastered">0</strong> / 250</b><span>已掌握</span><small><strong id="examC1Mistakes">0</strong> 道 C1 错题</small></div></header>
+          <div class="exam-level-actions">
+            <button class="featured" data-start="exam-vocab-c1"><span>C1 综合训练</span><b>20 题 · 四种题型</b><small>本轮只出现 C1 词汇</small><i>→</i></button>
+            <button data-start="exam-vocab-c1-recognition"><span>C1 认词</span><b>Deutsch → EN / 中</b><small>看到德语，选中英文词义</small><i>→</i></button>
+            <button data-start="exam-vocab-c1-reverse-en"><span>C1 主动回忆</span><b>English → Deutsch</b><small>从英文回忆德语</small><i>→</i></button>
+            <button data-start="exam-vocab-c1-reverse-zh"><span>C1 主动回忆</span><b>中文 → Deutsch</b><small>从中文回忆德语</small><i>→</i></button>
+            <button data-start="exam-vocab-c1-context"><span>C1 语境</span><b>德语例句完形</b><small>在句子中找回词汇</small><i>→</i></button>
+            <button class="level-mistakes" id="examC1MistakesButton" data-start="exam-vocab-c1-mistakes"><span>C1 错题本</span><b>只练本级错题</b><small>答对后自动移出</small><i>↻</i></button>
+          </div>
+        </section>
+
         <section class="exam-section" id="exam">
           <div class="exam-heading"><div><p class="eyebrow">PRÜFUNGSZENTRUM</p><h2>像科目一一样，<br />把错误刷到消失。</h2><p>专项练习答错会在本轮末尾重现。模拟考试 30 题，正确率 90% 及格。</p></div><div class="exam-badge"><span>PASS</span><b>90%</b><small>27 / 30</small></div></div>
           <div class="exam-modes">
@@ -183,9 +230,6 @@
             <button class="exam-mode" data-start="cases"><span>专项</span><b>四格判断</b><small>20 题 · 介词与冠词</small><i>→</i></button>
             <button class="exam-mode" data-start="music"><span>专项</span><b>Klangwort</b><small>专业词汇认词</small><i>→</i></button>
             <button class="exam-mode" data-start="interests"><span>专项</span><b>AI · Games · Film</b><small>兴趣词汇认词</small><i>→</i></button>
-            <button class="exam-mode" data-start="exam-vocab-b1"><span>B1 词汇</span><b>400 高频考试词</b><small>认词 · 反向翻译 · 语境完形</small><i>→</i></button>
-            <button class="exam-mode" data-start="exam-vocab-b2"><span>B2 词汇</span><b>350 进阶考试词</b><small>观点 · 社会 · 工作 · 学术</small><i>→</i></button>
-            <button class="exam-mode" data-start="exam-vocab-c1"><span>C1 词汇</span><b>250 高阶考试词</b><small>正式表达 · 抽象概念 · 论证</small><i>→</i></button>
             <button class="exam-mode grammar-mode" data-start="grammar-b1"><span>B1 语法</span><b>完整句法训练</b><small>从句 · 时态 · 四格 · 基础被动</small><i>→</i></button>
             <button class="exam-mode grammar-mode" data-start="grammar-b2"><span>B2 语法</span><b>复杂结构训练</b><small>虚拟式 · 被动替代 · 连接与搭配</small><i>→</i></button>
             <button class="exam-mode grammar-mode" data-start="grammar-c1"><span>C1 语法</span><b>正式书面句法</b><small>间接引语 · 名词化 · 分词结构</small><i>→</i></button>

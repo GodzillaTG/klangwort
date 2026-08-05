@@ -853,6 +853,22 @@ function updateDashboard() {
   $('#sideMastered').textContent = state.mastered.length;
   $('#sideAnswered').textContent = state.todayAnswered;
   $('#examMistakeCount').textContent = state.mistakes.length;
+  updateExamVocabularyDashboard();
+}
+function updateExamVocabularyDashboard() {
+  const examKeys = new Set(examWords.map(word => word.key));
+  const mastered = state.mastered.filter(key => examKeys.has(key));
+  const mistakeIds = new Set(state.mistakes);
+  $('#examWordMastered').textContent = mastered.length;
+  $('#examWordProgress').style.width = `${mastered.length / examWords.length * 100}%`;
+  ['B1','B2','C1'].forEach(level => {
+    const levelKeys = new Set(examWords.filter(word => word.level === level).map(word => word.key));
+    const levelMastered = mastered.filter(key => levelKeys.has(key)).length;
+    const levelMistakes = examVocabBank.filter(question => question.level === level && mistakeIds.has(question.id)).length;
+    $(`#exam${level}Mastered`).textContent = levelMastered;
+    $(`#exam${level}Mistakes`).textContent = levelMistakes;
+    $(`#exam${level}MistakesButton`).disabled = levelMistakes === 0;
+  });
 }
 function genderClass(gender) { return gender === 'der' ? 'der' : gender === 'die' ? 'die' : gender === 'das' ? 'das' : 'word-type'; }
 function wordCard(word) {
@@ -971,9 +987,18 @@ function makeExamVocabQuestions(word,pool) {
     },
     {
       id:`exam-vocab-reverse-${word.key}`, type:'examVocab', level:word.level,
-      category:`${word.level} · RÜCKÜBERSETZUNG`, prompt:`${word.en} · ${word.zh}`,
-      context:'英中反向翻译 · 选择对应的德语词。',
+      category:`${word.level} · EN → DE`, prompt:word.en,
+      context:`英语反向翻译 · ${word.examTopic}。选择对应的德语词。`,
       translationEn:'Choose the German word that matches this meaning.',
+      options:germanOptions, answer:word.key,
+      explanation:`正确表达是 ${word.word}。${word.example}`,
+      wordKey:word.key, speak:word.word
+    },
+    {
+      id:`exam-vocab-reverse-zh-${word.key}`, type:'examVocab', level:word.level,
+      category:`${word.level} · 中 → DE`, prompt:word.zh,
+      context:`中文反向翻译 · ${word.examTopic}。选择对应的德语词。`,
+      translationEn:`Choose the German word for “${word.en}”.`,
       options:germanOptions, answer:word.key,
       explanation:`正确表达是 ${word.word}。${word.example}`,
       wordKey:word.key, speak:word.word
@@ -1022,9 +1047,21 @@ function buildRound(mode) {
   if (mode === 'cases') return take(caseQuestions,20);
   if (mode === 'music') return take(musicBank,18);
   if (mode === 'interests') return take(interestBank,18);
-  if (mode.startsWith('exam-vocab-')) {
-    const level = mode.slice(-2).toUpperCase();
-    return takeUniqueWords(examVocabBank.filter(question => question.level === level),20);
+  const examVocabMode = mode.match(/^exam-vocab-(b1|b2|c1)(?:-(recognition|reverse-en|reverse-zh|context|mistakes))?$/);
+  if (examVocabMode) {
+    const level = examVocabMode[1].toUpperCase();
+    const kind = examVocabMode[2] || 'mixed';
+    let pool = examVocabBank.filter(question => question.level === level);
+    if (kind === 'recognition') pool = pool.filter(question => question.id.startsWith('exam-vocab-meaning-'));
+    if (kind === 'reverse-en') pool = pool.filter(question => question.id.startsWith('exam-vocab-reverse-') && !question.id.startsWith('exam-vocab-reverse-zh-'));
+    if (kind === 'reverse-zh') pool = pool.filter(question => question.id.startsWith('exam-vocab-reverse-zh-'));
+    if (kind === 'context') pool = pool.filter(question => question.id.startsWith('exam-vocab-context-'));
+    if (kind === 'mistakes') {
+      const mistakeIds = new Set(state.mistakes);
+      const mistakes = pool.filter(question => mistakeIds.has(question.id));
+      return take(mistakes,Math.min(mistakes.length,24));
+    }
+    return takeUniqueWords(pool,20);
   }
   if (mode.startsWith('grammar-')) {
     const level = mode.slice(-2).toUpperCase();
@@ -1046,6 +1083,7 @@ function buildRound(mode) {
 function startRound(mode) {
   roundMode = mode;
   round = buildRound(mode);
+  if (!round.length) return;
   roundIndex = 0;
   roundCorrect = 0;
   roundResults = [];
@@ -1186,9 +1224,9 @@ function activateNav(hash) {
 function syncNav() {
   const marker = window.scrollY + Math.min(window.innerHeight * .28,180);
   let active = '#home';
-  ['#gender','#cases','#words','#exam','#goethe'].forEach(hash => {
+  ['#gender','#cases','#words','#exam-vocabulary','#exam-vocab-b1','#exam-vocab-b2','#exam-vocab-c1','#exam','#goethe'].forEach(hash => {
     const section = $(hash);
-    if (section && section.getBoundingClientRect().top + window.scrollY <= marker) active = hash;
+    if (section && section.getBoundingClientRect().top + window.scrollY <= marker) active = hash.startsWith('#exam-vocab') ? '#exam-vocabulary' : hash;
   });
   activateNav(active);
 }
