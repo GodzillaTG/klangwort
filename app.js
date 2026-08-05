@@ -813,12 +813,15 @@ const STORAGE_KEY = 'mein-deutsch-personal-v1';
 const defaultState = {
   answered:0, correct:0, streak:0, bestStreak:0,
   today:dateKey(), todayAnswered:0, todayCorrect:0,
-  mistakes:[], mastered:[], wordScores:{}
+  mistakes:[], mastered:[], wordScores:{},
+  vocabularyCourse:{}, vocabularyMistakes:[]
 };
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
     const merged = {...defaultState,...saved};
+    merged.vocabularyCourse = saved.vocabularyCourse && typeof saved.vocabularyCourse === 'object' ? saved.vocabularyCourse : {};
+    merged.vocabularyMistakes = Array.isArray(saved.vocabularyMistakes) ? saved.vocabularyMistakes : [];
     if (merged.today !== dateKey()) {
       merged.today = dateKey();
       merged.todayAnswered = 0;
@@ -853,22 +856,7 @@ function updateDashboard() {
   $('#sideMastered').textContent = state.mastered.length;
   $('#sideAnswered').textContent = state.todayAnswered;
   $('#examMistakeCount').textContent = state.mistakes.length;
-  updateExamVocabularyDashboard();
-}
-function updateExamVocabularyDashboard() {
-  const examKeys = new Set(examWords.map(word => word.key));
-  const mastered = state.mastered.filter(key => examKeys.has(key));
-  const mistakeIds = new Set(state.mistakes);
-  $('#examWordMastered').textContent = mastered.length;
-  $('#examWordProgress').style.width = `${mastered.length / examWords.length * 100}%`;
-  ['B1','B2','C1'].forEach(level => {
-    const levelKeys = new Set(examWords.filter(word => word.level === level).map(word => word.key));
-    const levelMastered = mastered.filter(key => levelKeys.has(key)).length;
-    const levelMistakes = examVocabBank.filter(question => question.level === level && mistakeIds.has(question.id)).length;
-    $(`#exam${level}Mastered`).textContent = levelMastered;
-    $(`#exam${level}Mistakes`).textContent = levelMistakes;
-    $(`#exam${level}MistakesButton`).disabled = levelMistakes === 0;
-  });
+  renderVocabularyCourses();
 }
 function genderClass(gender) { return gender === 'der' ? 'der' : gender === 'die' ? 'die' : gender === 'das' ? 'das' : 'word-type'; }
 function wordCard(word) {
@@ -881,7 +869,7 @@ function wordCard(word) {
 function renderWords() {
   const words = allWords.filter(word => word.topic === activeTopic);
   $('#wordGrid').innerHTML = words.slice(0,wordLimit).map(wordCard).join('');
-  $('#visibleWordCount').textContent = words.length;
+  if ($('#visibleWordCount')) $('#visibleWordCount').textContent = words.length;
   $('#loadMoreWords').hidden = wordLimit >= words.length;
   $$('#topicTabs button').forEach(button => button.classList.toggle('active',button.dataset.topic === activeTopic));
 }
@@ -975,6 +963,7 @@ function makeExamVocabQuestions(word,pool) {
   const distractors = examDistractors(word,pool);
   const meaningOptions = shuffle([word,...distractors]).map(item => ({value:item.key,label:item.en,sub:item.zh}));
   const germanOptions = shuffle([word,...distractors]).map(item => ({value:item.key,label:item.word,sub:item.pos}));
+  const clozeOptions = shuffle([word,...distractors]).map(item => ({value:item.key,label:item.lemma || item.word.replace(/^(der|die|das)\s+/i,''),sub:item.en}));
   const questions = [
     {
       id:`exam-vocab-meaning-${word.key}`, type:'examVocab', level:word.level,
@@ -1012,7 +1001,7 @@ function makeExamVocabQuestions(word,pool) {
       category:`${word.level} · KONTEXTLÜCKE`, prompt:cloze,
       context:`语境完形 · ${word.exampleZh}`,
       translationEn:word.exampleEn || `Complete the sentence with “${word.en}”.`,
-      options:germanOptions, answer:word.key,
+      options:clozeOptions, answer:word.key,
       explanation:`完整句子：${word.example} · ${word.exampleEn || ''}`,
       wordKey:word.key, speak:word.word
     });
@@ -1020,6 +1009,129 @@ function makeExamVocabQuestions(word,pool) {
   return questions;
 }
 const examVocabBank = examWords.flatMap(word => makeExamVocabQuestions(word,examWords.filter(item => item.level === word.level)));
+const VOCABULARY_COURSES = [
+  {topic:'music',title:'Klangwort',subtitle:'作曲 · Tonmeister · 录音制作',anchor:'#vocab-course-music'},
+  {topic:'ai',title:'AI Deutsch',subtitle:'人工智能 · 技术 · 产品',anchor:'#vocab-course-ai'},
+  {topic:'games',title:'Games Deutsch',subtitle:'游戏设计 · 玩法 · 交互',anchor:'#vocab-course-games'},
+  {topic:'film',title:'Film Deutsch',subtitle:'电影 · 片场 · 叙事',anchor:'#vocab-course-film'},
+  {topic:'exam-b1',title:'B1 Prüfungswortschatz',subtitle:'B1 常用考试词汇',anchor:'#exam-vocab-b1'},
+  {topic:'exam-b2',title:'B2 Prüfungswortschatz',subtitle:'B2 常用考试词汇',anchor:'#exam-vocab-b2'},
+  {topic:'exam-c1',title:'C1 Prüfungswortschatz',subtitle:'C1 常用考试词汇',anchor:'#exam-vocab-c1'}
+];
+const vocabularyWordsByTopic = Object.fromEntries(VOCABULARY_COURSES.map(course => [course.topic,allWords.filter(word => word.topic === course.topic)]));
+const vocabularyWordByKey = new Map(allWords.map(word => [word.key,word]));
+let activeVocabularyCourseSession = null;
+
+function getVocabularyCourseState(topic) {
+  if (!state.vocabularyCourse[topic]) state.vocabularyCourse[topic] = {mastered:{},passedUnits:[]};
+  const progress = state.vocabularyCourse[topic];
+  if (!progress.mastered || typeof progress.mastered !== 'object') progress.mastered = {};
+  if (!Array.isArray(progress.passedUnits)) progress.passedUnits = [];
+  return progress;
+}
+function isCourseWordMastered(topic,key) {
+  const record = getVocabularyCourseState(topic).mastered[key];
+  return Boolean(record?.recognition && record?.spelling);
+}
+function courseUnitWords(topic,unitIndex) {
+  return (vocabularyWordsByTopic[topic] || []).slice(unitIndex * 100,unitIndex * 100 + 100);
+}
+function normalizedSpelling(value='') {
+  return value.normalize('NFC').toLocaleLowerCase('de-DE').trim().replace(/\s+/g,' ');
+}
+function courseDistractors(word,pool) {
+  const sameType = pool.filter(item => item.key !== word.key && (!word.pos || item.pos === word.pos));
+  return shuffle(sameType.length >= 3 ? sameType : pool.filter(item => item.key !== word.key)).slice(0,3);
+}
+function makeCourseRecognitionQuestion(word,pool,courseKind,unitIndex) {
+  const options = shuffle([word,...courseDistractors(word,pool)]).map(item => ({value:item.key,label:item.en,sub:item.zh}));
+  return {id:`course-${word.topic}-recognition-${word.key}`,type:'courseVocab',courseKind,courseSkill:'recognition',courseTopic:word.topic,unitIndex,wordKey:word.key,category:`${topicMeta[word.topic].short} · 认词`,prompt:word.word,context:'选择准确的英文和中文词义。',translationEn:'Choose the correct English and Chinese meaning.',options,answer:word.key,explanation:`${word.word} = ${word.en} = ${word.zh}。${word.example}`,speak:word.word};
+}
+function makeCourseReverseQuestion(word,pool,courseKind,unitIndex) {
+  const options = shuffle([word,...courseDistractors(word,pool)]).map(item => ({value:item.key,label:item.word,sub:item.en}));
+  return {id:`course-${word.topic}-reverse-${word.key}`,type:'courseVocab',courseKind,courseSkill:'recognition',courseTopic:word.topic,unitIndex,wordKey:word.key,category:`${topicMeta[word.topic].short} · 主动回忆`,prompt:`${word.en} · ${word.zh}`,context:'从英文和中文意思回忆完整德语词。',translationEn:'Choose the complete German word for this meaning.',options,answer:word.key,explanation:`正确答案：${word.word}。${word.example}`,speak:word.word};
+}
+function makeCourseSpellingQuestion(word,courseKind,unitIndex) {
+  return {id:`course-${word.topic}-spelling-${word.key}`,type:'courseVocab',courseKind,courseSkill:'spelling',courseTopic:word.topic,unitIndex,wordKey:word.key,inputType:'spelling',category:`${topicMeta[word.topic].short} · 拼写`,prompt:`${word.en}\n${word.zh}`,context:'请完整写出德语。名词必须包含冠词。',translationEn:'Type the complete German answer, including the article for nouns.',options:[],answer:normalizedSpelling(word.word),displayAnswer:word.word,explanation:`正确拼写：${word.word}。${word.example}`,speak:word.word};
+}
+function buildVocabularyCourseRound(mode) {
+  if (mode === 'vocab-course:mistakes') {
+    const words = state.vocabularyMistakes.map(key => vocabularyWordByKey.get(key)).filter(Boolean).slice(0,20);
+    activeVocabularyCourseSession = {kind:'mistakes',wordKeys:words.map(word => word.key)};
+    return shuffle(words.flatMap(word => [makeCourseRecognitionQuestion(word,vocabularyWordsByTopic[word.topic],'mistakes',-1),makeCourseSpellingQuestion(word,'mistakes',-1)]));
+  }
+  const match = mode.match(/^vocab-course:([^:]+):(\d+):(learn|exam|review)$/);
+  if (!match) return null;
+  const topic = match[1];
+  const unitIndex = Number(match[2]);
+  const kind = match[3];
+  const progress = getVocabularyCourseState(topic);
+  const unlockedUnit = progress.passedUnits.length;
+  const unitWords = courseUnitWords(topic,unitIndex);
+  if (!unitWords.length || unitIndex > unlockedUnit || (kind === 'review' && !progress.passedUnits.includes(unitIndex))) return [];
+  if (kind === 'learn') {
+    if (unitIndex !== unlockedUnit) return [];
+    const unfinished = unitWords.filter(word => !isCourseWordMastered(topic,word.key)).slice(0,20);
+    activeVocabularyCourseSession = {topic,unitIndex,kind,wordKeys:unfinished.map(word => word.key)};
+    return shuffle(unfinished.flatMap(word => {
+      const record = progress.mastered[word.key] || {};
+      const questions = [];
+      if (!record.recognition) questions.push(makeCourseRecognitionQuestion(word,unitWords,kind,unitIndex));
+      if (!record.spelling) questions.push(makeCourseSpellingQuestion(word,kind,unitIndex));
+      return questions;
+    }));
+  }
+  if (kind === 'exam' && (unitIndex !== unlockedUnit || unitWords.some(word => !isCourseWordMastered(topic,word.key)))) return [];
+  activeVocabularyCourseSession = {topic,unitIndex,kind,wordKeys:unitWords.map(word => word.key)};
+  return shuffle(unitWords.map((word,index) => index % 3 === 0
+    ? makeCourseSpellingQuestion(word,kind,unitIndex)
+    : index % 3 === 1
+      ? makeCourseRecognitionQuestion(word,unitWords,kind,unitIndex)
+      : makeCourseReverseQuestion(word,unitWords,kind,unitIndex)));
+}
+
+function vocabularyUnitCard(course,unitIndex) {
+  const words = courseUnitWords(course.topic,unitIndex);
+  const progress = getVocabularyCourseState(course.topic);
+  const masteredCount = words.filter(word => isCourseWordMastered(course.topic,word.key)).length;
+  const passed = progress.passedUnits.includes(unitIndex);
+  const current = unitIndex === progress.passedUnits.length;
+  const start = unitIndex * 100 + 1;
+  const end = unitIndex * 100 + words.length;
+  const status = passed ? 'passed' : current ? 'current' : 'locked';
+  let action = '<button disabled>上一组通过后解锁</button>';
+  if (passed) action = `<button data-start="vocab-course:${course.topic}:${unitIndex}:review">重新复习本组 →</button>`;
+  else if (current && masteredCount === words.length) action = `<button class="checkpoint" data-start="vocab-course:${course.topic}:${unitIndex}:exam">开始 ${words.length} 词总复习考试 →</button>`;
+  else if (current) action = `<button data-start="vocab-course:${course.topic}:${unitIndex}:learn">学习下一批 ${Math.min(20,words.length - masteredCount)} 词 →</button>`;
+  return `<article class="vocabulary-unit ${status}"><header><span>UNIT ${String(unitIndex + 1).padStart(2,'0')}</span><b>${start}–${end}</b></header><p><strong>${masteredCount}</strong> / ${words.length} 词已通过认词与拼写</p><div class="unit-progress"><i style="width:${masteredCount / words.length * 100}%"></i></div>${action}<small>${passed ? '✓ 总复习考试已通过' : current ? (masteredCount === words.length ? '必须通过本组考试才能解锁下一组' : '每次固定学习最多 20 个新词') : '🔒 尚未解锁'}</small></article>`;
+}
+function renderVocabularyCourses() {
+  const allMastered = VOCABULARY_COURSES.reduce((sum,course) => sum + vocabularyWordsByTopic[course.topic].filter(word => isCourseWordMastered(course.topic,word.key)).length,0);
+  $('#allVocabularyMastered').textContent = allMastered;
+  $('#vocabularyMistakeCount').textContent = state.vocabularyMistakes.length;
+  $('#startVocabularyMistakes').disabled = !state.vocabularyMistakes.length;
+  $('#vocabularyCourseGrid').innerHTML = VOCABULARY_COURSES.map(course => {
+    const words = vocabularyWordsByTopic[course.topic];
+    const progress = getVocabularyCourseState(course.topic);
+    const mastered = words.filter(word => isCourseWordMastered(course.topic,word.key)).length;
+    return `<article><span>${topicMeta[course.topic].short}</span><h3>${course.title}</h3><p>${course.subtitle}</p><div><b>${mastered}</b> / ${words.length} 已掌握</div><small>当前：第 ${Math.min(progress.passedUnits.length + 1,Math.ceil(words.length / 100))} 组</small><button data-jump="${course.anchor}">进入课程 →</button></article>`;
+  }).join('');
+  $('#personalVocabularyCourses').innerHTML = VOCABULARY_COURSES.filter(course => ['music','ai','games','film'].includes(course.topic)).map(course => `<section class="personal-vocabulary-section" id="vocab-course-${course.topic}"><header><div><p class="eyebrow">${topicMeta[course.topic].short.toUpperCase()} · ${vocabularyWordsByTopic[course.topic].length} WÖRTER</p><h2>${course.title}</h2><p>${course.subtitle}。按 100 词分组，每次 20 词，认词和拼写缺一不可。</p></div></header><div class="vocabulary-unit-track">${Array.from({length:Math.ceil(vocabularyWordsByTopic[course.topic].length / 100)},(_,index) => vocabularyUnitCard(course,index)).join('')}</div></section>`).join('');
+  VOCABULARY_COURSES.filter(course => course.topic.startsWith('exam-')).forEach(course => {
+    const track = document.querySelector(`[data-vocab-track="${course.topic}"]`);
+    if (track) track.innerHTML = Array.from({length:Math.ceil(vocabularyWordsByTopic[course.topic].length / 100)},(_,index) => vocabularyUnitCard(course,index)).join('');
+  });
+  const examMastered = ['exam-b1','exam-b2','exam-c1'].reduce((sum,topic) => sum + vocabularyWordsByTopic[topic].filter(word => isCourseWordMastered(topic,word.key)).length,0);
+  $('#examWordMastered').textContent = examMastered;
+  $('#examWordProgress').style.width = `${examMastered / examWords.length * 100}%`;
+  ['B1','B2','C1'].forEach(level => {
+    const topic = `exam-${level.toLowerCase()}`;
+    const mastered = vocabularyWordsByTopic[topic].filter(word => isCourseWordMastered(topic,word.key)).length;
+    const mistakes = state.vocabularyMistakes.filter(key => vocabularyWordByKey.get(key)?.topic === topic).length;
+    $(`#exam${level}Mastered`).textContent = mastered;
+    $(`#exam${level}Mistakes`).textContent = mistakes;
+  });
+}
 const levelledGrammarBank = globalThis.LEVELLED_GRAMMAR_QUESTIONS || [];
 const fullBank = [...genderBank,...articleBank,...adjectiveBank,...caseQuestions,...musicBank,...interestBank,...examVocabBank,...levelledGrammarBank];
 
@@ -1041,6 +1153,9 @@ function takeUniqueWords(pool,count) {
   return selected;
 }
 function buildRound(mode) {
+  activeVocabularyCourseSession = null;
+  const vocabularyCourseRound = buildVocabularyCourseRound(mode);
+  if (vocabularyCourseRound !== null) return vocabularyCourseRound;
   if (mode === 'gender') return take(genderBank,20);
   if (mode === 'articles') return take(articleBank,20);
   if (mode === 'adjectives') return take(adjectiveBank,20);
@@ -1069,7 +1184,7 @@ function buildRound(mode) {
   }
   if (mode === 'mock') return shuffle([
     ...take(genderBank,4),...take(articleBank,4),...take(adjectiveBank,4),...take(caseQuestions,4),
-    ...take(levelledGrammarBank,10),...take(musicBank,2),...take(interestBank,2)
+    ...take(levelledGrammarBank,14)
   ]);
   if (mode === 'mistakes') {
     const wrong = fullBank.filter(question => state.mistakes.includes(question.id));
@@ -1077,7 +1192,7 @@ function buildRound(mode) {
   }
   return shuffle([
     ...take(genderBank,2),...take(articleBank,2),...take(adjectiveBank,2),...take(caseQuestions,2),
-    ...take(levelledGrammarBank,5),...take(musicBank,1),...take(interestBank,1)
+    ...take(levelledGrammarBank,7)
   ]);
 }
 function startRound(mode) {
@@ -1110,9 +1225,18 @@ function renderQuestion() {
   $('#questionFeedback').innerHTML = '';
   $('#speakQuestion').hidden = !question.speak;
   $('#speakQuestion').dataset.speak = question.speak || '';
-  $('#choiceGrid').innerHTML = question.options.map((option,index) =>
-    `<button class="choice" data-value="${option.value}"><b>${index + 1}. ${option.label}</b>${option.sub ? `<small>${option.sub}</small>` : ''}</button>`
-  ).join('');
+  const spelling = question.inputType === 'spelling';
+  $('#choiceGrid').hidden = spelling;
+  $('#spellingAnswer').hidden = !spelling;
+  $('#spellingInput').value = '';
+  $('#spellingInput').className = '';
+  if (spelling) {
+    setTimeout(() => $('#spellingInput').focus(),50);
+  } else {
+    $('#choiceGrid').innerHTML = question.options.map((option,index) =>
+      `<button class="choice" data-value="${option.value}"><b>${index + 1}. ${option.label}</b>${option.sub ? `<small>${option.sub}</small>` : ''}</button>`
+    ).join('');
+  }
 }
 function selectChoice(button) {
   if (answerChecked) return;
@@ -1121,6 +1245,7 @@ function selectChoice(button) {
   $('#confirmAnswer').disabled = false;
 }
 function answerLabel(question,value) {
+  if (question.inputType === 'spelling') return question.displayAnswer || value;
   return question.options.find(option => option.value === value)?.label || value;
 }
 function gradeAnswer() {
@@ -1132,7 +1257,8 @@ function gradeAnswer() {
   }
   if (selectedAnswer === null) return;
   const question = round[roundIndex];
-  const correct = selectedAnswer === question.answer;
+  const submittedAnswer = question.inputType === 'spelling' ? normalizedSpelling(selectedAnswer) : selectedAnswer;
+  const correct = submittedAnswer === question.answer;
   answerChecked = true;
   state.answered += 1;
   state.todayAnswered += 1;
@@ -1147,15 +1273,25 @@ function gradeAnswer() {
       state.wordScores[question.wordKey] = (state.wordScores[question.wordKey] || 0) + 1;
       if (state.wordScores[question.wordKey] >= 2 && !state.mastered.includes(question.wordKey)) state.mastered.push(question.wordKey);
     }
+    if (question.type === 'courseVocab') {
+      const progress = getVocabularyCourseState(question.courseTopic);
+      const record = progress.mastered[question.wordKey] || {recognition:false,spelling:false};
+      record[question.courseSkill] = true;
+      progress.mastered[question.wordKey] = record;
+      if (record.recognition && record.spelling && !state.mastered.includes(question.wordKey)) state.mastered.push(question.wordKey);
+    }
   } else {
     state.streak = 0;
     if (!state.mistakes.includes(question.id)) state.mistakes.push(question.id);
-    if (roundMode !== 'mock' && !question.retry && retryCount < 5) {
+    if (question.type === 'courseVocab') {
+      if (!state.vocabularyMistakes.includes(question.wordKey)) state.vocabularyMistakes.push(question.wordKey);
+      round.push({...question,retry:true});
+    } else if (roundMode !== 'mock' && !question.retry && retryCount < 5) {
       round.push({...question,retry:true});
       retryCount += 1;
     }
   }
-  roundResults.push({type:question.type,correct});
+  roundResults.push({id:question.id,type:question.type,correct});
   saveState();
   $('#streakDisplay').textContent = state.streak;
   $('#trainerProgress').style.width = `${(roundIndex + 1) / round.length * 100}%`;
@@ -1163,6 +1299,7 @@ function gradeAnswer() {
     if (choice.dataset.value === question.answer) choice.classList.add('correct');
     else if (choice.dataset.value === selectedAnswer) choice.classList.add('wrong');
   });
+  if (question.inputType === 'spelling') $('#spellingInput').classList.add(correct ? 'correct' : 'wrong');
   const feedback = $('#questionFeedback');
   feedback.className = `question-feedback show ${correct ? 'correct' : 'wrong'}`;
   const memoryMethod = !correct && question.memoryTip
@@ -1174,6 +1311,16 @@ function gradeAnswer() {
   $('#confirmAnswer').textContent = roundIndex === round.length - 1 ? '查看结果' : '下一题';
 }
 function finishRound() {
+  if (activeVocabularyCourseSession?.kind === 'exam') {
+    const progress = getVocabularyCourseState(activeVocabularyCourseSession.topic);
+    if (!progress.passedUnits.includes(activeVocabularyCourseSession.unitIndex)) progress.passedUnits.push(activeVocabularyCourseSession.unitIndex);
+    progress.passedUnits.sort((a,b) => a - b);
+  }
+  if (activeVocabularyCourseSession?.kind === 'mistakes') {
+    const reviewed = new Set(activeVocabularyCourseSession.wordKeys);
+    state.vocabularyMistakes = state.vocabularyMistakes.filter(key => !reviewed.has(key));
+  }
+  if (activeVocabularyCourseSession) saveState();
   $('#trainer').hidden = true;
   $('#resultScreen').hidden = false;
   const total = roundResults.length;
@@ -1181,10 +1328,13 @@ function finishRound() {
   const passed = roundMode !== 'mock' || accuracy >= 90;
   $('#resultSymbol').textContent = passed ? '✓' : '↻';
   $('#resultSymbol').style.background = passed ? 'var(--lime)' : '#f5d7cc';
-  $('#resultKicker').textContent = roundMode === 'mock' ? 'PRÜFUNGSERGEBNIS' : 'TRAINING BEENDET';
-  $('#resultTitle').textContent = roundMode === 'mock' ? (passed ? '模拟考试通过' : '还差一点，再刷一次') : '完成这一轮';
-  $('#resultScore').textContent = `${roundCorrect} / ${total}`;
-  $('#resultCopy').textContent = roundMode === 'mock'
+  const vocabularySession = activeVocabularyCourseSession;
+  $('#resultKicker').textContent = vocabularySession?.kind === 'exam' ? '100-WÖRTER-PRÜFUNG BESTANDEN' : roundMode === 'mock' ? 'PRÜFUNGSERGEBNIS' : 'TRAINING BEENDET';
+  $('#resultTitle').textContent = vocabularySession?.kind === 'exam' ? '本组通过，下一组已解锁' : vocabularySession?.kind === 'mistakes' ? '词汇错题已清除' : vocabularySession?.kind === 'learn' ? '这一批词已经全部做对' : roundMode === 'mock' ? (passed ? '模拟考试通过' : '还差一点，再刷一次') : '完成这一轮';
+  $('#resultScore').textContent = vocabularySession ? `${vocabularySession.wordKeys.length} Wörter` : `${roundCorrect} / ${total}`;
+  $('#resultCopy').textContent = vocabularySession
+    ? `本轮共作答 ${total} 次；所有错误都已回炉并答对。${vocabularySession.kind === 'learn' ? '回到课程查看本组进度，完成整组后参加总复习考试。' : vocabularySession.kind === 'exam' ? '只有现在才可以继续学习下一组词汇。' : vocabularySession.kind === 'mistakes' ? '这批词已从统一错题集中移出。' : '复习完成。'}`
+    : roundMode === 'mock'
     ? `正确率 ${accuracy}%，${passed ? '达到 90% 及格线。' : '需要 90% 才能通过。错题已经进入错题本。'}`
     : `${accuracy}% 正确率。${state.mistakes.length ? `目前还有 ${state.mistakes.length} 道错题待消灭。` : '错题已经清空。'}`;
   const groups = [
@@ -1193,6 +1343,7 @@ function finishRound() {
     ['形容词',roundResults.filter(item => item.type === 'adjective')],
     ['四格',roundResults.filter(item => item.type === 'case')],
     ['句法语法',roundResults.filter(item => item.type === 'grammar')],
+    ['词汇强制掌握',roundResults.filter(item => item.type === 'courseVocab')],
     ['考试词汇',roundResults.filter(item => item.type === 'examVocab')],
     ['兴趣词汇',roundResults.filter(item => item.type === 'music' || item.type === 'interest')]
   ].filter(([,items]) => items.length);
@@ -1200,6 +1351,9 @@ function finishRound() {
     `<span><b>${items.filter(item => item.correct).length}/${items.length}</b>${label}</span>`
   ).join('');
   $('#trainMistakes').disabled = !state.mistakes.length;
+  $('#repeatTraining').textContent = vocabularySession?.kind === 'learn' ? '继续下一批' : vocabularySession?.kind === 'mistakes' ? '继续错题' : vocabularySession?.kind === 'exam' ? '复习本组' : '再刷一轮';
+  $('#trainMistakes').textContent = vocabularySession ? '统一词汇错题集' : '错题强化';
+  if (vocabularySession) $('#trainMistakes').disabled = !state.vocabularyMistakes.length;
 }
 function exitRound() {
   $('#trainer').hidden = true;
@@ -1224,9 +1378,9 @@ function activateNav(hash) {
 function syncNav() {
   const marker = window.scrollY + Math.min(window.innerHeight * .28,180);
   let active = '#home';
-  ['#gender','#cases','#words','#exam-vocabulary','#exam-vocab-b1','#exam-vocab-b2','#exam-vocab-c1','#exam','#goethe'].forEach(hash => {
+  ['#gender','#cases','#words','#vocab-course-music','#vocab-course-ai','#vocab-course-games','#vocab-course-film','#exam-vocabulary','#exam-vocab-b1','#exam-vocab-b2','#exam-vocab-c1','#exam','#goethe'].forEach(hash => {
     const section = $(hash);
-    if (section && section.getBoundingClientRect().top + window.scrollY <= marker) active = hash.startsWith('#exam-vocab') ? '#exam-vocabulary' : hash;
+    if (section && section.getBoundingClientRect().top + window.scrollY <= marker) active = hash.startsWith('#exam-vocab') ? '#exam-vocabulary' : hash.startsWith('#vocab-course-') ? '#words' : hash;
   });
   activateNav(active);
 }
@@ -1262,10 +1416,18 @@ $('#choiceGrid').addEventListener('click',event => {
   const choice = event.target.closest('.choice');
   if (choice) selectChoice(choice);
 });
+$('#spellingInput').addEventListener('input',event => {
+  if (answerChecked) return;
+  selectedAnswer = event.target.value;
+  $('#confirmAnswer').disabled = !event.target.value.trim();
+});
 $('#confirmAnswer').addEventListener('click',gradeAnswer);
 $('#exitTrainer').addEventListener('click',exitRound);
-$('#repeatTraining').addEventListener('click',() => startRound(roundMode));
-$('#trainMistakes').addEventListener('click',() => startRound('mistakes'));
+$('#repeatTraining').addEventListener('click',() => {
+  if (activeVocabularyCourseSession?.kind === 'exam') startRound(`vocab-course:${activeVocabularyCourseSession.topic}:${activeVocabularyCourseSession.unitIndex}:review`);
+  else startRound(roundMode);
+});
+$('#trainMistakes').addEventListener('click',() => startRound(activeVocabularyCourseSession ? 'vocab-course:mistakes' : 'mistakes'));
 $('#closeResult').addEventListener('click',exitRound);
 $('#closeWord').addEventListener('click',() => { $('#wordModal').hidden = true; });
 $('#wordModal').addEventListener('click',event => { if (event.target === $('#wordModal')) $('#wordModal').hidden = true; });
@@ -1298,7 +1460,7 @@ document.addEventListener('keydown',event => {
     event.preventDefault();
     $('#globalSearch').click();
   }
-  if (!$('#trainer').hidden && /^[1-4]$/.test(event.key) && !answerChecked) {
+  if (!$('#trainer').hidden && !$('#choiceGrid').hidden && /^[1-4]$/.test(event.key) && !answerChecked) {
     const choices = $$('#choiceGrid .choice');
     const choice = choices[Number(event.key)-1];
     if (choice) selectChoice(choice);

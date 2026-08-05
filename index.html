@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Mein Deutsch" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="description" content="为 Sichenguo 定制的完全离线德语刷题 App：3,080 个词汇、B1-C1 分级语法题库与 Goethe B1/B2 全真模拟考。" />
+    <meta name="description" content="为 Sichenguo 定制的完全离线德语刷题 App：3,080 个词汇按百词闯关，强制认词与拼写掌握，并包含 B1-C1 语法和 Goethe 模考。" />
     <meta property="og:title" content="Mein Deutsch — 我的德语训练场" />
     <meta property="og:description" content="3,080 个词汇、B1-C1 分级语法题库与 Goethe B1/B2 听说读写模拟考，完全离线练习。" />
     <meta property="og:image" content="https://mein-deutsch-sichenguo.godzillatg.chatgpt.site/og.png" />
@@ -85,10 +85,10 @@
         <section class="overview-section">
           <div class="section-heading"><div><p class="eyebrow">DEIN LEHRPLAN</p><h2>你的六大学习板块</h2></div><p>日常刷题打基础，Goethe B1/B2 模考检验真实应试能力。</p></div>
           <div class="course-grid">
-            <article class="course-card music-card"><div class="course-top"><span>01</span><i>♫</i></div><h3>Klangwort</h3><p>作曲、Tonmeister、录音制作和音乐表达。</p><div class="course-meta"><b>520</b><span>专业词汇</span></div><button data-jump="#words" data-topic="music">进入词库 →</button></article>
+            <article class="course-card music-card"><div class="course-top"><span>01</span><i>♫</i></div><h3>Klangwort</h3><p>作曲、Tonmeister、录音制作和音乐表达。</p><div class="course-meta"><b>520</b><span>专业词汇</span></div><button data-jump="#words" data-topic="music">进入课程 →</button></article>
             <article class="course-card gender-card"><div class="course-top"><span>02</span><i>der</i></div><h3>阴阳中性</h3><p>把 der / die / das 和名词当作一个整体记住。</p><div class="course-meta"><b>2,481</b><span>词性题</span></div><button data-start="gender">开始专项 →</button></article>
             <article class="course-card case-card"><div class="course-top"><span>03</span><i>Ⅳ</i></div><h3>变格系统</h3><p>四格、ein 类冠词，以及形容词强弱混合变化。</p><div class="course-meta"><b>1,560</b><span>变格专项题</span></div><button data-start="adjectives">开始形容词专项 →</button></article>
-            <article class="course-card interest-card"><div class="course-top"><span>04</span><i>AI</i></div><h3>Meine Welt</h3><p>用你感兴趣的 AI、游戏和电影建立词汇量。</p><div class="course-meta"><b>1,560</b><span>兴趣词</span></div><button data-jump="#words" data-topic="ai">浏览兴趣词 →</button></article>
+            <article class="course-card interest-card"><div class="course-top"><span>04</span><i>AI</i></div><h3>Meine Welt</h3><p>用你感兴趣的 AI、游戏和电影建立词汇量。</p><div class="course-meta"><b>1,560</b><span>兴趣词</span></div><button data-jump="#words" data-topic="ai">进入兴趣课程 →</button></article>
             <article class="course-card exam-vocab-card"><div class="course-top"><span>05</span><i>W</i></div><h3>Prüfungswortschatz</h3><p>B1、B2、C1 各自独立训练，不混级抽题。</p><div class="course-meta"><b>1,000</b><span>考试词汇</span></div><button data-jump="#exam-vocabulary">选择等级 →</button></article>
             <article class="course-card goethe-card"><div class="course-top"><span>06</span><i>B1·B2</i></div><h3>Goethe Prüfung</h3><p>按正式模块、题量和计时完成听说读写模拟考。</p><div class="course-meta"><b>2</b><span>完整级别</span></div><button data-jump="#goethe">进入模拟考 →</button></article>
           </div>
@@ -160,63 +160,42 @@
         </section>
 
         <section class="words-section" id="words">
-          <div class="section-heading"><div><p class="eyebrow">MEINE WÖRTER</p><h2>专业、兴趣与考试词库</h2><p>原有 2,080 个个性化词汇，加上 B1-C1 共 1,000 个考试高频词；全部提供英文、中文、词性和语境例句。</p></div><div class="word-count"><b id="visibleWordCount">0</b><span>Wörter</span></div></div>
-          <div class="topic-tabs" id="topicTabs">
-            <button class="active" data-topic="music">♫ Klangwort · 520</button>
-            <button data-topic="ai">AI · 520</button>
-            <button data-topic="games">Games · 520</button>
-            <button data-topic="film">Film · 520</button>
-            <button data-topic="exam-b1">B1 Prüfung · 400</button>
-            <button data-topic="exam-b2">B2 Prüfung · 350</button>
-            <button data-topic="exam-c1">C1 Prüfung · 250</button>
-          </div>
-          <div class="word-grid" id="wordGrid"></div>
-          <button class="load-more" id="loadMoreWords">显示更多 <span>↓</span></button>
+          <div class="section-heading"><div><p class="eyebrow">MASTERY-KURS · 3.080 WÖRTER</p><h2>所有词汇都必须真正掌握</h2><p>每组最多 100 词，每次学习 20 词；认词和拼写都通过后才能参加本组考试，考试完成才解锁下一组。</p></div><div class="word-count"><b id="allVocabularyMastered">0</b><span>已掌握</span></div></div>
+          <div class="vocabulary-mistake-box"><div><span>WORT-FEHLERBUCH</span><b>统一词汇错题集</b><p>任何词库中答错的词都会留在这里，完成认词和拼写复习后才会移出。</p></div><strong id="vocabularyMistakeCount">0</strong><button id="startVocabularyMistakes" data-start="vocab-course:mistakes">开始错题强化 →</button></div>
+          <div class="vocabulary-course-grid" id="vocabularyCourseGrid"></div>
+          <details class="word-reference">
+            <summary>只查词，不计入学习进度</summary>
+            <div class="topic-tabs" id="topicTabs">
+              <button class="active" data-topic="music">♫ Klangwort · 520</button><button data-topic="ai">AI · 520</button><button data-topic="games">Games · 520</button><button data-topic="film">Film · 520</button><button data-topic="exam-b1">B1 Prüfung · 400</button><button data-topic="exam-b2">B2 Prüfung · 350</button><button data-topic="exam-c1">C1 Prüfung · 250</button>
+            </div>
+            <div class="word-grid" id="wordGrid"></div><button class="load-more" id="loadMoreWords">显示更多 <span>↓</span></button>
+          </details>
         </section>
+
+        <div class="personal-vocabulary-courses" id="personalVocabularyCourses"></div>
 
         <section class="exam-vocabulary-intro" id="exam-vocabulary">
           <div>
             <p class="eyebrow">PRÜFUNGSWORTSCHATZ · 独立训练</p>
             <h2>每个等级分开练，<br /><em>清楚知道自己在学什么。</em></h2>
-            <p>B1、B2、C1 不再混合抽题。每个等级都有独立进度、四种训练方式和本级错题本。</p>
+            <p>B1、B2、C1 不混级。每 100 词为一个锁定阶段，每次学习 20 词；完成认词、拼写和本组总复习考试后才能继续。</p>
           </div>
           <div class="exam-vocabulary-total"><span>GESAMT</span><b><strong id="examWordMastered">0</strong> / 1000</b><small>已掌握考试词汇</small><div><i id="examWordProgress"></i></div></div>
         </section>
 
         <section class="exam-level-section exam-level-b1" id="exam-vocab-b1">
           <header class="exam-level-heading"><div><p class="eyebrow">NIVEAU B1 · 400 WÖRTER</p><h2>B1 常用考试词汇</h2><p>只练 B1：日常生活、工作、出行、住房、健康与基础观点表达。</p></div><div class="exam-level-progress"><b><strong id="examB1Mastered">0</strong> / 400</b><span>已掌握</span><small><strong id="examB1Mistakes">0</strong> 道 B1 错题</small></div></header>
-          <div class="exam-level-actions">
-            <button class="featured" data-start="exam-vocab-b1"><span>B1 综合训练</span><b>20 题 · 四种题型</b><small>本轮只出现 B1 词汇</small><i>→</i></button>
-            <button data-start="exam-vocab-b1-recognition"><span>B1 认词</span><b>Deutsch → EN / 中</b><small>看到德语，选中英文词义</small><i>→</i></button>
-            <button data-start="exam-vocab-b1-reverse-en"><span>B1 主动回忆</span><b>English → Deutsch</b><small>从英文回忆德语</small><i>→</i></button>
-            <button data-start="exam-vocab-b1-reverse-zh"><span>B1 主动回忆</span><b>中文 → Deutsch</b><small>从中文回忆德语</small><i>→</i></button>
-            <button data-start="exam-vocab-b1-context"><span>B1 语境</span><b>德语例句完形</b><small>在句子中找回词汇</small><i>→</i></button>
-            <button class="level-mistakes" id="examB1MistakesButton" data-start="exam-vocab-b1-mistakes"><span>B1 错题本</span><b>只练本级错题</b><small>答对后自动移出</small><i>↻</i></button>
-          </div>
+          <div class="vocabulary-unit-track" data-vocab-track="exam-b1"></div>
         </section>
 
         <section class="exam-level-section exam-level-b2" id="exam-vocab-b2">
           <header class="exam-level-heading"><div><p class="eyebrow">NIVEAU B2 · 350 WÖRTER</p><h2>B2 常用考试词汇</h2><p>只练 B2：社会议题、职业、教育、媒体、观点论证与进阶抽象表达。</p></div><div class="exam-level-progress"><b><strong id="examB2Mastered">0</strong> / 350</b><span>已掌握</span><small><strong id="examB2Mistakes">0</strong> 道 B2 错题</small></div></header>
-          <div class="exam-level-actions">
-            <button class="featured" data-start="exam-vocab-b2"><span>B2 综合训练</span><b>20 题 · 四种题型</b><small>本轮只出现 B2 词汇</small><i>→</i></button>
-            <button data-start="exam-vocab-b2-recognition"><span>B2 认词</span><b>Deutsch → EN / 中</b><small>看到德语，选中英文词义</small><i>→</i></button>
-            <button data-start="exam-vocab-b2-reverse-en"><span>B2 主动回忆</span><b>English → Deutsch</b><small>从英文回忆德语</small><i>→</i></button>
-            <button data-start="exam-vocab-b2-reverse-zh"><span>B2 主动回忆</span><b>中文 → Deutsch</b><small>从中文回忆德语</small><i>→</i></button>
-            <button data-start="exam-vocab-b2-context"><span>B2 语境</span><b>德语例句完形</b><small>在句子中找回词汇</small><i>→</i></button>
-            <button class="level-mistakes" id="examB2MistakesButton" data-start="exam-vocab-b2-mistakes"><span>B2 错题本</span><b>只练本级错题</b><small>答对后自动移出</small><i>↻</i></button>
-          </div>
+          <div class="vocabulary-unit-track" data-vocab-track="exam-b2"></div>
         </section>
 
         <section class="exam-level-section exam-level-c1" id="exam-vocab-c1">
           <header class="exam-level-heading"><div><p class="eyebrow">NIVEAU C1 · 250 WÖRTER</p><h2>C1 常用考试词汇</h2><p>只练 C1：正式书面语、学术讨论、精确论证、复杂关系与高阶抽象概念。</p></div><div class="exam-level-progress"><b><strong id="examC1Mastered">0</strong> / 250</b><span>已掌握</span><small><strong id="examC1Mistakes">0</strong> 道 C1 错题</small></div></header>
-          <div class="exam-level-actions">
-            <button class="featured" data-start="exam-vocab-c1"><span>C1 综合训练</span><b>20 题 · 四种题型</b><small>本轮只出现 C1 词汇</small><i>→</i></button>
-            <button data-start="exam-vocab-c1-recognition"><span>C1 认词</span><b>Deutsch → EN / 中</b><small>看到德语，选中英文词义</small><i>→</i></button>
-            <button data-start="exam-vocab-c1-reverse-en"><span>C1 主动回忆</span><b>English → Deutsch</b><small>从英文回忆德语</small><i>→</i></button>
-            <button data-start="exam-vocab-c1-reverse-zh"><span>C1 主动回忆</span><b>中文 → Deutsch</b><small>从中文回忆德语</small><i>→</i></button>
-            <button data-start="exam-vocab-c1-context"><span>C1 语境</span><b>德语例句完形</b><small>在句子中找回词汇</small><i>→</i></button>
-            <button class="level-mistakes" id="examC1MistakesButton" data-start="exam-vocab-c1-mistakes"><span>C1 错题本</span><b>只练本级错题</b><small>答对后自动移出</small><i>↻</i></button>
-          </div>
+          <div class="vocabulary-unit-track" data-vocab-track="exam-c1"></div>
         </section>
 
         <section class="exam-section" id="exam">
@@ -228,8 +207,6 @@
             <button class="exam-mode" data-start="articles"><span>专项</span><b>冠词变格</b><small>ein · kein · mein · 四格</small><i>→</i></button>
             <button class="exam-mode" data-start="adjectives"><span>专项</span><b>形容词变位</b><small>弱变化 · 混合 · 强变化</small><i>→</i></button>
             <button class="exam-mode" data-start="cases"><span>专项</span><b>四格判断</b><small>20 题 · 介词与冠词</small><i>→</i></button>
-            <button class="exam-mode" data-start="music"><span>专项</span><b>Klangwort</b><small>专业词汇认词</small><i>→</i></button>
-            <button class="exam-mode" data-start="interests"><span>专项</span><b>AI · Games · Film</b><small>兴趣词汇认词</small><i>→</i></button>
             <button class="exam-mode grammar-mode" data-start="grammar-b1"><span>B1 语法</span><b>完整句法训练</b><small>从句 · 时态 · 四格 · 基础被动</small><i>→</i></button>
             <button class="exam-mode grammar-mode" data-start="grammar-b2"><span>B2 语法</span><b>复杂结构训练</b><small>虚拟式 · 被动替代 · 连接与搭配</small><i>→</i></button>
             <button class="exam-mode grammar-mode" data-start="grammar-c1"><span>C1 语法</span><b>正式书面句法</b><small>间接引语 · 名词化 · 分词结构</small><i>→</i></button>
@@ -278,6 +255,7 @@
         <p id="questionEnglish" class="question-english">EN · Choose the correct answer.</p>
         <p id="questionContext" class="question-context"></p>
         <div class="choice-grid" id="choiceGrid"></div>
+        <div class="spelling-answer" id="spellingAnswer" hidden><label for="spellingInput">完整拼写德语答案</label><input id="spellingInput" type="text" inputmode="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="在这里输入德语…" /><small>名词需要写冠词；空格、ä / ö / ü / ß 也要正确。大小写不计。</small></div>
         <div class="question-feedback" id="questionFeedback"></div>
       </main>
       <footer class="trainer-footer"><div><b id="streakDisplay">0</b><span>连续答对</span></div><button id="confirmAnswer" disabled>确定</button></footer>

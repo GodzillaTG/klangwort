@@ -181,6 +181,49 @@ button{color:inherit}
 .gender-pill.word-type{background:#ece9df;color:#59645f;text-transform:uppercase}
 .load-more{display:block;margin:24px auto 0;border:0;background:transparent;color:#5a754f;cursor:pointer;font-size:10px;font-weight:700}
 .load-more span{font-size:15px;margin-left:5px}
+.vocabulary-mistake-box{display:grid;grid-template-columns:1fr auto auto;gap:22px;align-items:center;background:#f4dfd8;border:1px solid #e4ae9b;border-radius:11px;padding:19px 21px;margin-bottom:16px}
+.vocabulary-mistake-box span{font:8px "DM Mono",monospace;color:#9b6759;letter-spacing:.8px}
+.vocabulary-mistake-box b{display:block;font:19px "Playfair Display","Noto Serif SC",serif;margin-top:3px}
+.vocabulary-mistake-box p{font-size:10px;line-height:1.55;color:#856f66;margin:5px 0 0}
+.vocabulary-mistake-box>strong{font:36px "Playfair Display",serif;color:var(--orange)}
+.vocabulary-mistake-box>button{border:0;border-bottom:3px solid #8da641;border-radius:8px;background:var(--lime);color:#354529;padding:11px 15px;font-size:10px;font-weight:800;cursor:pointer}
+.vocabulary-mistake-box>button:disabled{opacity:.45;cursor:not-allowed}
+.vocabulary-course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.vocabulary-course-grid>article{min-height:205px;border:1px solid #d9ddd2;background:var(--surface);padding:17px;display:flex;flex-direction:column}
+.vocabulary-course-grid>article>span{font:8px "DM Mono",monospace;color:#87948b}
+.vocabulary-course-grid h3{font:20px "Playfair Display","Noto Serif SC",serif;margin:18px 0 6px}
+.vocabulary-course-grid p{font-size:10px;color:var(--muted);margin:0}
+.vocabulary-course-grid article>div{font-size:10px;color:#6f7b74;margin-top:auto}
+.vocabulary-course-grid article>div b{font:24px "Playfair Display",serif;color:var(--orange)}
+.vocabulary-course-grid article>small{font-size:9px;color:#8b958f;margin:5px 0 11px}
+.vocabulary-course-grid article>button{border:0;border-top:1px solid #e1e3dc;background:transparent;padding:11px 0 0;text-align:left;color:#58724f;font-size:10px;font-weight:700;cursor:pointer}
+.word-reference{margin-top:21px;border:1px solid #d9ddd2;background:#f8f7f1;padding:0 17px 18px}
+.word-reference summary{padding:16px 0;cursor:pointer;color:#65746c;font-size:10px;font-weight:700}
+.word-reference .topic-tabs{margin-top:2px}
+.personal-vocabulary-section,.exam-level-section{margin:0 -7.5%;padding:64px 7.5%;border-bottom:1px solid #d9ddd2}
+.personal-vocabulary-section:nth-child(odd){background:#edf0e8}
+.personal-vocabulary-section:nth-child(even){background:#f3ece3}
+.personal-vocabulary-section>header{margin-bottom:26px}
+.personal-vocabulary-section .eyebrow{margin:0 0 8px}
+.personal-vocabulary-section h2{font:38px/1 "Playfair Display","Noto Serif SC",serif;margin:0}
+.personal-vocabulary-section header p:not(.eyebrow){max-width:650px;color:var(--muted);font-size:11px;line-height:1.7;margin:11px 0 0}
+.vocabulary-unit-track{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.vocabulary-unit{min-height:212px;border:1px solid #d4d8ce;border-top:4px solid #b6bdb5;border-radius:8px;background:#fffdf8;padding:16px;display:flex;flex-direction:column}
+.vocabulary-unit.current{border-top-color:var(--orange);box-shadow:0 7px 25px rgba(44,59,51,.08)}
+.vocabulary-unit.passed{border-top-color:var(--green);background:#f3f8ed}
+.vocabulary-unit.locked{opacity:.56;background:#eeeee9}
+.vocabulary-unit header{display:flex;justify-content:space-between;align-items:baseline}
+.vocabulary-unit header span{font:8px "DM Mono",monospace;color:#8a938c}
+.vocabulary-unit header b{font:21px "Playfair Display",serif}
+.vocabulary-unit>p{font-size:9px;color:#7f8983;margin:22px 0 7px}
+.vocabulary-unit>p strong{font:23px "Playfair Display",serif;color:var(--orange)}
+.unit-progress{height:6px;border-radius:6px;background:#e2e5dd;overflow:hidden;margin-bottom:17px}
+.unit-progress i{display:block;height:100%;border-radius:inherit;background:var(--orange)}
+.vocabulary-unit>button{width:100%;margin-top:auto;border:0;border-radius:7px;background:var(--deep);color:#fff;padding:11px 9px;font-size:9px;font-weight:700;cursor:pointer}
+.vocabulary-unit>button.checkpoint{background:var(--orange)}
+.vocabulary-unit.passed>button{background:#6f925a}
+.vocabulary-unit>button:disabled{background:#d5d7d1;color:#8f9691;cursor:not-allowed}
+.vocabulary-unit>small{font-size:8px;line-height:1.4;color:#848d87;margin-top:8px;text-align:center}
 .exam-vocabulary-intro{background:var(--deep);color:#f8f6ed;margin:0 -7.5%;padding:68px 7.5%;display:grid;grid-template-columns:1fr 260px;gap:55px;align-items:end}
 .exam-vocabulary-intro .eyebrow{color:#a8b7af;margin:0 0 10px}
 .exam-vocabulary-intro h2{font:43px/.98 "Playfair Display","Noto Serif SC",serif;letter-spacing:-1.8px;margin:0}
@@ -358,6 +401,13 @@ button{color:inherit}
 .choice:hover,.choice.selected{border-color:#88aa60;background:#f0f4dc}
 .choice.correct{border-color:#73a743;background:#e5f2cb}
 .choice.wrong{border-color:#d97758;background:#f8ded5}
+.spelling-answer{margin-top:4px}
+.spelling-answer label{display:block;font:9px "DM Mono",monospace;color:#68756e;margin-bottom:8px}
+.spelling-answer input{width:100%;height:64px;border:2px solid #ccd3c8;border-radius:9px;background:#fff;padding:0 17px;color:var(--deep);font:23px "Playfair Display","Noto Serif SC",serif;outline:none}
+.spelling-answer input:focus{border-color:#769167;box-shadow:0 0 0 4px rgba(118,145,103,.12)}
+.spelling-answer input.correct{border-color:#7aa35b;background:#eef7e4}
+.spelling-answer input.wrong{border-color:#cf765d;background:#fae5de}
+.spelling-answer small{display:block;color:#87918b;font-size:9px;line-height:1.5;margin-top:8px}
 .question-feedback{display:none;margin-top:18px;border-radius:9px;padding:14px 15px;font-size:12px;line-height:1.65}
 .question-feedback.show{display:block}
 .question-feedback.correct{background:#e5f1cf;color:#486436}
@@ -432,6 +482,7 @@ button{color:inherit}
 .offline-setup-later{width:100%;margin-top:8px;border:0;background:transparent;color:#78837d;padding:9px;cursor:pointer;font-size:11px}
 @media(max-width:1050px){
   .course-grid{grid-template-columns:1fr 1fr}
+  .vocabulary-course-grid,.vocabulary-unit-track{grid-template-columns:1fr 1fr}
   .case-role-grid{grid-template-columns:1fr 1fr}
   .case-role-grid article:nth-child(2){border-right:0}
   .case-role-grid article:nth-child(-n+2){border-bottom:1px solid var(--line)}
@@ -446,8 +497,10 @@ button{color:inherit}
   .brand,.side-kicker,.side-progress{display:none}
   .nav-list{height:61px;display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
   .nav-item{height:57px;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:4px 2px;font-size:9px;text-align:center}
+  .nav-item{min-width:0;overflow:hidden}
   .nav-item i{font-size:18px;line-height:19px}
   .nav-item span{line-height:11px}
+  .nav-item>span{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:clip}
   .nav-item small{display:none}
   .nav-item.active{box-shadow:inset 0 0 0 1px #d1dc9e}
   .content{width:100%;padding:0 17px calc(92px + env(safe-area-inset-bottom))}
@@ -495,6 +548,13 @@ button{color:inherit}
   .word-card{min-height:183px;padding:14px}
   .word-card h3{font-size:19px;margin-top:20px;overflow-wrap:anywhere}
   .word-card .example{display:none}
+  .vocabulary-mistake-box{grid-template-columns:1fr auto;gap:12px;padding:16px}
+  .vocabulary-mistake-box>button{grid-column:1/-1;width:100%;min-height:44px}
+  .vocabulary-course-grid,.vocabulary-unit-track{grid-template-columns:1fr}
+  .vocabulary-course-grid>article{min-height:188px}
+  .personal-vocabulary-section{margin:0 -17px;padding:52px 17px}
+  .personal-vocabulary-section h2{font-size:33px}
+  .vocabulary-unit{min-height:196px}
   .exam-vocabulary-intro{margin:0 -17px;padding:52px 17px;grid-template-columns:1fr;gap:26px;align-items:start}
   .exam-vocabulary-intro h2{font-size:35px}
   .exam-vocabulary-total{border-left:0;border-top:1px solid #49605a;padding:18px 0 0}
@@ -539,13 +599,14 @@ button{color:inherit}
   .trainer-header{height:calc(64px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 15px 0}
   .trainer-main{width:100%;padding:37px 19px 24px}
   .trainer-main h2{font-size:30px}
+  .spelling-answer input{height:60px;font-size:21px}
   .question-english{font-size:11px}
   .choice-grid{grid-template-columns:1fr}
   .choice{min-height:60px}
   .trainer-footer{min-height:calc(82px + env(safe-area-inset-bottom));padding:12px 17px calc(12px + env(safe-area-inset-bottom))}
   .trainer-footer>button{min-width:140px;min-height:46px}
   .result-screen{padding:0}
-  .result-card{width:100%;height:100dvh;max-height:none;border-radius:0;display:flex;flex-direction:column;justify-content:center;padding:calc(32px + env(safe-area-inset-top)) 22px calc(32px + env(safe-area-inset-bottom))}
+  .result-card{width:100%;height:100dvh;max-height:none;border-radius:0;display:flex;flex-direction:column;justify-content:flex-start;overflow-y:auto;padding:calc(32px + env(safe-area-inset-top)) 22px calc(32px + env(safe-area-inset-bottom))}
   .word-modal,.search-modal,.install-modal,.offline-setup-modal{align-items:end;padding:0}
   .word-panel,.search-panel,.install-panel,.offline-setup-panel{width:100%;max-height:90dvh;border-radius:18px 18px 0 0;padding:32px 22px calc(24px + env(safe-area-inset-bottom))}
   .install-panel h2{font-size:31px}
