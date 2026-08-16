@@ -141,6 +141,19 @@
     await playbackStarted;
     if (currentRequest !== requestId) throw new DOMException('Playback was replaced.','AbortError');
     report('playing', { text, duration: entry.duration });
+
+    // Every Goethe source contains one complete recording. Waiting for the
+    // media element's real `ended` event avoids cutting the last syllable on
+    // iPhone when encoded duration metadata differs by a few hundred ms.
+    if (entry.src.includes('/goethe-')) {
+      audio.addEventListener('ended', () => {
+        if (activeFallback !== audio) return;
+        activeFallback = null;
+        report('idle', { text });
+      }, { once: true });
+      return;
+    }
+
     window.setTimeout(() => {
       if (activeFallback !== audio) return;
       audio.pause();

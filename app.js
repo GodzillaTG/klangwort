@@ -327,7 +327,7 @@ function makeWords(rows, topic) {
   return rows.map((row, index) => ({
     key:`${topic}-${index}`,
     word:row[0], gender:row[1], en:row[2], zh:row[3],
-    example:row[4], exampleZh:row[5], topic
+    example:row[4], exampleZh:row[5], topic, pos:'noun'
   }));
 }
 const interestAndMusicWords = [
@@ -336,21 +336,47 @@ const interestAndMusicWords = [
   ...makeWords(expandedGameWords,'games'),
   ...makeWords(expandedFilmWords,'film')
 ];
-const examWords = (globalThis.EXAM_VOCABULARY || []).map((row,index) => ({
-  key:row.id || `exam-${index}`,
-  word:row.gender ? `${row.gender} ${row.de}` : row.de,
-  lemma:row.de,
-  gender:row.gender || '',
-  en:row.en,
-  zh:row.zh,
-  example:row.exampleDe,
-  exampleEn:row.exampleEn,
-  exampleZh:row.exampleZh,
-  topic:`exam-${row.level.toLowerCase()}`,
-  level:row.level,
-  pos:row.pos,
-  examTopic:row.topic
-}));
+// The source list contains a handful of polysemous English glosses that were
+// previously translated without considering the German sentence. Keep these
+// corrections offline and keyed by stable IDs so course progress is unchanged.
+const vocabularyCorrections = {
+  'exam-b1-0233':{en:'to call; to name',zh:'称为；叫作；说出',exampleZh:'我们把这只狗叫作 Leo。'},
+  'exam-b2-0618':{en:'to name; to identify',zh:'命名；指出名称',exampleZh:'该村以其创始人的名字命名。'},
+  'exam-b2-0750':{en:'just; simply (modal particle)',zh:'就是；不过（语气词）',pos:'particle',exampleZh:'他就是有点笨。'},
+  'exam-c1-0892':{en:'within; inherent (verb particle)',zh:'内在于；蕴含（可分动词成分）',pos:'particle'},
+  'exam-c1-0935':{en:'by virtue of; under',zh:'凭借；依据',pos:'preposition',exampleDe:'Kraft Gesetzes gilt diese Regel für alle.',exampleEn:'By law, this rule applies to everyone.',exampleZh:'依据法律，这项规定适用于所有人。'},
+  'exam-c1-0937':{en:'my (inflected possessive determiner)',zh:'我的（物主冠词变格形式）',pos:'determiner'},
+  'exam-c1-0938':{en:'above; over',zh:'在……上方',pos:'preposition'},
+  'exam-c1-0939':{en:'including; together with',zh:'连同；包括',pos:'preposition',exampleEn:'including everyone and everything',exampleZh:'连同一家老小；包括所有人和物'},
+  'exam-c1-0947':{en:'dense; tight',zh:'密集的；严密的',pos:'adjective'},
+  'exam-c1-0954':{en:'near; close to',zh:'靠近；在……附近',pos:'preposition'},
+  'exam-c1-0956':{en:'your (formal, inflected)',zh:'您的（变格形式）',pos:'determiner'},
+  'exam-c1-0960':{en:'skillful; cleverly',zh:'熟练的；巧妙地',pos:'adjective'},
+  'exam-c1-0963':{en:'however; indeed',zh:'然而；当然；的确',exampleEn:'Does it hurt a lot? — Indeed it does!',exampleZh:'很疼吗？——当然很疼！'},
+  'exam-c1-0972':{en:'in a group of three',zh:'三个人一起（zu dritt）',pos:'particle'},
+  'exam-c1-0978':{en:'to them (dative)',zh:'给他们；对他们（第三格）',pos:'pronoun',exampleDe:'Ich helfe ihnen bei der Aufgabe.',exampleEn:'I help them with the task.',exampleZh:'我帮助他们完成这项任务。'},
+  'exam-c1-0985':{en:'incredibly; uncanny',zh:'非常；不可思议地；诡异的',pos:'adjective'},
+  'exam-c1-0986':{en:'calm; feel free to',zh:'平静的；尽管、放心地',pos:'adjective'},
+  'exam-c1-0995':{en:'passive',zh:'被动的',pos:'adjective',exampleDe:'Er blieb in der Diskussion passiv.',exampleEn:'He remained passive in the discussion.',exampleZh:'他在讨论中一直很被动。'}
+};
+const examWords = (globalThis.EXAM_VOCABULARY || []).map((source,index) => {
+  const row = {...source,...(vocabularyCorrections[source.id] || {})};
+  return {
+    key:row.id || `exam-${index}`,
+    word:row.gender ? `${row.gender} ${row.de}` : row.de,
+    lemma:row.de,
+    gender:row.gender || '',
+    en:row.en,
+    zh:row.zh,
+    example:row.exampleDe,
+    exampleEn:row.exampleEn,
+    exampleZh:row.exampleZh,
+    topic:`exam-${row.level.toLowerCase()}`,
+    level:row.level,
+    pos:row.pos,
+    examTopic:row.topic
+  };
+});
 const allWords = [...interestAndMusicWords,...examWords];
 
 const caseSeedEnglish = {
@@ -858,12 +884,26 @@ function updateDashboard() {
   $('#examMistakeCount').textContent = state.mistakes.length;
   renderVocabularyCourses();
 }
+const partOfSpeechMeta = {
+  noun:'Substantiv · Noun · 名词',
+  verb:'Verb · Verb · 动词',
+  adjective:'Adjektiv · Adjective · 形容词',
+  adverb:'Adverb · Adverb · 副词',
+  conjunction:'Konjunktion · Conjunction · 连词',
+  preposition:'Präposition · Preposition · 介词',
+  pronoun:'Pronomen · Pronoun · 代词',
+  determiner:'Artikelwort · Determiner · 限定词',
+  particle:'Partikel · Particle · 语气/小品词'
+};
+function partOfSpeechLabel(word) {
+  return partOfSpeechMeta[word.pos] || 'Wortart · Part of speech · 词性';
+}
 function genderClass(gender) { return gender === 'der' ? 'der' : gender === 'die' ? 'die' : gender === 'das' ? 'das' : 'word-type'; }
 function wordCard(word) {
   return `<article class="word-card" data-word="${word.key}">
     <div class="word-card-top"><span class="word-category">${topicMeta[word.topic].label}</span><button data-speak="${word.word}" aria-label="播放 ${word.word}">◖</button></div>
     <h3>${word.word}</h3><p class="en">${word.en}</p><p class="zh">${word.zh}</p>
-    <p class="example">${word.example}</p><span class="gender-pill ${genderClass(word.gender)}">${word.gender || (word.pos || 'Wortart')}</span>
+    <p class="example">${word.example}</p><span class="gender-pill ${genderClass(word.gender)}">${word.gender ? `${word.gender} · ` : ''}${partOfSpeechLabel(word)}</span>
   </article>`;
 }
 function renderWords() {
@@ -904,7 +944,7 @@ function openWord(key) {
   if (!word) return;
   $('#wordDetail').innerHTML = `
     <p class="detail-topic">${topicMeta[word.topic].label.toUpperCase()}${word.examTopic ? ` · ${word.examTopic}` : ''}</p>
-    <h2>${word.word}</h2><span class="detail-gender">${word.gender ? `${word.gender} · ${word.gender === 'der' ? '阳性' : word.gender === 'die' ? '阴性' : '中性'}` : `${word.level || ''} · ${word.pos || 'Wortart'}`}</span>
+    <h2>${word.word}</h2><span class="detail-gender">${word.gender ? `${word.gender} · ${word.gender === 'der' ? '阳性 · masculine' : word.gender === 'die' ? '阴性 · feminine' : '中性 · neuter'} · ` : ''}${partOfSpeechLabel(word)}</span>
     <div class="detail-translation"><b>EN</b><span>${word.en}</span><b>中</b><span>${word.zh}</span></div>
     <h4>IM SATZ · 例句</h4><div class="detail-example"><strong>„${word.example}“</strong><span>${word.exampleEn ? `EN · ${word.exampleEn}<br>` : ''}${word.exampleZh}</span></div>
     <h4>记忆方式</h4><p>${genderHint(word)}</p>
@@ -941,7 +981,7 @@ function makeVocabQuestion(word, pool) {
   return {
     id:`vocab-${word.key}`, type:word.topic === 'music' ? 'music' : 'interest',
     category:word.topic === 'music' ? 'KLANGWORT · 专业词汇' : `${topicMeta[word.topic].short.toUpperCase()} · 兴趣词汇`,
-    prompt:word.word, context:'选择最准确的英文和中文意思。',
+    prompt:word.word, context:`词性：${partOfSpeechLabel(word)}。选择最准确的英文和中文意思。`,
     translationEn:'Choose the most accurate English meaning of this German word.',
     options, answer:word.key,
     explanation:`${word.word} = ${word.en} = ${word.zh}`,
@@ -962,13 +1002,13 @@ function examDistractors(word,pool) {
 function makeExamVocabQuestions(word,pool) {
   const distractors = examDistractors(word,pool);
   const meaningOptions = shuffle([word,...distractors]).map(item => ({value:item.key,label:item.en,sub:item.zh}));
-  const germanOptions = shuffle([word,...distractors]).map(item => ({value:item.key,label:item.word,sub:item.pos}));
+  const germanOptions = shuffle([word,...distractors]).map(item => ({value:item.key,label:item.word,sub:partOfSpeechLabel(item)}));
   const clozeOptions = shuffle([word,...distractors]).map(item => ({value:item.key,label:item.lemma || item.word.replace(/^(der|die|das)\s+/i,''),sub:item.en}));
   const questions = [
     {
       id:`exam-vocab-meaning-${word.key}`, type:'examVocab', level:word.level,
       category:`${word.level} · PRÜFUNGSWORTSCHATZ`, prompt:word.word,
-      context:`正向认词 · ${word.examTopic}。选择最准确的英文与中文意思。`,
+      context:`正向认词 · ${word.examTopic} · ${partOfSpeechLabel(word)}。选择最准确的英文与中文意思。`,
       translationEn:'Choose the most accurate English and Chinese meaning.',
       options:meaningOptions, answer:word.key,
       explanation:`${word.word} = ${word.en} = ${word.zh}。例句：${word.example}`,
@@ -977,7 +1017,7 @@ function makeExamVocabQuestions(word,pool) {
     {
       id:`exam-vocab-reverse-${word.key}`, type:'examVocab', level:word.level,
       category:`${word.level} · EN → DE`, prompt:word.en,
-      context:`英语反向翻译 · ${word.examTopic}。选择对应的德语词。`,
+      context:`英语反向翻译 · ${word.examTopic}。选项标有词性；名词保留冠词。`,
       translationEn:'Choose the German word that matches this meaning.',
       options:germanOptions, answer:word.key,
       explanation:`正确表达是 ${word.word}。${word.example}`,
@@ -986,7 +1026,7 @@ function makeExamVocabQuestions(word,pool) {
     {
       id:`exam-vocab-reverse-zh-${word.key}`, type:'examVocab', level:word.level,
       category:`${word.level} · 中 → DE`, prompt:word.zh,
-      context:`中文反向翻译 · ${word.examTopic}。选择对应的德语词。`,
+      context:`中文反向翻译 · ${word.examTopic}。选项标有词性；名词保留冠词。`,
       translationEn:`Choose the German word for “${word.en}”.`,
       options:germanOptions, answer:word.key,
       explanation:`正确表达是 ${word.word}。${word.example}`,
@@ -999,7 +1039,7 @@ function makeExamVocabQuestions(word,pool) {
     questions.push({
       id:`exam-vocab-context-${word.key}`, type:'examVocab', level:word.level,
       category:`${word.level} · KONTEXTLÜCKE`, prompt:cloze,
-      context:`语境完形 · ${word.exampleZh}`,
+      context:`语境完形 · ${partOfSpeechLabel(word)} · ${word.exampleZh}`,
       translationEn:word.exampleEn || `Complete the sentence with “${word.en}”.`,
       options:clozeOptions, answer:word.key,
       explanation:`完整句子：${word.example} · ${word.exampleEn || ''}`,
@@ -1045,14 +1085,14 @@ function courseDistractors(word,pool) {
 }
 function makeCourseRecognitionQuestion(word,pool,courseKind,unitIndex) {
   const options = shuffle([word,...courseDistractors(word,pool)]).map(item => ({value:item.key,label:item.en,sub:item.zh}));
-  return {id:`course-${word.topic}-recognition-${word.key}`,type:'courseVocab',courseKind,courseSkill:'recognition',courseTopic:word.topic,unitIndex,wordKey:word.key,category:`${topicMeta[word.topic].short} · 认词`,prompt:word.word,context:'选择准确的英文和中文词义。',translationEn:'Choose the correct English and Chinese meaning.',options,answer:word.key,explanation:`${word.word} = ${word.en} = ${word.zh}。${word.example}`,speak:word.word};
+  return {id:`course-${word.topic}-recognition-${word.key}`,type:'courseVocab',courseKind,courseSkill:'recognition',courseTopic:word.topic,unitIndex,wordKey:word.key,category:`${topicMeta[word.topic].short} · 认词`,prompt:word.word,context:`词性：${partOfSpeechLabel(word)}。选择准确的英文和中文词义。`,translationEn:'Choose the correct English and Chinese meaning.',options,answer:word.key,explanation:`${word.word} · ${partOfSpeechLabel(word)} = ${word.en} = ${word.zh}。${word.example}`,speak:word.word};
 }
 function makeCourseReverseQuestion(word,pool,courseKind,unitIndex) {
-  const options = shuffle([word,...courseDistractors(word,pool)]).map(item => ({value:item.key,label:item.word,sub:item.en}));
+  const options = shuffle([word,...courseDistractors(word,pool)]).map(item => ({value:item.key,label:item.word,sub:`${partOfSpeechLabel(item)} · ${item.en}`}));
   return {id:`course-${word.topic}-reverse-${word.key}`,type:'courseVocab',courseKind,courseSkill:'recognition',courseTopic:word.topic,unitIndex,wordKey:word.key,category:`${topicMeta[word.topic].short} · 主动回忆`,prompt:`${word.en} · ${word.zh}`,context:'从英文和中文意思回忆完整德语词。',translationEn:'Choose the complete German word for this meaning.',options,answer:word.key,explanation:`正确答案：${word.word}。${word.example}`,speak:word.word};
 }
 function makeCourseSpellingQuestion(word,courseKind,unitIndex) {
-  return {id:`course-${word.topic}-spelling-${word.key}`,type:'courseVocab',courseKind,courseSkill:'spelling',courseTopic:word.topic,unitIndex,wordKey:word.key,inputType:'spelling',category:`${topicMeta[word.topic].short} · 拼写`,prompt:`${word.en}\n${word.zh}`,context:'请完整写出德语。名词必须包含冠词。',translationEn:'Type the complete German answer, including the article for nouns.',options:[],answer:normalizedSpelling(word.word),displayAnswer:word.word,explanation:`正确拼写：${word.word}。${word.example}`,speak:word.word};
+  return {id:`course-${word.topic}-spelling-${word.key}`,type:'courseVocab',courseKind,courseSkill:'spelling',courseTopic:word.topic,unitIndex,wordKey:word.key,inputType:'spelling',category:`${topicMeta[word.topic].short} · 拼写`,prompt:`${word.en}\n${word.zh}`,context:`词性：${partOfSpeechLabel(word)}。请完整写出德语；名词必须包含冠词。`,translationEn:'Type the complete German answer, including the article for nouns.',options:[],answer:normalizedSpelling(word.word),displayAnswer:word.word,explanation:`正确拼写：${word.word} · ${partOfSpeechLabel(word)}。${word.example}`,speak:word.word};
 }
 function buildVocabularyCourseRound(mode) {
   if (mode === 'vocab-course:mistakes') {
@@ -1365,7 +1405,7 @@ function searchWords(query='') {
   const q = query.trim().toLowerCase();
   const results = allWords.filter(word => `${word.word} ${word.en} ${word.zh}`.toLowerCase().includes(q));
   $('#searchResults').innerHTML = results.length
-    ? results.slice(0,30).map(word => `<button class="search-result" data-result="${word.key}"><b>${word.word}</b><span>${word.en} · ${word.zh}</span></button>`).join('')
+    ? results.slice(0,30).map(word => `<button class="search-result" data-result="${word.key}"><b>${word.word}</b><span>${partOfSpeechLabel(word)} · ${word.en} · ${word.zh}</span></button>`).join('')
     : '<p class="search-empty">没有找到这个词。</p>';
 }
 function activateNav(hash) {
@@ -1474,8 +1514,8 @@ document.addEventListener('keydown',event => {
 });
 
 let offlineReady = false;
-const OFFLINE_CACHE_NAME = 'mein-deutsch-v20';
-const OFFLINE_READY_MARKER = './offline-ready-v20';
+const OFFLINE_CACHE_NAME = 'mein-deutsch-v24';
+const OFFLINE_READY_MARKER = './offline-ready-v24';
 let workerRefreshing = false;
 let workerRegistration = null;
 let offlineAudioCompleted = 0;

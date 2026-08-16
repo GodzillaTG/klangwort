@@ -505,8 +505,21 @@ E · Technische Defekte dürfen ausschließlich vom Laborteam behoben werden.`, 
       const answered = Object.keys(state.answers).length;
       const score = Math.round(correct / state.questions.length * 100);
       const passed = score >= EXAMS[state.level].pass;
-      saveResult(state.level,state.module,{score,correct,total:state.questions.length,answered});
-      body = `<div class="goethe-result"><div class="score-ring"><b>${score}</b><span>PUNKTE / 100</span></div><p class="eyebrow">${state.level} · ${config.label}</p><h2>${passed?'模块通过':'还需要继续练习'}</h2><p>${correct} / ${state.questions.length} 题正确 · ${answered} 题已作答${timeExpired?' · 时间已到':''}<br>歌德模块及格线：60 分</p><div class="goethe-result-actions"><button class="primary" data-restart-goethe>再做一次</button><button data-goethe-overview>返回 ${state.level} 总览</button><button data-close-goethe>退出</button></div></div>`;
+      const mistakes = state.questions
+        .map((question,index) => ({
+          id:question.id,
+          number:index + 1,
+          part:config.parts[question.partIndex].title,
+          prompt:question.prompt,
+          selected:state.answers[question.id] || '',
+          answer:question.answer
+        }))
+        .filter(item => item.selected !== item.answer);
+      saveResult(state.level,state.module,{score,correct,total:state.questions.length,answered,mistakes});
+      const readingReview = state.module === 'lesen'
+        ? `<section class="goethe-answer-review"><div class="goethe-answer-review-head"><span>FEHLERANALYSE · 阅读复盘</span><h3>${mistakes.length ? `有 ${mistakes.length} 题需要复习` : '全部正确'}</h3><p>${mistakes.length ? '下面列出所有错题和未作答题。正确答案已完整标出。' : '这次阅读没有错题。'}</p></div>${mistakes.length ? mistakes.map(item => `<article class="goethe-review-item"><div><span>${escapeHtml(item.part)} · AUFGABE ${item.number}</span><b>${item.selected ? '答错' : '未作答'}</b></div><h4>${escapeHtml(item.prompt)}</h4><p class="goethe-review-wrong"><span>你的答案</span>${item.selected ? escapeHtml(item.selected) : '— 未作答 —'}</p><p class="goethe-review-correct"><span>正确答案</span>${escapeHtml(item.answer)}</p></article>`).join('') : '<div class="goethe-review-perfect">✓ Keine Fehler · 没有错题</div>'}</section>`
+        : '';
+      body = `<div class="goethe-result"><div class="score-ring"><b>${score}</b><span>PUNKTE / 100</span></div><p class="eyebrow">${state.level} · ${config.label}</p><h2>${passed?'模块通过':'还需要继续练习'}</h2><p>${correct} / ${state.questions.length} 题正确 · ${answered} 题已作答${timeExpired?' · 时间已到':''}<br>歌德模块及格线：60 分</p>${readingReview}<div class="goethe-result-actions"><button class="primary" data-restart-goethe>再做一次</button><button data-goethe-overview>返回 ${state.level} 总览</button><button data-close-goethe>退出</button></div></div>`;
     } else {
       const completed = state.module === 'schreiben' ? Object.values(state.drafts).filter(value => value.trim()).length : config.tasks.length;
       saveResult(state.level,state.module,{completed,total:config.tasks.length});
