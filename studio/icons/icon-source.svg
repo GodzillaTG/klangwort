@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Tonmeister Study Lab">
+  <defs>
+    <radialGradient id="glow" cx="64%" cy="18%" r="86%">
+      <stop offset="0" stop-color="#17342c" />
+      <stop offset="0.58" stop-color="#0d1313" />
+      <stop offset="1" stop-color="#07080a" />
+    </radialGradient>
+    <linearGradient id="wave" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#d4ffed" />
+      <stop offset="1" stop-color="#7dd3b4" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#glow)" />
+  <rect x="34" y="34" width="444" height="444" rx="88" fill="none" stroke="#ffffff" stroke-opacity="0.09" stroke-width="2" />
+  <g fill="none" stroke="url(#wave)" stroke-linecap="round">
+    <path d="M116 256h38l24-72 37 150 36-214 39 272 39-208 31 142 20-70h26" stroke-width="22" />
+    <path d="M118 392h276" stroke="#ffffff" stroke-opacity="0.14" stroke-width="2" />
+  </g>
+  <text x="256" y="438" fill="#aeb7b6" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="24" font-weight="700" letter-spacing="7" text-anchor="middle">TONMEISTER</text>
+</svg>

@@ -1,6 +1,6 @@
-const CACHE_NAME = 'mein-deutsch-v24';
+const CACHE_NAME = 'mein-deutsch-v25';
 const OFFLINE_PAGE = './offline.html';
-const READY_MARKER = './offline-ready-v24';
+const READY_MARKER = './offline-ready-v25';
 importScripts('./offline-audio-manifest.js');
 const CORE_ASSETS = [
   './index.html',
@@ -232,13 +232,20 @@ self.addEventListener('message',event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+  const scopePath = new URL(self.registration.scope).pathname.replace(/\/$/, '');
+  const scopedPath = scopePath && url.pathname.startsWith(`${scopePath}/`)
+    ? url.pathname.slice(scopePath.length)
+    : url.pathname;
+  if (scopedPath === '/tonmeister' || scopedPath.startsWith('/tonmeister/')) return;
+  if (scopedPath === '/studio' || scopedPath.startsWith('/studio/')) return;
+
   if (event.request.mode === 'navigate') {
     event.respondWith(networkFirstNavigation(event.request));
     return;
   }
 
-  const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return;
   if (event.request.headers.has('range')) {
     event.respondWith(serveRangeRequest(event.request));
     return;
