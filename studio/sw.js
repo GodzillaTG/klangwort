@@ -1,5 +1,7 @@
-const CACHE_VERSION = "66b8746736d2";
+const CACHE_VERSION = "222bf4f65775";
 const BUILD_ASSETS = [
+  "/klangwort/studio/_next/static/1b56b903-2ed7-4372-99ce-d6153f8ca4cb/_buildManifest.js",
+  "/klangwort/studio/_next/static/1b56b903-2ed7-4372-99ce-d6153f8ca4cb/_ssgManifest.js",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-001175b1.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-52306abf.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-875ccdd4.woff2",
@@ -11,15 +13,13 @@ const BUILD_ASSETS = [
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-44e03052.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-971fb274.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-f6b33328.woff2",
-  "/klangwort/studio/_next/static/chunks/TonmeisterApp-DJbLCxn8.js",
+  "/klangwort/studio/_next/static/chunks/TonmeisterApp-R0PTqvgF.js",
   "/klangwort/studio/_next/static/chunks/framework-BgSIrAUN.js",
-  "/klangwort/studio/_next/static/chunks/index-C-23A10j.js",
-  "/klangwort/studio/_next/static/chunks/layout-segment-context-BU7SEbfl.js",
+  "/klangwort/studio/_next/static/chunks/index-DjUQFg0b.js",
+  "/klangwort/studio/_next/static/chunks/layout-segment-context-DoaHw86j.js",
   "/klangwort/studio/_next/static/chunks/pwa-register-r5KOAsVE.js",
   "/klangwort/studio/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
-  "/klangwort/studio/_next/static/css/index.BNagDwjr.css",
-  "/klangwort/studio/_next/static/e345ba6f-783c-4408-9809-711c4ba5797d/_buildManifest.js",
-  "/klangwort/studio/_next/static/e345ba6f-783c-4408-9809-711c4ba5797d/_ssgManifest.js",
+  "/klangwort/studio/_next/static/css/index.D6HZjPDW.css",
   "/klangwort/studio/ab-dpa.jpg",
   "/klangwort/studio/ab-spacing-curve-dpa.jpg",
   "/klangwort/studio/comb-filtering-dpa.jpg",
