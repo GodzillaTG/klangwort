@@ -1,7 +1,5 @@
-const CACHE_VERSION = "34feadc34ca3";
+const CACHE_VERSION = "66b8746736d2";
 const BUILD_ASSETS = [
-  "/klangwort/studio/_next/static/9a6ebd86-c0e7-47d9-b929-b39d9abbca90/_buildManifest.js",
-  "/klangwort/studio/_next/static/9a6ebd86-c0e7-47d9-b929-b39d9abbca90/_ssgManifest.js",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-001175b1.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-52306abf.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-875ccdd4.woff2",
@@ -13,13 +11,15 @@ const BUILD_ASSETS = [
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-44e03052.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-971fb274.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-f6b33328.woff2",
-  "/klangwort/studio/_next/static/chunks/TonmeisterApp-CwB5ngl9.js",
+  "/klangwort/studio/_next/static/chunks/TonmeisterApp-DJbLCxn8.js",
   "/klangwort/studio/_next/static/chunks/framework-BgSIrAUN.js",
-  "/klangwort/studio/_next/static/chunks/index-BiLwxxuy.js",
-  "/klangwort/studio/_next/static/chunks/layout-segment-context-BdbjOxu1.js",
-  "/klangwort/studio/_next/static/chunks/pwa-register-DeCcSK8-.js",
+  "/klangwort/studio/_next/static/chunks/index-C-23A10j.js",
+  "/klangwort/studio/_next/static/chunks/layout-segment-context-BU7SEbfl.js",
+  "/klangwort/studio/_next/static/chunks/pwa-register-r5KOAsVE.js",
   "/klangwort/studio/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
   "/klangwort/studio/_next/static/css/index.BNagDwjr.css",
+  "/klangwort/studio/_next/static/e345ba6f-783c-4408-9809-711c4ba5797d/_buildManifest.js",
+  "/klangwort/studio/_next/static/e345ba6f-783c-4408-9809-711c4ba5797d/_ssgManifest.js",
   "/klangwort/studio/ab-dpa.jpg",
   "/klangwort/studio/ab-spacing-curve-dpa.jpg",
   "/klangwort/studio/comb-filtering-dpa.jpg",
@@ -136,6 +136,7 @@ const SHELL_CACHE = `tonmeister-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `tonmeister-runtime-${CACHE_VERSION}`;
 const CACHE_PREFIX = "tonmeister-";
 const APP_SHELL = ["/klangwort/studio/", "/klangwort/studio/offline.html", "/klangwort/studio/manifest.webmanifest", ...BUILD_ASSETS];
+const PRECACHE_BATCH_SIZE = 8;
 
 async function cacheResponse(cache, request, response) {
   if (response && response.ok && response.type === "basic") {
@@ -144,16 +145,60 @@ async function cacheResponse(cache, request, response) {
   return response;
 }
 
-async function precache() {
-  const cache = await caches.open(SHELL_CACHE);
-  await Promise.all(APP_SHELL.map(async (url) => {
+async function fetchAndCache(cache, url) {
+  const existing = await cache.match(url, { ignoreSearch: true });
+  if (existing) return;
+
+  let lastError;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
       const response = await fetch(url, { cache: "reload" });
-      await cacheResponse(cache, url, response);
-    } catch {
-      // A single optional asset must not prevent the rest of the app from installing.
+      if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
+      await cache.put(url, response.clone());
+      return;
+    } catch (error) {
+      lastError = error;
     }
-  }));
+  }
+  throw lastError;
+}
+
+async function offlineStatus() {
+  const cache = await caches.open(SHELL_CACHE);
+  const missing = [];
+  for (let index = 0; index < APP_SHELL.length; index += PRECACHE_BATCH_SIZE) {
+    const batch = APP_SHELL.slice(index, index + PRECACHE_BATCH_SIZE);
+    const matches = await Promise.all(batch.map((url) => cache.match(url, { ignoreSearch: true })));
+    matches.forEach((response, offset) => {
+      if (!response) missing.push(batch[offset]);
+    });
+  }
+  return {
+    type: "OFFLINE_STATUS",
+    version: CACHE_VERSION,
+    cached: APP_SHELL.length - missing.length,
+    total: APP_SHELL.length,
+    missing,
+    complete: missing.length === 0,
+  };
+}
+
+async function precache() {
+  const cache = await caches.open(SHELL_CACHE);
+  const failures = [];
+  for (let index = 0; index < APP_SHELL.length; index += PRECACHE_BATCH_SIZE) {
+    const batch = APP_SHELL.slice(index, index + PRECACHE_BATCH_SIZE);
+    const results = await Promise.allSettled(batch.map((url) => fetchAndCache(cache, url)));
+    results.forEach((result, offset) => {
+      if (result.status === "rejected") failures.push(batch[offset]);
+    });
+  }
+
+  const status = await offlineStatus();
+  if (failures.length || !status.complete) {
+    throw new Error(`Offline cache incomplete: ${status.missing.join(", ")}`);
+  }
+  return status;
 }
 
 self.addEventListener("install", (event) => {
@@ -218,5 +263,21 @@ self.addEventListener("fetch", (event) => {
 });
 
 self.addEventListener("message", (event) => {
-  if (event.data === "SKIP_WAITING") self.skipWaiting();
+  if (event.data === "SKIP_WAITING") {
+    self.skipWaiting();
+    return;
+  }
+
+  const port = event.ports && event.ports[0];
+  if (!port || !event.data || typeof event.data !== "object") return;
+
+  if (event.data.type === "GET_OFFLINE_STATUS") {
+    event.waitUntil(offlineStatus().then((status) => port.postMessage(status)));
+  }
+
+  if (event.data.type === "PRECACHE_OFFLINE") {
+    event.waitUntil(precache()
+      .then((status) => port.postMessage(status))
+      .catch(async () => port.postMessage(await offlineStatus())));
+  }
 });
