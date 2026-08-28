@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f3ec" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="研政" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="description" content="101 思想政治理论主动学习 App：分类刷题、错因诊断、速记、间隔复习和原创模拟考试。" />
+    <title>研政 · 101 主动学习</title>
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css?v=20260828" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="主导航">
+        <a class="brand" href="#today" aria-label="研政首页">
+          <span class="brand-mark">研</span>
+          <span><strong>研政</strong><small>101 主动学习</small></span>
+        </a>
+        <nav id="primary-nav"></nav>
+        <div class="exam-badge">
+          <span>考试目标</span>
+          <strong>2027 考研</strong>
+          <small>沿用 2026 公开结构基线<br />待 2027 官方大纲更新</small>
+        </div>
+      </aside>
+
+      <main id="app" tabindex="-1"></main>
+    </div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script>
+      if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === '127.0.0.1' || location.hostname === 'localhost')) {
+        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(registration => registration.update()).catch(() => {});
+      }
+    </script>
+    <script src="app.js?v=20260828"></script>
+  </body>
+</html>

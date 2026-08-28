@@ -1,0 +1,19 @@
+{
+  "name": "研政 · 101 主动学习",
+  "short_name": "研政",
+  "description": "101 思想政治理论分类刷题、错因诊断、间隔复习与原创模拟考试。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f3ec",
+  "theme_color": "#175c4c",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
