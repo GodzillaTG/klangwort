@@ -240,6 +240,7 @@ self.addEventListener('fetch', event => {
     : url.pathname;
   if (scopedPath === '/tonmeister' || scopedPath.startsWith('/tonmeister/')) return;
   if (scopedPath === '/studio' || scopedPath.startsWith('/studio/')) return;
+  if (scopedPath === '/kaoyan-politics-study-app' || scopedPath.startsWith('/kaoyan-politics-study-app/')) return;
 
   if (event.request.mode === 'navigate') {
     event.respondWith(networkFirstNavigation(event.request));
