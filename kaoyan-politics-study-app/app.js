@@ -24,6 +24,16 @@ const SUBJECTS = [
 const CHAPTERS = [
   { id: "marx-cognition", subjectId: "marx", title: "认识论" },
   { id: "marx-dialectics", subjectId: "marx", title: "唯物辩证法" },
+  { id: "df-marx-01", subjectId: "marx", title: "东方马原 01 · 导论" },
+  { id: "df-marx-02", subjectId: "marx", title: "东方马原 02 · 哲学基本问题" },
+  { id: "df-marx-03", subjectId: "marx", title: "东方马原 03 · 辩证唯物论" },
+  { id: "df-marx-04", subjectId: "marx", title: "东方马原 04 · 唯物辩证法" },
+  { id: "df-marx-05", subjectId: "marx", title: "东方马原 05 · 认识论" },
+  { id: "df-marx-06", subjectId: "marx", title: "东方马原 06 · 唯物史观" },
+  { id: "df-marx-07", subjectId: "marx", title: "东方马原 07 · 资本主义本质及规律" },
+  { id: "df-marx-08", subjectId: "marx", title: "东方马原 08 · 资本主义发展趋势" },
+  { id: "df-marx-09", subjectId: "marx", title: "东方马原 09 · 社会主义发展" },
+  { id: "df-marx-10", subjectId: "marx", title: "东方马原 10 · 共产主义理想" },
   { id: "history-new-democracy", subjectId: "history", title: "新民主主义革命" },
   { id: "ethics-rule-law", subjectId: "ethics", title: "法治素养" }
 ];
@@ -34,6 +44,16 @@ const MOCK_EXAM = { id: "mock-blueprint-2026-fallback", examProfileId: EXAM_PROF
 const KNOWLEDGE_NODES = [
   { id: "kn-practice-truth", subject: "marx", title: "实践与真理标准", chapter: "认识论", prerequisite: "kn-practice-cognition", confusion: "kn-truth-objectivity" },
   { id: "kn-contradiction-particularity", subject: "marx", title: "矛盾普遍性与特殊性", chapter: "唯物辩证法", prerequisite: "kn-contradiction", confusion: "kn-common-individual" },
+  { id: "kn-df-marx-origin", subject: "marx", title: "马克思主义创立与鲜明特征", chapter: "东方马原 01 · 导论", prerequisite: null, confusion: "kn-df-marx-scientific-socialism" },
+  { id: "kn-df-marx-philosophy", subject: "marx", title: "哲学基本问题", chapter: "东方马原 02 · 哲学基本问题", prerequisite: "kn-df-marx-origin", confusion: "kn-df-marx-historical-materialism" },
+  { id: "kn-df-marx-material", subject: "marx", title: "物质、运动与意识", chapter: "东方马原 03 · 辩证唯物论", prerequisite: "kn-df-marx-philosophy", confusion: "kn-df-marx-practice-cognition" },
+  { id: "kn-df-marx-dialectics", subject: "marx", title: "联系、发展与矛盾规律", chapter: "东方马原 04 · 唯物辩证法", prerequisite: "kn-df-marx-material", confusion: "kn-contradiction-particularity" },
+  { id: "kn-df-marx-cognition", subject: "marx", title: "实践、认识与真理", chapter: "东方马原 05 · 认识论", prerequisite: "kn-df-marx-material", confusion: "kn-practice-truth" },
+  { id: "kn-df-marx-history", subject: "marx", title: "社会基本矛盾与人民群众", chapter: "东方马原 06 · 唯物史观", prerequisite: "kn-df-marx-dialectics", confusion: "kn-df-marx-philosophy" },
+  { id: "kn-df-marx-capital", subject: "marx", title: "商品、价值与剩余价值", chapter: "东方马原 07 · 资本主义本质及规律", prerequisite: "kn-df-marx-history", confusion: "kn-df-marx-monopoly" },
+  { id: "kn-df-marx-monopoly", subject: "marx", title: "垄断、竞争与资本主义趋势", chapter: "东方马原 08 · 资本主义发展趋势", prerequisite: "kn-df-marx-capital", confusion: "kn-df-marx-capital" },
+  { id: "kn-df-marx-socialism", subject: "marx", title: "社会主义从空想到科学", chapter: "东方马原 09 · 社会主义发展", prerequisite: "kn-df-marx-history", confusion: "kn-df-marx-communism" },
+  { id: "kn-df-marx-communism", subject: "marx", title: "共产主义理想及其实现", chapter: "东方马原 10 · 共产主义理想", prerequisite: "kn-df-marx-socialism", confusion: "kn-df-marx-socialism" },
   { id: "kn-may-fourth", subject: "history", title: "五四运动与新民主主义革命", chapter: "新民主主义革命", prerequisite: "kn-old-democracy", confusion: "kn-revolution-task" },
   { id: "kn-rule-virtue", subject: "ethics", title: "法治与德治相结合", chapter: "法治素养", prerequisite: "kn-rule-law", confusion: "kn-rule-vs-virtue" }
 ];
@@ -54,7 +74,7 @@ const ERROR_ACTIONS = {
 };
 const REVIEW_LABELS = ["立即重测", "短时重测", "次日复习", "3 日复习", "7 日复习", "14 日复习", "30 日复习"];
 const NAV = [
-  ["today", "◉", "今日"], ["drill", "◇", "分类刷题"], ["mock", "□", "模拟考试"],
+  ["today", "◉", "今日"], ["dongfang", "东", "东方马原"], ["drill", "◇", "分类刷题"], ["mock", "□", "模拟考试"],
   ["wrong", "×", "错题本"], ["memory", "⌁", "速记"], ["map", "⌘", "知识地图"], ["data", "▥", "数据"]
 ];
 
@@ -75,12 +95,14 @@ const defaultStudyState = {
 };
 
 let questions = [];
+let dongfangCourse = { chapters: [], inventory: {} };
 let route = location.hash.replace("#", "") || "today";
 let drill = { index: 0, selected: [], submitted: false, completed: false, seenIds: loadRoundSeen(), filters: { subject: "all", chapter: "all", node: "all", type: "all", difficulty: "all", mastery: "all", error: "all", source: "all", current: "all", highMix: false, wrong: false, favorite: false, due: false } };
 let study = loadStudy();
 let miniMock = { active: false, submitted: false, index: 0, answers: {}, startedAt: null, finishedAt: null };
 let mockTimerId = null;
 let analysisExpanded = false;
+let selectedCourseChapterId = "df-marx-01";
 
 function loadStudy() {
   try {
@@ -223,6 +245,7 @@ function renderDrill() {
     else drill.completed = true;
   }
   const q = list[drill.index];
+  const sourceOptions = [...new Map(questions.map(item => [item.source.version, item.source.title])).entries()];
   const filters = `<section class="card filter-panel">
     <div class="filter-heading"><div><strong>选择训练范围</strong><small>基础筛选保持常用项，更多条件按需展开</small></div><span class="tag">${list.length} 道可用题</span></div>
     <div class="filter-primary">
@@ -233,9 +256,9 @@ function renderDrill() {
     </div>
     <details class="advanced-filter"><summary>更多筛选：章节、知识点、错因、版本与时政</summary><div class="advanced-grid">
       ${selectField("错误类型", "error", [["all", "全部错因"], ...ERROR_TAGS.map(x => [x, x])])}
-      ${selectField("章节", "chapter", [["all", "全部章节"], ["marx-cognition", "认识论"], ["marx-dialectics", "唯物辩证法"], ["history-new-democracy", "新民主主义革命"], ["ethics-rule-law", "法治素养"]])}
+      ${selectField("章节", "chapter", [["all", "全部章节"], ...CHAPTERS.map(chapter => [chapter.id, chapter.title])])}
       ${selectField("知识点", "node", [["all", "全部知识点"], ...KNOWLEDGE_NODES.map(node => [node.id, node.title])])}
-      ${selectField("模拟卷来源 / 版本", "source", [["all", "全部原创版本"], ["sample-2026-v1", "原创示例 · sample-2026-v1"]])}
+      ${selectField("来源 / 版本", "source", [["all", "全部原创版本"], ...sourceOptions.map(([version, title]) => [version, `${title} · ${version}`])])}
       ${selectField("时政月份 / 主题", "current", [["all", "全部内容"], ["verified", "已核验时政（当前 0 题）"]])}
     </div></details>
     <div class="toggles">${[["highMix", "高频易混点"], ["wrong", "仅错题"], ["favorite", "仅收藏"], ["due", "仅到期复习"]].map(([key,label]) => `<button class="toggle ${drill.filters[key] ? "active" : ""}" data-toggle="${key}">${label}</button>`).join("")}</div>
@@ -335,8 +358,12 @@ function refreshMasteryStates() {
   KNOWLEDGE_NODES.forEach(node => { study.mastery[node.id] = calculateMastery(node.id); });
 }
 
+function getMiniMockQuestions() {
+  return questions.filter(question => question.source.version === MINI_MOCK_PROFILE.version);
+}
+
 function scoreMiniMock() {
-  const rows = questions.map(q => {
+  const rows = getMiniMockQuestions().map(q => {
     const answers = miniMock.answers[q.id] || [];
     const correct = JSON.stringify([...answers].sort()) === JSON.stringify([...q.correct_answers].sort());
     const points = q.type === "multiple" ? 2 : 1;
@@ -346,26 +373,27 @@ function scoreMiniMock() {
 }
 
 function renderMiniMock() {
+  const mockQuestions = getMiniMockQuestions();
   if (miniMock.submitted) {
     const result = scoreMiniMock();
     const wrong = result.rows.filter(row => !row.correct);
     return `<section class="mock-result card">
       <div class="score-ring"><strong>${result.score}</strong><span>/ ${result.maxScore} 分</span></div>
       <div><div class="eyebrow">MINI MOCK RESULT</div><h2>${result.score === result.maxScore ? "全对，也要继续间隔复测" : "成绩已生成，下一步修复失分点"}</h2><p class="lede">严格计分：单选 1 分；多选 2 分，多选、少选、错选均为 0 分。本次答对 ${result.rows.length - wrong.length}/${result.rows.length} 题。</p></div>
-      <div class="mock-breakdown">${result.rows.map((row, index) => `<article class="${row.correct ? "pass" : "fail"}"><span>${index + 1}</span><div><strong>${nodeById(questions[index].knowledge_node_ids[0])?.title}</strong><small>你的答案 ${row.answers.join("、") || "未答"} · 正确答案 ${questions[index].correct_answers.join("、")}</small></div><b>${row.earned}/${row.points}</b></article>`).join("")}</div>
+      <div class="mock-breakdown">${result.rows.map((row, index) => `<article class="${row.correct ? "pass" : "fail"}"><span>${index + 1}</span><div><strong>${nodeById(mockQuestions[index].knowledge_node_ids[0])?.title}</strong><small>你的答案 ${row.answers.join("、") || "未答"} · 正确答案 ${mockQuestions[index].correct_answers.join("、")}</small></div><b>${row.earned}/${row.points}</b></article>`).join("")}</div>
       <div class="button-row"><button class="primary" data-review-mock-wrong ${wrong.length ? "" : "disabled"}>修复本次错题</button><button class="secondary" data-restart-mini-mock>再考一次</button><button class="ghost" data-exit-mini-mock>返回模考中心</button></div>
     </section>`;
   }
-  const q = questions[miniMock.index];
+  const q = mockQuestions[miniMock.index];
   const selected = miniMock.answers[q.id] || [];
   return `<section class="mock-shell">
-    <div class="mock-toolbar card"><div><span>原创迷你模考</span><strong id="mock-clock">10:00</strong></div><div><span>答题进度</span><strong>${Object.keys(miniMock.answers).length}/${questions.length}</strong></div><button class="secondary" data-submit-mini-mock>提前交卷</button></div>
-    <div class="mock-progress" aria-label="题目导航">${questions.map((item, index) => `<button data-mock-index="${index}" class="${index === miniMock.index ? "current" : ""} ${miniMock.answers[item.id]?.length ? "answered" : ""}" aria-label="第 ${index + 1} 题">${index + 1}</button>`).join("")}</div>
+    <div class="mock-toolbar card"><div><span>原创迷你模考</span><strong id="mock-clock">10:00</strong></div><div><span>答题进度</span><strong>${Object.keys(miniMock.answers).length}/${mockQuestions.length}</strong></div><button class="secondary" data-submit-mini-mock>提前交卷</button></div>
+    <div class="mock-progress" aria-label="题目导航">${mockQuestions.map((item, index) => `<button data-mock-index="${index}" class="${index === miniMock.index ? "current" : ""} ${miniMock.answers[item.id]?.length ? "answered" : ""}" aria-label="第 ${index + 1} 题">${index + 1}</button>`).join("")}</div>
     <article class="card question-card mock-question">
-      <div class="question-meta"><span class="tag">${q.type === "multiple" ? "多项选择 · 2 分" : "单项选择 · 1 分"}</span><span>${subjectName(q.subject_id)}</span><span>第 ${miniMock.index + 1}/${questions.length} 题</span></div>
+      <div class="question-meta"><span class="tag">${q.type === "multiple" ? "多项选择 · 2 分" : "单项选择 · 1 分"}</span><span>${subjectName(q.subject_id)}</span><span>第 ${miniMock.index + 1}/${mockQuestions.length} 题</span></div>
       <h2>${escapeHtml(q.stem)}</h2>
       <div class="options">${Object.entries(q.options).map(([letter, text]) => `<button class="option ${selected.includes(letter) ? "selected" : ""}" data-mock-option="${letter}"><span class="letter">${letter}</span><span>${escapeHtml(text)}</span></button>`).join("")}</div>
-      <div class="button-row spread"><button class="secondary" data-mock-prev ${miniMock.index === 0 ? "disabled" : ""}>← 上一题</button><span class="source">作答期间不显示答案与解析</span><button class="primary" data-mock-next>${miniMock.index === questions.length - 1 ? "检查答题卡" : "保存并下一题 →"}</button></div>
+      <div class="button-row spread"><button class="secondary" data-mock-prev ${miniMock.index === 0 ? "disabled" : ""}>← 上一题</button><span class="source">作答期间不显示答案与解析</span><button class="primary" data-mock-next>${miniMock.index === mockQuestions.length - 1 ? "检查答题卡" : "保存并下一题 →"}</button></div>
     </article>
   </section>`;
 }
@@ -392,11 +420,65 @@ function renderMock() {
   const last = study.mockAttempts.at(-1);
   return `${pageHead("FULL MOCK", "模拟考试", "先读取 ExamProfile，再按版本计时和计分。完整卷结构与可用训练严格区分。")}
     <div class="notice"><strong>${EXAM_PROFILE.targetExam}</strong>：当前沿用 <strong>${EXAM_PROFILE.baseline}</strong>，不把 2027 内容宣称为官方。38 题完整卷仍需补齐并验证；当前开放经过验证的 8 题原创迷你模考。</div>
-    <section class="card mini-mock-launch"><div><div class="eyebrow">AVAILABLE NOW</div><h2>10 分钟原创迷你模考</h2><p class="lede">${questions.length} 题 · 单选 1 分 / 多选 2 分 · 满分 ${questions.reduce((sum, q) => sum + (q.type === "multiple" ? 2 : 1), 0)} 分 · 交卷后统一解析</p>${last ? `<p class="tag">上次 ${last.score}/${last.maxScore} 分 · ${formatDate(last.finishedAt)}</p>` : ""}</div><button class="primary" data-start-mini-mock>开始模考</button></section>
+    <section class="card mini-mock-launch"><div><div class="eyebrow">AVAILABLE NOW</div><h2>10 分钟原创迷你模考</h2><p class="lede">${getMiniMockQuestions().length} 题 · 单选 1 分 / 多选 2 分 · 满分 ${getMiniMockQuestions().reduce((sum, q) => sum + (q.type === "multiple" ? 2 : 1), 0)} 分 · 交卷后统一解析</p>${last ? `<p class="tag">上次 ${last.score}/${last.maxScore} 分 · ${formatDate(last.finishedAt)}</p>` : ""}</div><button class="primary" data-start-mini-mock>开始模考</button></section>
     <div class="section-title"><h2>完整卷蓝图</h2><span class="tag">${EXAM_PROFILE.baseline}</span></div>
     <div class="grid-3"><article class="card stat"><small>考试时长</small><strong>${EXAM_PROFILE.durationMinutes}</strong><span>分钟</span></article><article class="card stat"><small>试卷总分</small><strong>${EXAM_PROFILE.totalPoints}</strong><span>分</span></article><article class="card stat"><small>题目总数</small><strong>${EXAM_PROFILE.totalQuestions}</strong><span>题</span></article></div>
     <section class="blueprint">${EXAM_PROFILE.sections.map(s => `<article class="card"><div class="big-number">${s.range}</div><h3>${s.label}</h3><p>${s.count} 题 · 每题 ${s.pointsEach} 分</p></article>`).join("")}</section>
     <div class="section-title"><h2>材料分析框架训练</h2><span class="tag">先回忆，后看答案</span></div>${renderAnalysisPractice()}`;
+}
+
+function courseChapterProgress(chapter) {
+  const chapterQuestions = questions.filter(question => chapter.question_ids.includes(question.id));
+  const answered = chapterQuestions.filter(question => latestAttempt(question.id)).length;
+  const stable = chapterQuestions.filter(question => ["stable", "mastered"].includes(study.mastery[question.knowledge_node_ids[0]] || "unseen")).length;
+  return { total: chapterQuestions.length, answered, stable, percent: chapterQuestions.length ? Math.round(answered / chapterQuestions.length * 100) : 0 };
+}
+
+function renderDongfang() {
+  const chapters = dongfangCourse.chapters || [];
+  const chapter = chapters.find(item => item.id === selectedCourseChapterId) || chapters[0];
+  if (!chapter) return `${pageHead("DONGFANG POLITICS", "东方马原", "课程数据暂未加载。")}`;
+  const chapterQuestions = questions.filter(question => chapter.question_ids.includes(question.id));
+  const chapterProgress = courseChapterProgress(chapter);
+  const allCourseQuestions = questions.filter(question => question.source.version === "dongfang-marx-2027-local-v1");
+  const completedQuestions = allCourseQuestions.filter(question => latestAttempt(question.id)).length;
+  const stableNodes = new Set(allCourseQuestions.filter(question => ["stable", "mastered"].includes(study.mastery[question.knowledge_node_ids[0]] || "unseen")).map(question => question.knowledge_node_ids[0])).size;
+  return `${pageHead("DONGFANG POLITICS · MARXISM", "东方政治 · 马原专修", "按你桌面课程的 10 章结构重建：先用总结建立框架，再用原创题主动提取，错后立即回到对应知识卡。")}
+    <section class="course-hero card">
+      <div><span class="course-kicker">2027 长线预热 · 本地资料整理版</span><h2>从 50 节课程中，提炼一条可练习的马原主线</h2><p>导论 → 哲学基本问题 → 唯物论 → 辩证法 → 认识论 → 唯物史观 → 政治经济学 → 科学社会主义</p></div>
+      <div class="course-score"><strong>${completedQuestions}</strong><span>/ ${allCourseQuestions.length} 题已完成</span><small>${stableNodes}/10 个核心节点达到稳定</small></div>
+    </section>
+    <div class="course-source-note"><strong>内容边界：</strong>章节顺序来自你本地的 ${dongfangCourse.inventory.videos || 50} 节马原视频、${dongfangCourse.inventory.pdfs || 8} 份课件 PDF 与 ${dongfangCourse.inventory.mindmaps || 10} 张思维导图；总结为重新整理，习题为原创命制，不复刻课程原题。2027 官方大纲未提供，因此不宣称为官方 2027 考纲。</div>
+    <div class="grid-3 course-stats">
+      <article class="card stat"><small>课程路线</small><strong>${chapters.length}</strong><span>章 · 完整主线</span></article>
+      <article class="card stat"><small>原创配对题</small><strong>${allCourseQuestions.length}</strong><span>每章 2 题互相巩固</span></article>
+      <article class="card stat"><small>本章进度</small><strong>${chapterProgress.percent}%</strong><span>${chapterProgress.answered}/${chapterProgress.total} 题已作答</span></article>
+    </div>
+    <div class="section-title"><h2>十章路线图</h2><span class="tag">点击切换章节</span></div>
+    <nav class="course-roadmap" aria-label="东方马原章节">${chapters.map(item => {
+      const progress = courseChapterProgress(item);
+      return `<button class="course-step ${item.id === chapter.id ? "active" : ""} ${progress.percent === 100 ? "done" : ""}" data-course-chapter="${item.id}"><span>${String(item.order).padStart(2, "0")}</span><div><strong>${escapeHtml(item.short_title)}</strong><small>${progress.answered}/${progress.total} 题</small></div></button>`;
+    }).join("")}</nav>
+    <section class="course-chapter card">
+      <header class="course-chapter-head"><div><div class="eyebrow">第 ${chapter.order} 章 · ${escapeHtml(chapter.module)}</div><h2>${escapeHtml(chapter.title)}</h2><p>${escapeHtml(chapter.coverage)}</p></div><span class="chapter-number">${String(chapter.order).padStart(2, "0")}</span></header>
+      <div class="summary-grid">
+        <article class="summary-main"><h3>核心总结</h3><ol>${chapter.summary.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ol></article>
+        <aside class="summary-side">
+          <div><span>正式表述</span><p>${escapeHtml(chapter.formal)}</p></div>
+          <div><span>记忆秘诀</span><p>${escapeHtml(chapter.memory_cue)}</p></div>
+          <div><span>高频易混</span><p>${escapeHtml(chapter.confusion)}</p></div>
+        </aside>
+      </div>
+      <div class="exam-focus"><strong>命题抓手</strong><p>${escapeHtml(chapter.exam_focus)}</p></div>
+      <div class="section-title compact"><h2>本章原创习题</h2><span class="tag">同考点配对 · 本轮不重复</span></div>
+      <div class="course-question-list">${chapterQuestions.map((question, index) => {
+        const attempt = latestAttempt(question.id);
+        return `<article><span class="question-index">${index + 1}</span><div><strong>${escapeHtml(question.one_line_point)}</strong><small>${question.type === "multiple" ? "多项选择" : "单项选择"} · 难度 ${question.difficulty}/5 · ${attempt ? (attempt.correct ? "上次正确" : "待修复") : "未作答"}</small></div><button class="secondary" data-start-course-question="${question.id}">${attempt ? "再练" : "开始"}</button></article>`;
+      }).join("")}</div>
+      <div class="course-actions"><button class="primary" data-start-course-chapter="${chapter.id}">开始本章 ${chapterQuestions.length} 题</button><span>答题 → 错因 → 知识卡 → 配对巩固 → 间隔复习</span></div>
+    </section>
+    <div class="section-title"><h2>全程学习顺序</h2><span class="tag">主动回忆优先</span></div>
+    <section class="course-loop card"><div><b>1</b><strong>先读框架</strong><span>只看核心关系，不背长段落</span></div><i>→</i><div><b>2</b><strong>遮住总结做题</strong><span>先说依据，再选择</span></div><i>→</i><div><b>3</b><strong>按错因修复</strong><span>回到正式表述与易混点</span></div><i>→</i><div><b>4</b><strong>间隔复测</strong><span>次日、3 日、7 日再提取</span></div></section>`;
 }
 
 function renderWrong() {
@@ -422,7 +504,7 @@ function renderData() {
   return `${pageHead("STUDY ANALYTICS", "数据只回答：下一步学什么？", "正确率与用时一起看；一次猜对不会抬高掌握状态，重复错因会缩短复习间隔。")}
     <div class="grid-3"><article class="card stat"><small>累计作答</small><strong>${total}</strong><span>次主动提取</span></article><article class="card stat"><small>正确率</small><strong>${total ? Math.round(correct/total*100) : 0}%</strong><span>多选严格计分</span></article><article class="card stat"><small>平均用时</small><strong>${avgMs}s</strong><span>快答会降低置信权重</span></article></div>
     <div class="section-title"><h2>高频错因</h2></div><section class="card">${errors.length ? errors.map(([tag,count]) => `<div class="map-row"><strong>${tag}</strong><div class="progress"><i style="width:${Math.min(100,count*24)}%"></i></div><span>${count} 次</span></div>`).join("") : `<div class="empty">还没有错因数据。先完成几道题。</div>`}</section>
-    <div class="section-title"><h2>内容版本</h2></div><div class="notice">理论题：sample-2026-v1 原创示例。时政来源记录：${sources.length} 条；未核验来源只保存，不自动生成题目。考试档案：${EXAM_PROFILE.baseline}。</div>
+    <div class="section-title"><h2>内容版本</h2></div><div class="notice">基础题：sample-2026-v1；东方马原：dongfang-marx-2027-local-v1（本地课程结构衍生的原创总结与习题）。时政来源记录：${sources.length} 条；未核验来源只保存，不自动生成题目。考试档案：${EXAM_PROFILE.baseline}。</div>
     <div class="section-title"><h2>时政可信来源导入</h2><span class="tag">人工录入 · 本机保存</span></div>
     <section class="card source-import">
       <div><h3>添加 SourceRecord</h3><p class="lede">请只录入官方或权威公开来源。系统保存标题、网址、发布日期、事件日期和检索日期；录入不等于事实已核验。</p></div>
@@ -442,22 +524,23 @@ function renderData() {
 function renderRoute() {
   clearInterval(mockTimerId);
   renderNav();
-  const renderers = { today: renderToday, drill: renderDrill, mock: renderMock, wrong: renderWrong, memory: renderMemory, map: renderMap, data: renderData };
+  const renderers = { today: renderToday, dongfang: renderDongfang, drill: renderDrill, mock: renderMock, wrong: renderWrong, memory: renderMemory, map: renderMap, data: renderData };
   document.querySelector("#app").innerHTML = (renderers[route] || renderToday)();
   bindEvents();
   if (route === "mock" && miniMock.active && !miniMock.submitted) startMockTimer();
 }
 
-function openQuestion(id, { allowRepeat = false } = {}) {
-  drill.filters = { ...drill.filters, subject: "all", chapter: "all", node: "all", type: "all", difficulty: "all", mastery: "all", error: "all", source: "all", current: "all", highMix: false, wrong: false, favorite: false, due: false };
+function openQuestion(id, { allowRepeat = false, preserveFilters = false } = {}) {
+  if (!preserveFilters) drill.filters = { ...drill.filters, subject: "all", chapter: "all", node: "all", type: "all", difficulty: "all", mastery: "all", error: "all", source: "all", current: "all", highMix: false, wrong: false, favorite: false, due: false };
   if (allowRepeat) {
     drill.seenIds = drill.seenIds.filter(seenId => seenId !== id);
     saveRoundSeen();
   }
-  let target = questions.find(q => q.id === id && !drill.seenIds.includes(q.id));
-  if (!target) target = questions.find(q => !drill.seenIds.includes(q.id));
+  const activeQuestions = filteredQuestions();
+  let target = activeQuestions.find(q => q.id === id && !drill.seenIds.includes(q.id));
+  if (!target) target = activeQuestions.find(q => !drill.seenIds.includes(q.id));
   drill.completed = !target;
-  drill.index = target ? questions.indexOf(target) : 0;
+  drill.index = target ? activeQuestions.indexOf(target) : 0;
   drill.selected = []; drill.submitted = false; drill.startedAt = Date.now();
   location.hash = "drill";
   if (route === "drill") renderRoute();
@@ -467,13 +550,26 @@ function openReinforcement(id) {
   const requested = questions.find(q => q.id === id);
   if (!requested) return;
   const nodeId = requested.knowledge_node_ids[0];
-  const target = questions.find(q => q.id === id && !drill.seenIds.includes(q.id))
-    || questions.find(q => q.knowledge_node_ids.includes(nodeId) && !drill.seenIds.includes(q.id));
+  const activeQuestions = filteredQuestions();
+  const target = activeQuestions.find(q => q.id === id && !drill.seenIds.includes(q.id))
+    || activeQuestions.find(q => q.knowledge_node_ids.includes(nodeId) && !drill.seenIds.includes(q.id));
   if (!target) {
     toast("本轮该考点已无未做题，不会重复出题");
     return;
   }
-  openQuestion(target.id);
+  openQuestion(target.id, { preserveFilters: true });
+}
+
+function startCourseChapter(chapterId) {
+  drill.filters = { ...drill.filters, subject: "marx", chapter: chapterId, node: "all", type: "all", difficulty: "all", mastery: "all", error: "all", source: "dongfang-marx-2027-local-v1", current: "all", highMix: false, wrong: false, favorite: false, due: false };
+  drill.index = 0;
+  drill.selected = [];
+  drill.submitted = false;
+  drill.startedAt = Date.now();
+  const chapterQuestions = questions.filter(question => question.chapter_id === chapterId);
+  drill.completed = chapterQuestions.length > 0 && chapterQuestions.every(question => drill.seenIds.includes(question.id));
+  location.hash = "drill";
+  if (route === "drill") renderRoute();
 }
 
 function startMiniMock() {
@@ -523,6 +619,9 @@ function startMockTimer() {
 
 function bindEvents() {
   document.querySelectorAll("[data-route-inline]").forEach(el => el.addEventListener("click", () => location.hash = el.dataset.routeInline));
+  document.querySelectorAll("[data-course-chapter]").forEach(el => el.addEventListener("click", () => { selectedCourseChapterId = el.dataset.courseChapter; renderRoute(); document.querySelector(".course-chapter")?.scrollIntoView({ behavior: "smooth", block: "start" }); }));
+  document.querySelector("[data-start-course-chapter]")?.addEventListener("click", event => startCourseChapter(event.currentTarget.dataset.startCourseChapter));
+  document.querySelectorAll("[data-start-course-question]").forEach(el => el.addEventListener("click", () => openQuestion(el.dataset.startCourseQuestion, { allowRepeat: Boolean(latestAttempt(el.dataset.startCourseQuestion)) })));
   document.querySelector("[data-save-plan]")?.addEventListener("click", () => {
     const dailyMinutes = Number(document.querySelector("#daily-minutes")?.value);
     const plannedExamDate = document.querySelector("#planned-exam-date")?.value;
@@ -608,7 +707,7 @@ function bindEvents() {
   document.querySelector("[data-start-mini-mock]")?.addEventListener("click", startMiniMock);
   document.querySelectorAll("[data-mock-index]").forEach(el => el.addEventListener("click", () => { miniMock.index = Number(el.dataset.mockIndex); renderRoute(); }));
   document.querySelectorAll("[data-mock-option]").forEach(el => el.addEventListener("click", () => {
-    const q = questions[miniMock.index];
+    const q = getMiniMockQuestions()[miniMock.index];
     const current = miniMock.answers[q.id] || [];
     miniMock.answers[q.id] = q.type === "single"
       ? [el.dataset.mockOption]
@@ -617,10 +716,11 @@ function bindEvents() {
   }));
   document.querySelector("[data-mock-prev]")?.addEventListener("click", () => { miniMock.index = Math.max(0, miniMock.index - 1); renderRoute(); });
   document.querySelector("[data-mock-next]")?.addEventListener("click", () => {
-    if (miniMock.index < questions.length - 1) miniMock.index += 1;
+    const mockQuestions = getMiniMockQuestions();
+    if (miniMock.index < mockQuestions.length - 1) miniMock.index += 1;
     else {
-      const unanswered = questions.findIndex(q => !(miniMock.answers[q.id]?.length));
-      if (unanswered >= 0) { miniMock.index = unanswered; toast(`还有 ${questions.length - Object.keys(miniMock.answers).length} 题未答`); }
+      const unanswered = mockQuestions.findIndex(q => !(miniMock.answers[q.id]?.length));
+      if (unanswered >= 0) { miniMock.index = unanswered; toast(`还有 ${mockQuestions.length - Object.keys(miniMock.answers).length} 题未答`); }
       else toast("答题卡完整，可以交卷");
     }
     renderRoute();
@@ -641,9 +741,15 @@ window.addEventListener("hashchange", () => { route = location.hash.replace("#",
 
 async function boot() {
   try {
-    const response = await fetch("data/questions.json");
-    if (!response.ok) throw new Error(`题库加载失败：${response.status}`);
-    questions = await response.json();
+    const [baseResponse, courseResponse, courseQuestionResponse] = await Promise.all([
+      fetch("data/questions.json"),
+      fetch("data/dongfang-marx.json"),
+      fetch("data/dongfang-marx-questions.json")
+    ]);
+    if (!baseResponse.ok || !courseResponse.ok || !courseQuestionResponse.ok) throw new Error("课程或题库数据加载失败");
+    const [baseQuestions, course, courseQuestions] = await Promise.all([baseResponse.json(), courseResponse.json(), courseQuestionResponse.json()]);
+    questions = [...baseQuestions, ...courseQuestions];
+    dongfangCourse = course;
     refreshMasteryStates();
     saveStudy();
     drill.startedAt = Date.now();

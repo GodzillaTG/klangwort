@@ -1,10 +1,12 @@
-const CACHE_VERSION = "yanzheng-20260828-v1";
+const CACHE_VERSION = "yanzheng-20260831-v1";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=20260828",
-  "./app.js?v=20260828",
+  "./styles.css?v=20260831",
+  "./app.js?v=20260831",
   "./data/questions.json",
+  "./data/dongfang-marx.json",
+  "./data/dongfang-marx-questions.json",
   "./manifest.webmanifest",
   "./icon.svg"
 ];
