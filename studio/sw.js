@@ -1,7 +1,7 @@
-const CACHE_VERSION = "222bf4f65775";
+const CACHE_VERSION = "e9027eac0e82";
 const BUILD_ASSETS = [
-  "/klangwort/studio/_next/static/1b56b903-2ed7-4372-99ce-d6153f8ca4cb/_buildManifest.js",
-  "/klangwort/studio/_next/static/1b56b903-2ed7-4372-99ce-d6153f8ca4cb/_ssgManifest.js",
+  "/klangwort/studio/_next/static/96c8fcc1-88ae-420e-a279-a2507eda7219/_buildManifest.js",
+  "/klangwort/studio/_next/static/96c8fcc1-88ae-420e-a279-a2507eda7219/_ssgManifest.js",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-001175b1.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-52306abf.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-875ccdd4.woff2",
@@ -13,13 +13,13 @@ const BUILD_ASSETS = [
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-44e03052.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-971fb274.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-f6b33328.woff2",
-  "/klangwort/studio/_next/static/chunks/TonmeisterApp-R0PTqvgF.js",
+  "/klangwort/studio/_next/static/chunks/TonmeisterApp-BWh1MT1q.js",
   "/klangwort/studio/_next/static/chunks/framework-BgSIrAUN.js",
-  "/klangwort/studio/_next/static/chunks/index-DjUQFg0b.js",
-  "/klangwort/studio/_next/static/chunks/layout-segment-context-DoaHw86j.js",
+  "/klangwort/studio/_next/static/chunks/index-OTWi4kYo.js",
+  "/klangwort/studio/_next/static/chunks/layout-segment-context-CuGq90l4.js",
   "/klangwort/studio/_next/static/chunks/pwa-register-r5KOAsVE.js",
   "/klangwort/studio/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
-  "/klangwort/studio/_next/static/css/index.D6HZjPDW.css",
+  "/klangwort/studio/_next/static/css/index.CHbNoXig.css",
   "/klangwort/studio/ab-dpa.jpg",
   "/klangwort/studio/ab-spacing-curve-dpa.jpg",
   "/klangwort/studio/comb-filtering-dpa.jpg",
