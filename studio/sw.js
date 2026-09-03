@@ -1,7 +1,7 @@
-const CACHE_VERSION = "e9027eac0e82";
+const CACHE_VERSION = "7972a060508a";
 const BUILD_ASSETS = [
-  "/klangwort/studio/_next/static/96c8fcc1-88ae-420e-a279-a2507eda7219/_buildManifest.js",
-  "/klangwort/studio/_next/static/96c8fcc1-88ae-420e-a279-a2507eda7219/_ssgManifest.js",
+  "/klangwort/studio/_next/static/749497cc-a8ba-4e3e-b91d-2acdc0b6ed8f/_buildManifest.js",
+  "/klangwort/studio/_next/static/749497cc-a8ba-4e3e-b91d-2acdc0b6ed8f/_ssgManifest.js",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-001175b1.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-52306abf.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-8ac0455e797f/geist-875ccdd4.woff2",
@@ -13,10 +13,10 @@ const BUILD_ASSETS = [
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-44e03052.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-971fb274.woff2",
   "/klangwort/studio/_next/static/_vinext_fonts/geist-mono-00e989178794/geist-mono-f6b33328.woff2",
-  "/klangwort/studio/_next/static/chunks/TonmeisterApp-BWh1MT1q.js",
+  "/klangwort/studio/_next/static/chunks/TonmeisterApp-yDCPNERp.js",
   "/klangwort/studio/_next/static/chunks/framework-BgSIrAUN.js",
-  "/klangwort/studio/_next/static/chunks/index-OTWi4kYo.js",
-  "/klangwort/studio/_next/static/chunks/layout-segment-context-CuGq90l4.js",
+  "/klangwort/studio/_next/static/chunks/index-Dy6RAnta.js",
+  "/klangwort/studio/_next/static/chunks/layout-segment-context-D53QLz8P.js",
   "/klangwort/studio/_next/static/chunks/pwa-register-r5KOAsVE.js",
   "/klangwort/studio/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
   "/klangwort/studio/_next/static/css/index.CHbNoXig.css",
@@ -214,7 +214,7 @@ self.addEventListener("activate", (event) => {
 });
 
 async function cacheFirst(request) {
-  const cached = await caches.match(request, { ignoreSearch: false });
+  const cached = await caches.match(request, { ignoreSearch: true });
   if (cached) return cached;
   const response = await fetch(request);
   const cache = await caches.open(RUNTIME_CACHE);
