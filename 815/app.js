@@ -1,5 +1,6 @@
 import { validatePack, verifyPackDigest, gradeQuestion, selectQuestions, progressSummary } from "./core.js";
 import { getContent, saveContent, getProgress, saveProgress } from "./db.js";
+import { withGeneratedQuestions } from "./question-bank.js";
 
 const navItems = [
   ["practice", "练习", "✎"], ["atlas", "知识图解", "◉"], ["mistakes", "错题", "△"], ["progress", "学习记录", "▥"], ["content", "内容", "⇩"]
@@ -115,8 +116,8 @@ function renderQuestion() {
   const timed = state.mode === "timed" ? `<span id="timer">30:00</span>` : "";
   const kind = question.type === "choice" ? "单选题 · 请选择一个答案" : question.type === "multi" ? "多选题 · 可选择多个答案" : "";
   return `${header(state.mode === "timed" ? "TIMED PRACTICE" : "ACTIVE RECALL", state.mode === "diagnostic" ? "诊断练习" : state.mode === "mistakes" ? "错题重练" : state.mode === "timed" ? "教材综合训练" : "混合练习", `<button class="button ghost" data-action="exit-round">退出本轮</button>`)}
-    <section class="card question-shell"><div class="question-top"><span>第 ${state.current + 1} / ${state.round.length} 题 · ${e(question.topic)} ${kind ? `<b class="badge">${kind}</b>` : ""}</span>${timed}</div><div class="progress-bar"><span style="width:${(state.current + 1) / state.round.length * 100}%"></span></div>
-    <div class="question-prompt">${e(question.prompt)}</div>${questionInput(question)}
+    <section class="card question-shell"><div class="question-top"><span>第 ${state.current + 1} / ${state.round.length} 题 · ${e(question.topic)}</span>${timed}</div><div class="progress-bar"><span style="width:${(state.current + 1) / state.round.length * 100}%"></span></div>
+    ${kind ? `<div class="question-type">${kind}</div>` : ""}<div class="question-prompt">${e(question.prompt)}</div>${questionInput(question)}
     ${state.revealed ? `<div class="answer-panel ${answer?.correct === true ? "correct" : answer?.correct === false ? "wrong" : ""}"><h3>${answer?.correct === true ? "回答正确" : answer?.correct === false ? "这里需要再练" : "对照答案自评"}</h3><p><b>答案：</b>${e(answerText(question))}</p><ol class="steps">${(question.steps || []).map(step => `<li>${e(step)}</li>`).join("")}</ol>${question.trap ? `<p><b>易错点：</b>${e(question.trap)}</p>` : ""}${lesson ? `<button class="button secondary" data-lesson="${lesson.id}">打开对应图解</button>` : ""}<p class="source">${e(question.source)} · ${e(question.answerStatus || "原创整理答案")}</p></div>` : ""}
     <div class="actions">${!state.revealed ? (question.type === "self" ? `<button class="button" data-self="true">完成，查看答案</button>` : `<button class="button" data-action="submit-answer">提交答案</button>`) : (question.type === "self" && answer?.correct == null ? `<button class="button" data-self-grade="true">掌握</button><button class="button secondary" data-self-grade="false">需要再练</button>` : `<button class="button" data-action="next-question">下一题</button>`)}</div></section>`;
 }
@@ -273,7 +274,7 @@ async function installPack(next, byteSize = 0) {
   }
   await Promise.all((next.assets || []).slice(0,12).map(asset => preloadImage(asset.data)));
   await saveContent(next);
-  state.pack = next; state.round = []; state.lessonId = null;
+  state.pack = withGeneratedQuestions(next); state.round = []; state.lessonId = null;
 }
 
 async function loadSample() {
@@ -326,14 +327,13 @@ window.addEventListener("hashchange",()=>{state.route=location.hash.slice(1)||"p
 window.addEventListener("error",event=>console.error("APP_ERROR",event.error||event.message));
 
 async function init() {
-  try { state.pack=await getContent()||null; state.progress=await getProgress()||state.progress; } catch(error){ console.error(error); }
+  try { state.pack=withGeneratedQuestions(await getContent())||null; state.progress=await getProgress()||state.progress; } catch(error){ console.error(error); }
   if (new URL(location.href).searchParams.get("privatePack") === "local") {
     try {
       const response = await fetch("./private.815pack");
       if (response.ok) await installPack(await response.json(), Number(response.headers.get("content-length")) || 0);
     } catch (error) { console.error("LOCAL_PACK_TEST", error); }
   }
-  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(console.error);
   render();
 }
 init();

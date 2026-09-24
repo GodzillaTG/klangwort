@@ -1,5 +1,5 @@
-const CACHE = "shangyin-815-shell-c4be45e6c356";
-const SHELL = ["./", "./index.html", "./styles.css", "./app.js", "./core.js", "./db.js", "./manifest.webmanifest", "./icon.svg", "./sample.815pack"];
+const CACHE = "shangyin-815-shell-6b56e62a92c8";
+const SHELL = ["./", "./index.html", "./styles.css", "./app.js", "./core.js", "./db.js", "./question-bank.js", "./manifest.webmanifest", "./icon.svg", "./sample.815pack"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
