@@ -12,10 +12,11 @@
   --shadow: 0 18px 42px rgba(40, 55, 50, .08);
   font-family: Inter, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
+html { -webkit-text-size-adjust: 100%; }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--paper); color: var(--ink); }
+body { margin: 0; background: var(--paper); color: var(--ink); overscroll-behavior-y: none; }
 button, input, select { font: inherit; }
-button { cursor: pointer; }
+button { cursor: pointer; touch-action: manipulation; }
 .skip-link { position: fixed; left: 12px; top: -60px; z-index: 100; background: var(--ink); color: white; padding: 10px 14px; border-radius: 8px; }
 .skip-link:focus { top: 12px; }
 .app-shell { min-height: 100vh; display: grid; grid-template-columns: 248px minmax(0, 1fr); }
@@ -47,7 +48,7 @@ p { line-height: 1.75; }
 .stat span { color: var(--muted); font-size: 13px; }
 .hero { padding: clamp(24px,4vw,44px); background: linear-gradient(145deg,#fff 20%,#edf3f0); }
 .hero-actions, .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
-.button { min-height: 44px; border: 1px solid var(--accent); border-radius: 12px; padding: 10px 16px; background: var(--accent); color: white; font-weight: 700; }
+.button { min-height: 44px; border: 1px solid var(--accent); border-radius: 12px; padding: 10px 16px; background: var(--accent); color: white; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
 .button.secondary { background: white; color: var(--accent); }
 .button.ghost { background: transparent; color: var(--muted); border-color: var(--line); }
 .button.danger { background: var(--danger); border-color: var(--danger); }
@@ -115,6 +116,10 @@ dialog img { max-width: 100%; max-height: 80vh; }
   .grid.three, .grid.two { grid-template-columns: 1fr; }
   .page-head { display: block; }
   .page-head .actions { margin-top: 16px; }
+  .hero-actions .button { flex: 1 1 100%; }
+  .card { padding: 18px; border-radius: 16px; }
+  .question-prompt { font-size: 23px; }
+  .option { min-height: 52px; align-items: center; }
   .scan-grid { grid-template-columns: 1fr; }
   .note-slot { grid-template-columns: 32px 1fr 1fr; }
   .note-slot select:nth-of-type(3), .note-slot select:nth-of-type(4) { grid-column: span 1; }

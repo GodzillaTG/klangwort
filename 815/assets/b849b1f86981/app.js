@@ -212,6 +212,7 @@ function contentView() {
   const pack = state.pack;
   return `${header("CONTENT & OFFLINE", "内容与离线")}
     <section class="card"><div class="import-box"><h2>导入私人 .815pack</h2><p class="muted">文件只在当前设备中解析并保存，不会上传。</p><input id="packFile" type="file" accept=".815pack,application/json"><div id="importStatus" class="status-line" style="justify-content:center"><span class="status-dot ${pack?.private ? "ready" : ""}"></span>${pack ? `${e(pack.title)} · ${e(pack.version)}` : "尚未导入"}</div><div class="actions" style="justify-content:center"><button class="button secondary" data-action="load-sample">载入公开示例</button><button class="button ghost" data-action="offline-check">检查离线状态</button></div></div></section>
+    <section class="card" style="margin-top:18px"><h2>安装手机版</h2><ol class="steps"><li>iPhone／iPad：用 Safari 打开本页，点击“分享”→“添加到主屏幕”。</li><li>Android：用 Chrome 打开本页，点击菜单→“安装应用”或“添加到主屏幕”。</li><li>把私人 .815pack 通过隔空投送、iCloud 或文件应用传到手机，在“内容”页选择一次。</li></ol><p class="muted">安装并导入后可断网练习；手机使用底部导航，学习记录保存在该设备。</p></section>
     ${pack ? `<section class="grid two" style="margin-top:18px"><article class="card"><h2>来源边界</h2>${pack.sources.map(source=>`<p><b>${e(source.title)}</b><br><span class="muted">${e(source.edition)} · ${e(source.role)}</span></p>`).join("")}</article><article class="card"><h2>内容统计</h2><p>${pack.coverage.length} 个章节覆盖项</p><p>${pack.questions.length} 道数字化题／习题组</p><p>${pack.assets.length} 张私人扫描资源</p><p>${pack.diagrams.length} 张预载图解</p></article></section>
     <section class="card" style="margin-top:18px"><h2>教材覆盖报告</h2>${pack.sources.filter(s=>s.kind==="textbook").map(source=>`<div class="coverage-group"><h3>${e(source.title)}</h3>${pack.coverage.filter(item=>item.sourceId===source.id).map(item=>`<details class="coverage-item"><summary>${e(item.chapter)} <span class="badge">${item.sections.length} 节</span> ${item.reviewStatus !== "verified" ? '<span class="badge warn">扫描页覆盖</span>' : ''}</summary><div class="coverage-meta"><span class="badge">书面页 ${e(item.printPages)}</span><span class="badge">PDF 页 ${e(item.pdfPages)}</span><span class="badge">${item.exerciseAssetIds.length} 张习题页</span></div><p>${item.sections.map(e).join(" · ")}</p>${item.note?`<p class="muted">${e(item.note)}</p>`:""}${item.exerciseAssetIds.length?`<button class="button secondary" data-scans="${item.id}">查看习题扫描页</button>`:""}</details>`).join("")}</div>`).join("")}</section>` : ""}`;
 }
@@ -314,7 +315,9 @@ async function checkOffline() {
   const cacheName=(await caches.keys()).find(name=>name.startsWith("shangyin-815-shell-"));
   if (!cacheName) return showToast("离线外壳尚未缓存完成");
   const cache=await caches.open(cacheName);
-  const missing=(await Promise.all(["./index.html","./styles.css","./app.js","./core.js","./db.js"].map(async url=>(await cache.match(url))?null:url))).filter(Boolean);
+  const urls=(await cache.keys()).map(request=>new URL(request.url).pathname);
+  const required=["/index.html","/styles.css","/app.js","/core.js","/db.js","/question-bank.js"];
+  const missing=required.filter(file=>!urls.some(url=>url.endsWith(file)));
   showToast(missing.length ? `离线外壳缺少 ${missing.length} 项资源` : `${registration.active ? "离线外壳已就绪" : "服务尚未激活"}${state.pack?.private ? "，私人内容已保存" : "，尚未导入私人内容"}`);
 }
 

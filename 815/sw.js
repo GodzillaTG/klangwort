@@ -1,5 +1,6 @@
-const CACHE = "shangyin-815-shell-65befc910769";
-const SHELL = ["./", "./index.html", "./styles.css", "./app.js", "./core.js", "./db.js", "./question-bank.js", "./manifest.webmanifest", "./icon.svg", "./sample.815pack"];
+const CACHE = "shangyin-815-shell-b849b1f86981";
+const MODULE_ROOT = "./assets/b849b1f86981";
+const SHELL = ["./", "./index.html", "./styles.css", `${MODULE_ROOT}/app.js`, `${MODULE_ROOT}/core.js`, `${MODULE_ROOT}/db.js`, `${MODULE_ROOT}/question-bank.js`, "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png", "./sample.815pack"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -15,5 +16,5 @@ self.addEventListener("fetch", event => {
     event.respondWith(fetch(event.request).catch(() => caches.match("./index.html")));
     return;
   }
-  event.respondWith(caches.match(event.request, { ignoreSearch: true }).then(cached => cached || fetch(event.request)));
+  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
 });
