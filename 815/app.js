@@ -53,7 +53,7 @@ function practiceHome() {
   const summary = progressSummary(state.progress, state.pack.questions.length);
   const topics = [...new Set(state.pack.questions.map(q => q.topic))];
   return `${header("PRACTICE", "今天从哪里开始？", `<div class="status-line"><span class="status-dot ${state.pack.private ? "ready" : ""}"></span>${state.pack.private ? "私人内容已离线" : "示例内容"}</div>`)}
-    <section class="card hero"><p class="eyebrow">推荐</p><h2>先做一轮诊断</h2><p class="muted">每个知识域抽取一道题，答完直接进入解析与同类变式。题目不会在本轮重复。</p><div class="hero-actions"><button class="button" data-start="diagnostic">开始诊断</button><button class="button secondary" data-start="mixed">混合 20 题</button><button class="button ghost" data-start="timed">30 分钟教材综合训练</button></div></section>
+    <section class="card hero"><p class="eyebrow">推荐</p><h2>先做一轮诊断</h2><p class="muted">每个知识域抽取一道题，答完直接进入解析与同类变式。题目不会在本轮重复。</p><div class="hero-actions"><button class="button" data-start="diagnostic">开始诊断</button><button class="button secondary" data-start="mixed">全章节混合练习</button><button class="button ghost" data-start="timed">30 分钟教材综合训练</button></div></section>
     <section class="grid three" style="margin-top:18px"><article class="card stat"><span>已答题</span><strong>${summary.answered}</strong><small class="muted">累计作答记录</small></article><article class="card stat"><span>正确率</span><strong>${summary.accuracy}%</strong><small class="muted">自动判题与自评合计</small></article><article class="card stat"><span>错题</span><strong>${state.progress.mistakes.length}</strong><small class="muted">等待针对复习</small></article></section>
     <section class="card" style="margin-top:18px"><h2>按知识点练习</h2><div class="chip-row">${topics.map(topic => `<button class="chip" data-topic="${e(topic)}">${e(topic)}</button>`).join("")}</div></section>
     <section class="notice" style="margin-top:18px">综合训练是基于教材范围组织的练习，不宣称还原 815 真卷。2027 招生文件发布后应重新核对科目要求。</section>`;
@@ -63,7 +63,8 @@ function startRound(mode, topic = "all") {
   const source = mode === "timed" ? "mixed" : mode;
   state.mode = mode;
   state.topic = topic;
-  state.round = selectQuestions(state.pack.questions, { mode: source, topic, mistakes: state.progress.mistakes, limit: mode === "diagnostic" ? 20 : 20 });
+  const limit = mode === "mixed" && topic === "all" ? state.pack.questions.length : 20;
+  state.round = selectQuestions(state.pack.questions, { mode: source, topic, mistakes: state.progress.mistakes, limit });
   if (!state.round.length) return showToast(mode === "mistakes" ? "错题本目前是空的" : "这个范围暂时没有可练习题");
   state.current = 0; state.selected = null; state.revealed = false;
   state.progress.currentRound = { ids: state.round.map(q => q.id), current: 0, mode, topic, startedAt: Date.now() };
@@ -112,8 +113,9 @@ function renderQuestion() {
   const lesson = byId(state.pack.lessons, question.lessonId);
   const answer = state.progress.answers[question.id];
   const timed = state.mode === "timed" ? `<span id="timer">30:00</span>` : "";
+  const kind = question.type === "choice" ? "单选题 · 请选择一个答案" : question.type === "multi" ? "多选题 · 可选择多个答案" : "";
   return `${header(state.mode === "timed" ? "TIMED PRACTICE" : "ACTIVE RECALL", state.mode === "diagnostic" ? "诊断练习" : state.mode === "mistakes" ? "错题重练" : state.mode === "timed" ? "教材综合训练" : "混合练习", `<button class="button ghost" data-action="exit-round">退出本轮</button>`)}
-    <section class="card question-shell"><div class="question-top"><span>第 ${state.current + 1} / ${state.round.length} 题 · ${e(question.topic)} ${question.type === "multi" ? '<b class="badge">多选题 · 可选择多个答案</b>' : ""}</span>${timed}</div><div class="progress-bar"><span style="width:${(state.current + 1) / state.round.length * 100}%"></span></div>
+    <section class="card question-shell"><div class="question-top"><span>第 ${state.current + 1} / ${state.round.length} 题 · ${e(question.topic)} ${kind ? `<b class="badge">${kind}</b>` : ""}</span>${timed}</div><div class="progress-bar"><span style="width:${(state.current + 1) / state.round.length * 100}%"></span></div>
     <div class="question-prompt">${e(question.prompt)}</div>${questionInput(question)}
     ${state.revealed ? `<div class="answer-panel ${answer?.correct === true ? "correct" : answer?.correct === false ? "wrong" : ""}"><h3>${answer?.correct === true ? "回答正确" : answer?.correct === false ? "这里需要再练" : "对照答案自评"}</h3><p><b>答案：</b>${e(answerText(question))}</p><ol class="steps">${(question.steps || []).map(step => `<li>${e(step)}</li>`).join("")}</ol>${question.trap ? `<p><b>易错点：</b>${e(question.trap)}</p>` : ""}${lesson ? `<button class="button secondary" data-lesson="${lesson.id}">打开对应图解</button>` : ""}<p class="source">${e(question.source)} · ${e(question.answerStatus || "原创整理答案")}</p></div>` : ""}
     <div class="actions">${!state.revealed ? (question.type === "self" ? `<button class="button" data-self="true">完成，查看答案</button>` : `<button class="button" data-action="submit-answer">提交答案</button>`) : (question.type === "self" && answer?.correct == null ? `<button class="button" data-self-grade="true">掌握</button><button class="button secondary" data-self-grade="false">需要再练</button>` : `<button class="button" data-action="next-question">下一题</button>`)}</div></section>`;

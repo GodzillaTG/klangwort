@@ -66,12 +66,19 @@ export function normalizeNote(note) {
   return `${note.letter || ""}${note.accidental || ""}${Number(note.octave)}:${note.duration || "quarter"}`;
 }
 
-export function selectQuestions(questions, { mode = "mixed", topic = "all", mistakes = [], limit = 20 } = {}) {
+export function selectQuestions(questions, { mode = "mixed", topic = "all", mistakes = [], limit = 20, random = Math.random } = {}) {
   let pool = questions.filter(q => topic === "all" || q.topic === topic);
   if (mode === "mistakes") pool = pool.filter(q => mistakes.includes(q.id));
   if (mode === "diagnostic") {
     const seen = new Set();
     pool = pool.filter(q => seen.has(q.topic) ? false : (seen.add(q.topic), true));
+  }
+  if (mode === "mixed") {
+    pool = [...pool];
+    for (let i = pool.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
   }
   return pool.slice(0, limit);
 }
