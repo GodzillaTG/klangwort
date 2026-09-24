@@ -16,7 +16,7 @@
     <aside class="sidebar" aria-label="主要导航">
       <div class="brand"><img src="./icon.svg" alt=""><div><b>上音 815</b><span>音乐基础理论</span></div></div>
       <nav id="desktopNav"></nav>
-      <div class="source-note">2027 备考<br><span>当前官方基线：2026</span><br><span>应用版本：6e1023a616d7</span></div>
+      <div class="source-note">2027 备考<br><span>当前官方基线：2026</span><br><span>应用版本：65befc910769</span></div>
     </aside>
     <main id="main" tabindex="-1">
       <div id="view" aria-live="polite"></div>
@@ -30,7 +30,7 @@
       navigator.serviceWorker.addEventListener("controllerchange", () => {
         if (!refreshing) { refreshing = true; location.reload(); }
       });
-      navigator.serviceWorker.register("./sw.js?v=6e1023a616d7", {scope:"./", updateViaCache:"none"}).catch(console.error);
+      navigator.serviceWorker.register("./sw.js?v=65befc910769", {scope:"./", updateViaCache:"none"}).catch(console.error);
     }
   </script>
   <script type="module" src="./app.js"></script>

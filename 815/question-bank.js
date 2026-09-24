@@ -63,7 +63,8 @@ function hash(text) {
 }
 
 function uniqueOptions(correct, wrong, size = 4) {
-  const pool = [...new Set([correct,...wrong,...chromatic,"大三和弦","小三和弦","增三和弦","减三和弦"])];
+  const pool = [...new Set([correct,...wrong])];
+  if (pool.length < size) throw new Error(`选项不足：${correct}`);
   return rotate(pool.slice(0,size), hash(correct));
 }
 
@@ -115,7 +116,7 @@ export function generateQuestionBank(lessons) {
   const triadQualities = ["大三和弦","小三和弦","小三和弦","大三和弦","大三和弦","减三和弦","小三和弦"];
   for (const [keyIndex,key] of majorKeys.entries()) for (let degree=0; degree<7; degree+=1) {
     const notes = [key.scale[degree],key.scale[(degree+2)%7],key.scale[(degree+4)%7]];
-    add(choice(`gen-triad-quality-${keyIndex}-${degree}`,"和弦",`在${key.name}中，第${degree+1}级三和弦的性质是？`,triadQualities[degree],triadQualities.filter(value=>value!==triadQualities[degree]),"lesson-chord",["按调内音级作三度叠置。",`第${degree+1}级为${triadQualities[degree]}。`]));
+    add(choice(`gen-triad-quality-${keyIndex}-${degree}`,"和弦",`在${key.name}中，第${degree+1}级三和弦的性质是？`,triadQualities[degree],["大三和弦","小三和弦","增三和弦","减三和弦"].filter(value=>value!==triadQualities[degree]),"lesson-chord",["按调内音级作三度叠置。",`第${degree+1}级为${triadQualities[degree]}。`]));
     const spellings = Array.from({length:7},(_,other)=>[key.scale[other],key.scale[(other+2)%7],key.scale[(other+4)%7]].join("–"));
     add(choice(`gen-triad-spelling-${keyIndex}-${degree}`,"和弦",`在${key.name}中，第${degree+1}级三和弦的规范拼写是？`,notes.join("–"),spellings.filter(value=>value!==notes.join("–")),"lesson-chord",["从指定音级开始隔级取音。",`规范拼写为${notes.join("–")}。`]));
   }
@@ -133,7 +134,7 @@ export function generateQuestionBank(lessons) {
   for (const root of roots) for (const [degree,semitones,name] of intervalSpecs) {
     const correct = spellInterval(root,degree,semitones);
     const targetLetter = correct[0];
-    add(choice(`gen-interval-${root}-${name}`,"音程",`${root}上方的${name}应规范拼写为？`,correct,[alter(targetLetter,-1),targetLetter,alter(targetLetter,1),chromatic[pitchClass(correct)]],"lesson-interval",[`先按字母级数确定${degree}度的目标字母。`,`再按${semitones}个半音调整，得到${correct}。`]));
+    add(choice(`gen-interval-${root}-${name}`,"音程",`${root}上方的${name}应规范拼写为？`,correct,[alter(targetLetter,-2),alter(targetLetter,-1),targetLetter,alter(targetLetter,1),alter(targetLetter,2),chromatic[pitchClass(correct)]],"lesson-interval",[`先按字母级数确定${degree}度的目标字母。`,`再按${semitones}个半音调整，得到${correct}。`]));
   }
 
   let transposeCount = 0;
