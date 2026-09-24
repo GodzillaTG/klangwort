@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "id": "815-public-demo",
+  "title": "上音 815 公开功能示例",
+  "version": "demo-1",
+  "private": false,
+  "sources": [
+    {
+      "id": "official-2026",
+      "kind": "official",
+      "title": "上海音乐学院2026年硕士研究生招生简章与初试参考书目",
+      "edition": "2025-10-09 发布",
+      "role": "确认 815 为 150 分、3 小时，以及官方列出的两种 2021 年版参考书"
+    },
+    {
+      "id": "demo",
+      "kind": "original",
+      "title": "公开原创示例",
+      "edition": "不含教材原题",
+      "role": "体验交互与离线功能"
+    }
+  ],
+  "coverage": [],
+  "lessons": [
+    {
+      "id": "lesson-rhythm",
+      "title": "拍子、节拍与音值组合",
+      "summary": "正确分组的目标是让拍点和强弱层级一眼可见。",
+      "topic": "节奏节拍",
+      "points": [
+        "单拍子每小节有两个或三个单位拍；复拍子由同类单拍子组合。",
+        "切分改变正常重音位置，但小节结构仍应清楚。",
+        "连音符表示把通常的时值单位改作另一种均分。"
+      ],
+      "diagramId": "diagram-rhythm",
+      "source": "两本指定教材对应章节的结构化整理；文字为原创概括"
+    },
+    {
+      "id": "lesson-interval",
+      "title": "音程构成、转位与解决",
+      "summary": "音程要同时判断级数和音数。",
+      "topic": "音程",
+      "points": [
+        "级数包含首尾两个音；先数级数再核对半音数。",
+        "转位后度数相加为九，大小互换、增减互换、纯仍为纯。",
+        "C♯ 到 G♯ 与 D♭ 到 A♭虽同为纯五度，但拼写语境不同。"
+      ],
+      "diagramId": "diagram-interval",
+      "source": "两本指定教材对应章节的结构化整理；文字为原创概括"
+    },
+    {
+      "id": "lesson-major-minor",
+      "title": "大小调与调号",
+      "summary": "调号、主音和音阶结构共同确定调性。",
+      "topic": "调式调性",
+      "points": [
+        "自然大调按全全半全全全半排列。",
+        "自然小调与关系大调共享调号；和声小调升高第七级。",
+        "旋律小调上行与下行的处理必须结合教材约定和谱面方向。"
+      ],
+      "diagramId": "diagram-fifths",
+      "source": "两本指定教材对应章节的结构化整理；文字为原创概括"
+    }
+  ],
+  "diagrams": [
+    {
+      "id": "diagram-fifths",
+      "type": "circle",
+      "title": "五度圈",
+      "alt": "五度圈调号关系图",
+      "labels": [
+        "C",
+        "G",
+        "D",
+        "A",
+        "E",
+        "B",
+        "F♯/G♭",
+        "D♭",
+        "A♭",
+        "E♭",
+        "B♭",
+        "F"
+      ]
+    },
+    {
+      "id": "diagram-interval",
+      "type": "flow",
+      "title": "音程判定四步",
+      "alt": "音程判定步骤图",
+      "nodes": [
+        {
+          "title": "数级数",
+          "note": "含首尾音"
+        },
+        {
+          "title": "算半音",
+          "note": "核对音数"
+        },
+        {
+          "title": "定性质",
+          "note": "大、小、纯、增减"
+        },
+        {
+          "title": "查拼写",
+          "note": "等音不等名"
+        }
+      ]
+    },
+    {
+      "id": "diagram-rhythm",
+      "type": "flow",
+      "title": "节奏分组",
+      "alt": "节奏与节拍分组步骤图",
+      "nodes": [
+        {
+          "title": "确认拍号",
+          "note": "单位拍"
+        },
+        {
+          "title": "标强弱",
+          "note": "拍内层级"
+        },
+        {
+          "title": "按拍分组",
+          "note": "不遮蔽重音"
+        },
+        {
+          "title": "检查连线",
+          "note": "跨拍清楚"
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-rhythm-01",
+      "type": "choice",
+      "topic": "节奏节拍",
+      "prompt": "6/8 拍通常按哪种方式理解？",
+      "options": [
+        "六个独立强拍",
+        "两个单位拍，每拍三等分",
+        "三个单位拍，每拍二等分",
+        "自由节拍"
+      ],
+      "answer": 1,
+      "lessonId": "lesson-rhythm",
+      "steps": [
+        "6/8 是常见复二拍子。",
+        "每小节两个单位拍，每个单位拍含三个八分音符。"
+      ],
+      "trap": "分母只说明基本时值单位，不直接给出强拍数量。",
+      "source": "依据指定教材知识点编写的原创变式",
+      "answerStatus": "整理答案"
+    },
+    {
+      "id": "q-notation-01",
+      "type": "notation",
+      "topic": "音程",
+      "prompt": "请拼写 C♯4 上方的纯五度（保留正确字母级数）。",
+      "slots": [
+        {
+          "duration": "quarter"
+        }
+      ],
+      "answer": [
+        {
+          "letter": "G",
+          "accidental": "#",
+          "octave": 4,
+          "duration": "quarter"
+        }
+      ],
+      "lessonId": "lesson-interval",
+      "steps": [
+        "C 到 G 是五度。",
+        "C♯ 的纯五度是 G♯。"
+      ],
+      "trap": "A♭ 与 G♯等音，但从 C 到 A 是六度拼写，不能判为纯五度。",
+      "source": "依据指定教材知识点编写的原创变式",
+      "answerStatus": "整理答案"
+    },
+    {
+      "id": "q-interval-01",
+      "type": "choice",
+      "topic": "音程",
+      "prompt": "大三度转位后成为？",
+      "options": [
+        "大六度",
+        "小六度",
+        "纯六度",
+        "减六度"
+      ],
+      "answer": 1,
+      "lessonId": "lesson-interval",
+      "steps": [
+        "转位度数相加为九：3+6=9。",
+        "大音程转位为小音程。"
+      ],
+      "trap": "只记度数、不转换性质。",
+      "source": "依据指定教材知识点编写的原创变式",
+      "answerStatus": "整理答案"
+    },
+    {
+      "id": "q-key-01",
+      "type": "choice",
+      "topic": "调式调性",
+      "prompt": "G 大调的调号包含？",
+      "options": [
+        "F♯",
+        "B♭",
+        "F♯与C♯",
+        "无升降号"
+      ],
+      "answer": 0,
+      "lessonId": "lesson-major-minor",
+      "steps": [
+        "按五度圈从 C 向上一个纯五度得到 G。",
+        "升号次序第一个是 F♯。"
+      ],
+      "trap": "不要把属音 G 本身误当成变化音。",
+      "source": "依据指定教材知识点编写的原创变式",
+      "answerStatus": "整理答案"
+    }
+  ],
+  "assets": []
+}

@@ -1,0 +1,13 @@
+{
+  "name": "上音 815 乐理练习",
+  "short_name": "上音815",
+  "description": "上海音乐学院 815 音乐基础理论离线练习工具",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f8f5",
+  "theme_color": "#496b63",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
