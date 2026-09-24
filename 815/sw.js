@@ -1,4 +1,4 @@
-const CACHE = "shangyin-815-shell-cb1a89849783";
+const CACHE = "shangyin-815-shell-5e65b5e21806";
 const SHELL = ["./", "./index.html", "./styles.css", "./app.js", "./core.js", "./db.js", "./manifest.webmanifest", "./icon.svg", "./sample.815pack"];
 
 self.addEventListener("install", event => {
