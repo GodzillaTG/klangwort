@@ -1,5 +1,5 @@
-const CACHE = "shangyin-815-shell-b849b1f86981";
-const MODULE_ROOT = "./assets/b849b1f86981";
+const CACHE = "shangyin-815-shell-e31a4185fc4b";
+const MODULE_ROOT = "./assets/e31a4185fc4b";
 const SHELL = ["./", "./index.html", "./styles.css", `${MODULE_ROOT}/app.js`, `${MODULE_ROOT}/core.js`, `${MODULE_ROOT}/db.js`, `${MODULE_ROOT}/question-bank.js`, "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png", "./sample.815pack"];
 
 self.addEventListener("install", event => {

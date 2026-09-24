@@ -113,7 +113,7 @@ export function generateQuestionBank(lessons) {
     add(multi(`gen-melodic-minor-${index}`,"调式调性",`${key.name}旋律小调上行相对自然小调升高哪两个音？`,[raisedSixth,raisedSeventh],[key.scale[5],key.scale[6]],"lesson-major-minor",["旋律小调上行升高第六、七级。",`对应音为${raisedSixth}与${raisedSeventh}。`]));
   }
 
-  const triadQualities = ["大三和弦","小三和弦","小三和弦","大三和弦","大三和弦","减三和弦","小三和弦"];
+  const triadQualities = ["大三和弦","小三和弦","小三和弦","大三和弦","大三和弦","小三和弦","减三和弦"];
   for (const [keyIndex,key] of majorKeys.entries()) for (let degree=0; degree<7; degree+=1) {
     const notes = [key.scale[degree],key.scale[(degree+2)%7],key.scale[(degree+4)%7]];
     add(choice(`gen-triad-quality-${keyIndex}-${degree}`,"和弦",`在${key.name}中，第${degree+1}级三和弦的性质是？`,triadQualities[degree],["大三和弦","小三和弦","增三和弦","减三和弦"].filter(value=>value!==triadQualities[degree]),"lesson-chord",["按调内音级作三度叠置。",`第${degree+1}级为${triadQualities[degree]}。`]));

@@ -20,7 +20,7 @@
     <aside class="sidebar" aria-label="主要导航">
       <div class="brand"><img src="./icon.svg" alt=""><div><b>上音 815</b><span>音乐基础理论</span></div></div>
       <nav id="desktopNav"></nav>
-      <div class="source-note">2027 备考<br><span>当前官方基线：2026</span><br><span>应用版本：b849b1f86981</span></div>
+      <div class="source-note">2027 备考<br><span>当前官方基线：2026</span><br><span>应用版本：e31a4185fc4b</span></div>
     </aside>
     <main id="main" tabindex="-1">
       <div id="view" aria-live="polite"></div>
@@ -32,8 +32,8 @@
     if (location.protocol === "file:") {
       document.querySelector("#view").innerHTML = '<header class="page-head"><div><p class="eyebrow">LOCAL SOURCE</p><h1>请打开正式版</h1></div></header><section class="card hero"><h2>本地源码文件不能直接运行 PWA</h2><p class="muted">请使用正式网址。教材内容和学习记录仍只保存在浏览器本机。</p><a class="button" href="https://godzillatg.github.io/klangwort/815/">打开上音815正式版</a></section>';
     } else {
-      if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js?v=b849b1f86981", {scope:"./", updateViaCache:"none"}).catch(console.error);
-      import("./assets/b849b1f86981/app.js");
+      if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js?v=e31a4185fc4b", {scope:"./", updateViaCache:"none"}).catch(console.error);
+      import("./assets/e31a4185fc4b/app.js");
     }
   </script>
 </body>
